@@ -1713,3 +1713,96 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+// ────────────────────────────────────────────────────────────
+// 登録モーダル制御
+// ────────────────────────────────────────────────────────────
+
+/** 登録済みかどうかを確認する */
+function isRegistered() {
+  return localStorage.getItem('kk_registered') === 'true';
+}
+
+/** 登録モーダルを開く */
+function openRegModal() {
+  const modal = document.getElementById('registrationModal');
+  if (modal) {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+/** 登録モーダルを閉じる */
+function closeRegModal() {
+  const modal = document.getElementById('registrationModal');
+  if (modal) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+/** 登録完了：localStorageにフラグを保存し、全ロックオーバーレイを非表示にする */
+function completeRegistration() {
+  localStorage.setItem('kk_registered', 'true');
+  unlockAllSections();
+  closeRegModal();
+  showToast('登録が完了しました！全ての機能が使えるようになりました。');
+}
+
+/** 全てのロックオーバーレイを非表示にする */
+function unlockAllSections() {
+  const lockIds = ['lockFood', 'lockCondition', 'lockFasting', 'lockGraph'];
+  lockIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+/** 登録済みの場合は起動時にロック解除 */
+function initRegistrationState() {
+  if (isRegistered()) {
+    unlockAllSections();
+  }
+}
+
+// 登録モーダルのイベントリスナー初期化
+document.addEventListener('DOMContentLoaded', () => {
+  // LINEボタン → リンクを開いた後に登録完了とみなす
+  const lineBtn = document.getElementById('regLineBtn');
+  if (lineBtn) {
+    lineBtn.addEventListener('click', () => {
+      // LINEページへ遷移後、少し待ってから登録済みフラグをセット
+      setTimeout(completeRegistration, 1000);
+    });
+  }
+
+  // メール登録ボタン → モーダル内にメールフォームを表示（仮実装：登録完了）
+  const emailBtn = document.getElementById('regEmailBtn');
+  if (emailBtn) {
+    emailBtn.addEventListener('click', () => {
+      const email = prompt('メールアドレスを入力してください：');
+      if (email && email.includes('@')) {
+        completeRegistration();
+      } else if (email !== null) {
+        alert('正しいメールアドレスを入力してください。');
+      }
+    });
+  }
+
+  // 「あとで」ボタン → モーダルを閉じるだけ
+  const laterBtn = document.getElementById('regLaterBtn');
+  if (laterBtn) {
+    laterBtn.addEventListener('click', closeRegModal);
+  }
+
+  // オーバーレイ背景クリックで閉じる
+  const modal = document.getElementById('registrationModal');
+  if (modal) {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeRegModal();
+    });
+  }
+
+  // 起動時に登録状態を反映
+  initRegistrationState();
+});
