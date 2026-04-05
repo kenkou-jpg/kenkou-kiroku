@@ -3222,3 +3222,26 @@ button:active,
 .reg-lock-btn:active {
   transform: scale(0.97);
 }
+
+/* ============================================
+   PC対応レイアウト
+   ============================================ */
+
+.app-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 0 30px rgba(0,0,0,0.08);
+}
+
+@media (min-width: 768px) {
+  body {
+    background: #f0ede8;
+  }
+  .app-shell {
+    border-left: 1px solid #e8e4de;
+    border-right: 1px solid #e8e4de;
+  }
+}
