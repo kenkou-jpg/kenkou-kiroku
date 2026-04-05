@@ -9,8 +9,8 @@
 
   /* ============================================
      ★ サイト設定 — ここを編集してください ★
-     BLOG_URL: WordPressブログのURL
-     PROFILE_NAME: プロフィールに表示する名前
+     BLOG_URL:https://kenkou-kiroku.com
+     PROFILE_NAME:SUMI
   ============================================ */
   const SITE_CONFIG = {
     BLOG_URL: 'BLOG_URL_HERE',   // 例: 'https://kenkou-kiroku.com'
