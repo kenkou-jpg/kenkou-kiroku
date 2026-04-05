@@ -369,19 +369,7 @@
       </div>
 
       <!-- ── 食事パネル ── -->
-      <div class="record-panel" id="panel-food" role="tabpanel" style="position:relative;">
-        <!-- 登録ロックオーバーレイ -->
-        <div class="reg-lock-overlay" id="lockFood">
-          <div class="reg-lock-inner">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#7DB8B4" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#7DB8B4" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#7DB8B4"/>
-            </svg>
-            <p class="reg-lock-text">食事記録を使うには<br>無料登録が必要です</p>
-            <button class="reg-lock-btn" onclick="openRegModal()">無料で登録する</button>
-          </div>
-        </div>
+      <div class="record-panel" id="panel-food" role="tabpanel">
         <h3 class="chakra-section-title">食事を記録する</h3>
         <p class="chakra-section-sub">からだが喜ぶ食材・整える食事を意識するだけで、<br>ホルモンバランスが整いやすくなります。</p>
 
@@ -460,19 +448,7 @@
       </div>
 
       <!-- ── 体調メモセクション（食事パネルの直下、常時表示） ── -->
-      <div class="condition-memo-section" id="conditionMemoSection" style="position:relative;">
-        <!-- 登録ロックオーバーレイ -->
-        <div class="reg-lock-overlay" id="lockCondition">
-          <div class="reg-lock-inner">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#7DB8B4" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#7DB8B4" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#7DB8B4"/>
-            </svg>
-            <p class="reg-lock-text">体調メモを使うには<br>無料登録が必要です</p>
-            <button class="reg-lock-btn" onclick="openRegModal()">無料で登録する</button>
-          </div>
-        </div>
+      <div class="condition-memo-section" id="conditionMemoSection">
         <h3 class="condition-memo-title">今日の体調</h3>
         <p class="condition-memo-sub">からだの状態を5段階で記録しましょう。<br>続けると、自分のパターンが見えてきます。</p>
 
@@ -549,19 +525,7 @@
       </div>
 
       <!-- ── 断食タイマー（常時表示） ── -->
-      <div class="fasting-live-section" id="fastingLiveSection" style="position:relative;">
-        <!-- 登録ロックオーバーレイ -->
-        <div class="reg-lock-overlay" id="lockFasting">
-          <div class="reg-lock-inner">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#7DB8B4" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#7DB8B4" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#7DB8B4"/>
-            </svg>
-            <p class="reg-lock-text">断食タイマーを使うには<br>無料登録が必要です</p>
-            <button class="reg-lock-btn" onclick="openRegModal()">無料で登録する</button>
-          </div>
-        </div>
+      <div class="fasting-live-section" id="fastingLiveSection">
         <h3 class="condition-memo-title">断食タイマー</h3>
         <p class="condition-memo-sub">今日の断食時間をリアルタイムで計測します。</p>
 
@@ -851,19 +815,7 @@
       </div>
 
       <!-- ウェルネス推移グラフ -->
-      <div class="insight-chart-section" style="position:relative;">
-        <!-- 登録ロックオーバーレイ（グラフ全体） -->
-        <div class="reg-lock-overlay" id="lockGraph">
-          <div class="reg-lock-inner">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#7DB8B4" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#7DB8B4" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#7DB8B4"/>
-            </svg>
-            <p class="reg-lock-text">グラフを見るには<br>無料登録が必要です</p>
-            <button class="reg-lock-btn" onclick="openRegModal()">無料で登録する</button>
-          </div>
-        </div>
+      <div class="insight-chart-section">
         <p class="insight-chart-title">ウェルネス・エネルギー推移 <span style="font-size:0.65rem;color:var(--text-muted);">(直近3日)</span></p>
         <div class="chart-lock-wrap">
           <div class="insight-chart-wrap" style="height: 200px;">
@@ -1346,42 +1298,6 @@
   </svg>
 
 </div><!-- /app-shell -->
-
-<!-- ============================================================
-     登録モーダル
-     ============================================================ -->
-<div id="registrationModal" class="reg-modal-overlay" role="dialog" aria-modal="true" aria-label="無料登録">
-  <div class="reg-modal-card">
-    <!-- ロゴ -->
-    <img src="images/logo-kenkou-kiroku.png" alt="kenkou kiroku" class="reg-modal-logo" onerror="this.style.display='none'">
-
-    <!-- タイトル -->
-    <p class="reg-modal-tag">無料で使えます</p>
-    <h2 class="reg-modal-title">記録を続けるには<br>登録が必要です</h2>
-    <p class="reg-modal-desc">食事記録・断食タイマー・体調メモ・グラフ機能を使うには、無料の会員登録が必要です。登録は1分で完了します。</p>
-
-    <!-- LINEボタン -->
-    <a href="https://page.line.me/384xpfml" target="_blank" rel="noopener" class="reg-modal-line-btn" id="regLineBtn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex-shrink:0;">
-        <path d="M12 2C6.48 2 2 6.03 2 11c0 3.07 1.68 5.78 4.27 7.45L5.5 22l4.13-2.17C10.37 19.93 11.17 20 12 20c5.52 0 10-4.03 10-9S17.52 2 12 2z"/>
-      </svg>
-      LINEで無料登録する
-    </a>
-
-    <!-- メールボタン -->
-    <button class="reg-modal-email-btn" id="regEmailBtn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="flex-shrink:0;">
-        <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <path d="m2 7 10 7 10-7"/>
-      </svg>
-      メールで登録する
-    </button>
-
-    <!-- お試しリンク -->
-    <p class="reg-modal-trial-text">チャクラ診断と今日の記録1件はお試しで利用できます。</p>
-    <button class="reg-modal-later" id="regLaterBtn">あとで</button>
-  </div>
-</div>
 
 <!-- スクリプト -->
 <script src="js/kk-app.js"></script>
