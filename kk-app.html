@@ -2791,7 +2791,6 @@
   html, body { height: 100%; overflow: hidden; }
   #app-shell {
     height: 100%;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -2801,6 +2800,7 @@
     -webkit-overflow-scrolling: touch !important;
     display: none;
     flex-direction: column;
+    height: calc(100vh - 120px);
   }
   .app-screen.active { display: flex; }
   .app-content {
@@ -2811,9 +2811,14 @@
   }
 
   /* PC対応 */
+  #app-shell { max-width:430px; margin:0 auto; position:relative; background:#FBF7F2; box-shadow:0 0 30px rgba(0,0,0,0.08); }
   .app-shell { max-width:430px; margin:0 auto; min-height:100vh; position:relative; background:#FBF7F2; box-shadow:0 0 30px rgba(0,0,0,0.08); }
+  #screen-welcome { max-width: 430px; margin: 0 auto; }
+  .welcome-slide { word-break: normal; white-space: normal; }
+  .welcome-title { word-break: keep-all; overflow-wrap: break-word; }
   @media (min-width:768px) {
     body { background:#E8E4DE; }
+    #app-shell { max-width:430px; margin:0 auto; box-shadow:0 0 40px rgba(0,0,0,0.08); }
     .app-shell { border-left:1px solid #ddd8d2; border-right:1px solid #ddd8d2; }
     #record-wizard { max-width:430px; left:50%; right:auto; transform:translateX(-50%) translateY(100%); }
     #record-wizard.wizard-open { transform:translateX(-50%) translateY(0); }
