@@ -12,6 +12,10 @@
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-title" content="kenkou kiroku">
+  <!-- Phosphor Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/light/style.css">
+  <!-- Lottie Player -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.8/dist/lottie-player.js"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -37,6 +41,9 @@
     /* 画面遷移アニメーション */
     .app-screen {
       transition: opacity 0.22s ease, transform 0.22s ease;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      height: 100%;
     }
     .app-screen.screen-enter {
       opacity: 0;
@@ -472,12 +479,7 @@
       transform: scale(0.96);
       box-shadow: 0 3px 12px rgba(230,63,168,0.3);
     }
-    .fab-pulse {
-      width: 8px; height: 8px;
-      background: white;
-      border-radius: 50%;
-      animation: fabPulse 2s ease-in-out infinite;
-    }
+    .fab-pulse { display: none; }
     @keyframes fabPulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(0.7); }
@@ -625,6 +627,73 @@
     }
     .wizard-lock-btn:active { transform:scale(0.97); }
     .wizard-lock-skip { font-size:0.8125rem; color:#B0A0B0; cursor:pointer; padding:6px; }
+
+    /* =====================================================
+       改善1: Phosphor Icons タブバー
+       ===================================================== */
+    .nav-item .ph-light { font-size:24px; color:#B0A0B0; transition:color 0.2s; display:block; line-height:1; }
+    .nav-item.active .ph-light { color:#E63FA8; }
+    .nav-record .ph-light { font-size:26px; color:white !important; }
+
+    /* =====================================================
+       改善2: タブバウンスアニメーション
+       ===================================================== */
+    @keyframes tabBounce {
+      0%   { transform:scale(1); }
+      40%  { transform:scale(1.28); }
+      70%  { transform:scale(0.93); }
+      100% { transform:scale(1); }
+    }
+    .nav-item.tab-bounce .ph-light { animation:tabBounce 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+
+    /* =====================================================
+       改善3: リップルエフェクト
+       ===================================================== */
+    .ripple-btn { position:relative; overflow:hidden; }
+    .ripple-btn::after {
+      content:''; position:absolute; width:100%; height:100%; top:0; left:0;
+      background:radial-gradient(circle, rgba(230,63,168,0.28) 10%, transparent 70%);
+      transform:scale(0); opacity:0; border-radius:50%; pointer-events:none; transition:none;
+    }
+    .ripple-btn:active::after {
+      transform:scale(2.8); opacity:1;
+      transition:transform 0.5s ease, opacity 0.4s ease;
+    }
+
+    /* =====================================================
+       改善4: 画面遷移スライド方向分離
+       ===================================================== */
+    @keyframes slideInRight { from{transform:translateX(28px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideInLeft  { from{transform:translateX(-28px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .screen-enter-forward  { animation:slideInRight 0.28s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+    .screen-enter-backward { animation:slideInLeft  0.28s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+
+    /* =====================================================
+       改善6: スケルトンローディング
+       ===================================================== */
+    .skeleton {
+      background:linear-gradient(90deg,#f0ede8 25%,#faf8f5 50%,#f0ede8 75%);
+      background-size:200% 100%;
+      animation:shimmer 1.5s infinite;
+      border-radius:12px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* =====================================================
+       改善7: Lottie完了画面
+       ===================================================== */
+    .lottie-complete-wrap { display:flex; justify-content:center; margin-bottom:12px; }
+
+    /* =====================================================
+       改善8: Empty State
+       ===================================================== */
+    .empty-state { text-align:center; padding:48px 24px 32px; }
+    .empty-state .ph-light { font-size:60px; color:#D8D0D8; display:block; margin-bottom:14px; }
+    .empty-state-text { color:#A090A0; font-size:0.875rem; line-height:1.7; }
+    .empty-state-sub { font-size:0.8125rem; color:#C0B0C0; }
+
+    /* ウィザードステップアイコン */
+    .wizard-step-ph { font-size:32px; color:#E63FA8; display:block; text-align:center; margin:4px 0 6px; line-height:1; }
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
   <link rel="apple-touch-icon" href="images/icon-192.png">
@@ -1393,6 +1462,21 @@
 
     <div class="app-content">
 
+      <!-- Empty State（データ0件時） -->
+      <div class="empty-state" id="emptyInsight" style="display:none;">
+        <i class="ph-light ph-notebook"></i>
+        <p class="empty-state-text">まだデータがありません<br>
+          <span class="empty-state-sub">記録を始めると、ここにグラフが表示されます</span>
+        </p>
+      </div>
+
+      <!-- スケルトンローディング -->
+      <div id="skeletonInsight">
+        <div class="skeleton" style="height:180px;margin:12px 20px;"></div>
+        <div class="skeleton" style="height:120px;margin:12px 20px;"></div>
+        <div class="skeleton" style="height:80px;margin:12px 20px;"></div>
+      </div>
+
       <!-- ヒーロー -->
       <div class="insight-hero">
         <p class="insight-hero-tag">your body's story</p>
@@ -1602,7 +1686,12 @@
       <!-- プロフィール -->
       <div class="settings-profile-section">
         <div class="settings-avatar" id="settingsAvatar" aria-label="プロフィール画像">
-          <img src="images/profile-photo.png" alt="sumi" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="22" cy="22" r="22" fill="linear-gradient(135deg,#F2EAF0,#EAF7F7)"/>
+            <circle cx="22" cy="22" r="21" fill="#F2EAF0"/>
+            <circle cx="22" cy="17" r="8" fill="#E63FA8" opacity="0.7"/>
+            <path d="M6 40c0-8.837 7.163-16 16-16s16 7.163 16 16" fill="#27B7B3" opacity="0.5"/>
+          </svg>
         </div>
         <p class="settings-name" id="settingsName"><!-- JS inject --></p>
         <p class="settings-since" id="settingsSince"><!-- JS inject --></p>
@@ -1764,21 +1853,21 @@
        ══════════════════════════════════ -->
   <nav class="app-nav" id="appNav" aria-label="メインナビゲーション" style="display:none;">
     <button class="nav-item active" data-screen="home" aria-label="ホーム">
-      <span class="nav-icon nav-icon-text">home</span>
+      <i class="ph-light ph-house"></i>
       <span class="nav-label">ホーム</span>
     </button>
     <button class="nav-item" data-screen="insight" aria-label="インサイト">
-      <span class="nav-icon nav-icon-text">insight</span>
+      <i class="ph-light ph-chart-line-up"></i>
       <span class="nav-label">インサイト</span>
     </button>
     <button class="nav-item nav-record" data-screen="record" aria-label="記録する">
       <div class="nav-record-ring">
-        <span class="nav-record-cross" aria-hidden="true"></span>
+        <i class="ph-light ph-note-pencil"></i>
       </div>
       <span class="nav-label">記録</span>
     </button>
     <button class="nav-item" data-screen="settings" aria-label="設定">
-      <span class="nav-icon nav-icon-text">menu</span>
+      <i class="ph-light ph-gear-six"></i>
       <span class="nav-label">設定</span>
     </button>
   </nav>
@@ -1998,6 +2087,7 @@
 
     <!-- Step 1: 体調スコア -->
     <div class="wizard-step step-active" data-step="1">
+      <i class="ph-light ph-heart wizard-step-ph"></i>
       <p class="wizard-question">今日のからだの調子は<br>どうですか？</p>
       <p class="wizard-sub">今の感覚に一番近いものをタップ</p>
       <div class="wizard-scale-row" id="wBodyScaleRow">
@@ -2014,6 +2104,7 @@
 
     <!-- Step 2: チャクラ選択（ビジュアル強化） -->
     <div class="wizard-step" data-step="2">
+      <i class="ph-light ph-flower-lotus wizard-step-ph"></i>
       <p class="wizard-question">骨盤まわりの<br>感覚はどうですか？</p>
       <p class="wizard-sub">今日意識しているチャクラを選んでください</p>
 
@@ -2067,7 +2158,7 @@
 
       <!-- チャクラリスト -->
       <div class="chakra-visual-list" id="wChakraGrid">
-        <div class="chakra-visual-item" data-chakra="sacral">
+        <div class="chakra-visual-item ripple-btn" data-chakra="sacral">
           <div class="chakra-visual-dot" style="background:linear-gradient(135deg,#FF9A4A,#E67A2A)"></div>
           <div class="chakra-visual-info">
             <span class="chakra-visual-name">第2チャクラ ★</span>
@@ -2075,7 +2166,7 @@
           </div>
           <div class="chakra-visual-check" style="background:linear-gradient(135deg,#FF9A4A,#E67A2A)">✓</div>
         </div>
-        <div class="chakra-visual-item" data-chakra="root">
+        <div class="chakra-visual-item ripple-btn" data-chakra="root">
           <div class="chakra-visual-dot" style="background:linear-gradient(135deg,#E63FA8,#C02E8E)"></div>
           <div class="chakra-visual-info">
             <span class="chakra-visual-name">第1チャクラ</span>
@@ -2083,7 +2174,7 @@
           </div>
           <div class="chakra-visual-check" style="background:linear-gradient(135deg,#E63FA8,#C02E8E)">✓</div>
         </div>
-        <div class="chakra-visual-item" data-chakra="solar">
+        <div class="chakra-visual-item ripple-btn" data-chakra="solar">
           <div class="chakra-visual-dot" style="background:linear-gradient(135deg,#F5D020,#C9A44A)"></div>
           <div class="chakra-visual-info">
             <span class="chakra-visual-name">第3チャクラ</span>
@@ -2091,7 +2182,7 @@
           </div>
           <div class="chakra-visual-check" style="background:linear-gradient(135deg,#F5D020,#C9A44A)">✓</div>
         </div>
-        <div class="chakra-visual-item" data-chakra="heart">
+        <div class="chakra-visual-item ripple-btn" data-chakra="heart">
           <div class="chakra-visual-dot" style="background:linear-gradient(135deg,#4CAF50,#2E7D32)"></div>
           <div class="chakra-visual-info">
             <span class="chakra-visual-name">第4チャクラ</span>
@@ -2099,7 +2190,7 @@
           </div>
           <div class="chakra-visual-check" style="background:linear-gradient(135deg,#4CAF50,#2E7D32)">✓</div>
         </div>
-        <div class="chakra-visual-item" data-chakra="throat">
+        <div class="chakra-visual-item ripple-btn" data-chakra="throat">
           <div class="chakra-visual-dot" style="background:linear-gradient(135deg,#27B7B3,#1A8F8C)"></div>
           <div class="chakra-visual-info">
             <span class="chakra-visual-name">第5チャクラ</span>
@@ -2107,7 +2198,7 @@
           </div>
           <div class="chakra-visual-check" style="background:linear-gradient(135deg,#27B7B3,#1A8F8C)">✓</div>
         </div>
-        <div class="chakra-visual-item" data-chakra="third_eye">
+        <div class="chakra-visual-item ripple-btn" data-chakra="third_eye">
           <div class="chakra-visual-dot" style="background:linear-gradient(135deg,#7C4DFF,#5C35CC)"></div>
           <div class="chakra-visual-info">
             <span class="chakra-visual-name">第6チャクラ</span>
@@ -2121,59 +2212,63 @@
 
     <!-- Step 3: 食事（無料登録ユーザーに開放） -->
     <div class="wizard-step" data-step="3">
+      <i class="ph-light ph-bowl-food wizard-step-ph"></i>
       <p class="wizard-question">今日の食事の質は<br>どうでしたか？</p>
       <p class="wizard-sub">からだが喜ぶ食事ができましたか？</p>
       <div class="wizard-scale-row" id="wFoodScaleRow">
-        <button class="wizard-scale-btn" data-val="1">1</button>
-        <button class="wizard-scale-btn" data-val="2">2</button>
-        <button class="wizard-scale-btn" data-val="3">3</button>
-        <button class="wizard-scale-btn" data-val="4">4</button>
-        <button class="wizard-scale-btn" data-val="5">5</button>
+        <button class="wizard-scale-btn ripple-btn" data-val="1">1</button>
+        <button class="wizard-scale-btn ripple-btn" data-val="2">2</button>
+        <button class="wizard-scale-btn ripple-btn" data-val="3">3</button>
+        <button class="wizard-scale-btn ripple-btn" data-val="4">4</button>
+        <button class="wizard-scale-btn ripple-btn" data-val="5">5</button>
       </div>
       <div class="wizard-scale-labels"><span>整えられなかった</span><span>完璧に整えた</span></div>
       <p style="font-family:'Noto Serif JP',serif;font-size:0.875rem;color:#6C4A67;margin-bottom:10px;align-self:flex-start;">意識した食材（複数OK）</p>
       <div class="wizard-chip-group" id="wFoodChips">
-        <div class="wizard-chip" data-val="root_veg">根菜類</div>
-        <div class="wizard-chip" data-val="fermented">発酵食品</div>
-        <div class="wizard-chip" data-val="warm">温かいもの</div>
-        <div class="wizard-chip" data-val="no_sugar">砂糖控え</div>
-        <div class="wizard-chip" data-val="omega3">EPA/DHA</div>
-        <div class="wizard-chip" data-val="iron">鉄分</div>
-        <div class="wizard-chip" data-val="vitD">ビタミンD</div>
-        <div class="wizard-chip" data-val="water">水2L以上</div>
+        <div class="wizard-chip ripple-btn" data-val="root_veg">根菜類</div>
+        <div class="wizard-chip ripple-btn" data-val="fermented">発酵食品</div>
+        <div class="wizard-chip ripple-btn" data-val="warm">温かいもの</div>
+        <div class="wizard-chip ripple-btn" data-val="no_sugar">砂糖控え</div>
+        <div class="wizard-chip ripple-btn" data-val="omega3">EPA/DHA</div>
+        <div class="wizard-chip ripple-btn" data-val="iron">鉄分</div>
+        <div class="wizard-chip ripple-btn" data-val="vitD">ビタミンD</div>
+        <div class="wizard-chip ripple-btn" data-val="water">水2L以上</div>
       </div>
     </div>
 
     <!-- Step 4: 断食（無料登録ユーザーに開放） -->
     <div class="wizard-step" data-step="4">
+      <i class="ph-light ph-timer wizard-step-ph"></i>
       <p class="wizard-question">今日の断食時間は<br>どのくらいでしたか？</p>
       <p class="wizard-sub">食事と食事の間があいた時間を選んでください</p>
       <div class="wizard-chip-group" id="wFastingChips">
-        <div class="wizard-chip" data-val="0">記録しない</div>
-        <div class="wizard-chip" data-val="12">12時間</div>
-        <div class="wizard-chip" data-val="14">14時間</div>
-        <div class="wizard-chip" data-val="16">16時間</div>
-        <div class="wizard-chip" data-val="18">18時間以上</div>
+        <div class="wizard-chip ripple-btn" data-val="0">記録しない</div>
+        <div class="wizard-chip ripple-btn" data-val="12">12時間</div>
+        <div class="wizard-chip ripple-btn" data-val="14">14時間</div>
+        <div class="wizard-chip ripple-btn" data-val="16">16時間</div>
+        <div class="wizard-chip ripple-btn" data-val="18">18時間以上</div>
       </div>
       <p class="wizard-skip" id="wFastingSkip">スキップ →</p>
     </div>
 
     <!-- Step 5: 感情（無料登録ユーザーに開放） -->
     <div class="wizard-step" data-step="5">
+      <i class="ph-light ph-smiley wizard-step-ph"></i>
       <p class="wizard-question">今の気持ちに<br>近いのは？</p>
       <p class="wizard-sub">正直な感覚をタップしてください</p>
       <div class="wizard-emotion-grid" id="wEmotionGrid">
-        <div class="wizard-emotion-card" data-emotion="peaceful"><span class="emotion-icon">🌸</span><span class="emotion-name">穏やか<br>平和</span></div>
-        <div class="wizard-emotion-card" data-emotion="happy"><span class="emotion-icon">✨</span><span class="emotion-name">うれしい<br>満たされ</span></div>
-        <div class="wizard-emotion-card" data-emotion="tired"><span class="emotion-icon">🌙</span><span class="emotion-name">疲れ<br>重さ</span></div>
-        <div class="wizard-emotion-card" data-emotion="anxious"><span class="emotion-icon">🌊</span><span class="emotion-name">不安<br>緊張</span></div>
-        <div class="wizard-emotion-card" data-emotion="irritated"><span class="emotion-icon">🔥</span><span class="emotion-name">イライラ<br>焦り</span></div>
-        <div class="wizard-emotion-card" data-emotion="neutral"><span class="emotion-icon">☁️</span><span class="emotion-name">ふつう<br>普通</span></div>
+        <div class="wizard-emotion-card ripple-btn" data-emotion="peaceful"><span class="emotion-icon">🌸</span><span class="emotion-name">穏やか<br>平和</span></div>
+        <div class="wizard-emotion-card ripple-btn" data-emotion="happy"><span class="emotion-icon">✨</span><span class="emotion-name">うれしい<br>満たされ</span></div>
+        <div class="wizard-emotion-card ripple-btn" data-emotion="tired"><span class="emotion-icon">🌙</span><span class="emotion-name">疲れ<br>重さ</span></div>
+        <div class="wizard-emotion-card ripple-btn" data-emotion="anxious"><span class="emotion-icon">🌊</span><span class="emotion-name">不安<br>緊張</span></div>
+        <div class="wizard-emotion-card ripple-btn" data-emotion="irritated"><span class="emotion-icon">🔥</span><span class="emotion-name">イライラ<br>焦り</span></div>
+        <div class="wizard-emotion-card ripple-btn" data-emotion="neutral"><span class="emotion-icon">☁️</span><span class="emotion-name">ふつう<br>普通</span></div>
       </div>
     </div>
 
     <!-- Step 6: 一言メモ -->
     <div class="wizard-step" data-step="6">
+      <i class="ph-light ph-pencil-simple wizard-step-ph"></i>
       <p class="wizard-question">からだへの<br>一言メモ（任意）</p>
       <p class="wizard-sub">今日感じたことを自由に</p>
       <textarea class="wizard-textarea" id="wMemoText" rows="4"
@@ -2195,10 +2290,15 @@
      記録完了アニメーション
      ===================================================== -->
 <div id="wizard-complete">
-  <div class="complete-checkmark">
-    <svg viewBox="0 0 40 40" fill="none">
-      <path d="M8 20 L16 28 L32 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+  <div class="lottie-complete-wrap">
+    <lottie-player
+      id="completeLottie"
+      src="https://lottie.host/4db68bbd-0e80-4f4b-8b8e-9f7c0db78f4e/HcJgJz6cGe.json"
+      background="transparent"
+      speed="1"
+      style="width:180px;height:180px;"
+      autoplay>
+    </lottie-player>
   </div>
   <p class="complete-title" id="completeTitle">記録できました 🌸</p>
   <p class="complete-sub" id="completeSub">今日もからだの声を<br>聴いてくれてありがとう。</p>
@@ -2208,8 +2308,7 @@
      FABボタン（ホーム画面）
      ===================================================== -->
 <div class="home-record-fab" id="homeRecordFab">
-  <button class="home-record-fab-btn" id="fabRecordBtn">
-    <div class="fab-pulse" id="fabPulse"></div>
+  <button class="home-record-fab-btn ripple-btn" id="fabRecordBtn">
     今日を記録する
   </button>
 </div>
@@ -2301,7 +2400,117 @@
     if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
   };
 
-  /* ── Toast ── */
+
+  /* ─────────────────────────────────────
+     改善5: 数値カウントアップ
+  ───────────────────────────────────── */
+  function animateCount(element, target, duration) {
+    if (!element || isNaN(target) || target <= 0) return;
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { start = target; clearInterval(timer); }
+      element.textContent = Math.floor(start);
+    }, 16);
+  }
+
+  /* ─────────────────────────────────────
+     改善6: スケルトン制御
+  ───────────────────────────────────── */
+  function showInsightSkeleton() {
+    const sk = document.getElementById('skeletonInsight');
+    if (sk) sk.style.display = 'block';
+  }
+  function hideInsightSkeleton() {
+    const sk = document.getElementById('skeletonInsight');
+    if (sk) sk.style.display = 'none';
+  }
+
+  /* ─────────────────────────────────────
+     改善8: EmptyState制御
+  ───────────────────────────────────── */
+  function checkInsightEmpty() {
+    try {
+      const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
+      const hasData = Object.keys(records).length > 0;
+      const empty = document.getElementById('emptyInsight');
+      const hero = document.querySelector('#screen-insight .insight-hero');
+      if (empty) empty.style.display = hasData ? 'none' : 'block';
+      if (hero) hero.style.display = hasData ? '' : 'none';
+    } catch(e) {}
+  }
+
+  /* ─────────────────────────────────────
+     改善4: 方向付き画面遷移
+  ───────────────────────────────────── */
+  const TAB_ORDER = ['home', 'insight', 'record', 'settings'];
+  function showScreen(screenId, direction) {
+    const cur = document.querySelector('.app-screen.active');
+    const next = document.getElementById('screen-' + screenId);
+    if (!next || cur === next) return;
+    if (cur) cur.classList.remove('active','screen-enter-forward','screen-enter-backward');
+    const cls = direction === 'back' ? 'screen-enter-backward' : 'screen-enter-forward';
+    next.classList.add('active', cls);
+    next.addEventListener('animationend', () => {
+      next.classList.remove('screen-enter-forward','screen-enter-backward');
+    }, { once: true });
+    updateFabVisibility();
+    if (screenId === 'insight') {
+      showInsightSkeleton();
+      setTimeout(() => { hideInsightSkeleton(); checkInsightEmpty(); }, 600);
+    }
+    if (screenId === 'home') {
+      setTimeout(() => {
+        const streak = getStreak();
+        const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
+        animateCount(document.getElementById('statStreak'), streak, 700);
+        animateCount(document.getElementById('statTotal'), Object.keys(records).length, 700);
+      }, 200);
+    }
+    if (screenId === 'settings') {
+      updateSettingsProfile();
+    }
+  }
+
+  /* ─────────────────────────────────────
+     修正3: 設定画面プロフィール動的表示
+  ───────────────────────────────────── */
+  function updateSettingsProfile() {
+    // ユーザー名（kkUserName または kk_username、なければ「あなた」）
+    const userName = localStorage.getItem('kkUserName')
+                  || localStorage.getItem('kk_username')
+                  || 'あなた';
+
+    const nameEl = document.getElementById('settingsName');
+    const sinceEl = document.getElementById('settingsSince');
+    const nameValEl = document.getElementById('settingNameValue');
+
+    if (nameEl) nameEl.textContent = userName;
+    if (nameValEl) nameValEl.textContent = userName;
+
+    // 開始日・記録日数
+    if (sinceEl) {
+      try {
+        const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
+        const keys = Object.keys(records).sort();
+        const count = keys.length;
+        if (count > 0) {
+          const firstDate = new Date(keys[0]);
+          const y = firstDate.getFullYear();
+          const m = firstDate.getMonth() + 1;
+          const d = firstDate.getDate();
+          sinceEl.textContent = `開始日: ${y}年${m}月${d}日 — ${count}日分の記録`;
+        } else {
+          sinceEl.textContent = 'まだ記録がありません';
+        }
+      } catch(e) {
+        sinceEl.textContent = '';
+      }
+    }
+  }
+
+
   function showToast(msg) {
     let t = document.getElementById('kk-toast');
     if (!t) { t = document.createElement('div'); t.id = 'kk-toast'; document.body.appendChild(t); }
@@ -2449,9 +2658,11 @@
     const streak = getStreak();
     document.getElementById('completeTitle').textContent = (name ? name+'さん、' : '')+'記録できました 🌸';
     document.getElementById('completeSub').textContent = streak > 1 ? streak+'日連続記録中✨\n今日もからだの声を聴いてくれてありがとう。' : '今日もからだの声を\n聴いてくれてありがとう。';
+    // Lottie再生
+    const lottie = document.getElementById('completeLottie');
+    if (lottie) { try { lottie.stop(); lottie.play(); } catch(e) {} }
     complete.classList.add('complete-show');
-    spawnPetals();
-    setTimeout(() => complete.classList.remove('complete-show'), 2800);
+    setTimeout(() => complete.classList.remove('complete-show'), 3000);
   }
 
   function spawnPetals() {
@@ -2467,8 +2678,8 @@
     const today = new Date().toISOString().split('T')[0];
     const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
     const fabBtn = document.getElementById('fabRecordBtn'); if (!fabBtn) return;
-    if (records[today]) { fabBtn.classList.add('recorded'); fabBtn.innerHTML = '<span>✓</span> 今日の記録済み'; }
-    else { fabBtn.classList.remove('recorded'); fabBtn.innerHTML = '<div class="fab-pulse"></div>今日を記録する'; }
+    if (records[today]) { fabBtn.classList.add('recorded'); fabBtn.innerHTML = '✓ 今日の記録済み'; }
+    else { fabBtn.classList.remove('recorded'); fabBtn.textContent = '今日を記録する'; }
   }
 
   function getStreak() {
@@ -2489,10 +2700,7 @@
       const el = document.getElementById(id); if (el) { el.onclick = null; el.addEventListener('click', openWizard); }
     });
     document.querySelectorAll('[data-screen="record"]').forEach(el => { el.onclick = null; el.addEventListener('click', openWizard); });
-    // インサイトガード
-    document.querySelectorAll('[data-screen="insight"]').forEach(btn => {
-      btn.addEventListener('click', function(e) { if (!isRegistered()) { e.stopImmediatePropagation(); openRegModal(); } }, true);
-    });
+    // インサイトガード: showScreen()内で対応
     // Premiumトリガー
     document.querySelectorAll('.premium-trigger').forEach(btn => { btn.addEventListener('click', openPremiumModal); });
   }
@@ -2504,20 +2712,35 @@
     fab.style.display = (active && active.id === 'screen-home') ? 'block' : 'none';
   }
 
-  /* 画面遷移 */
+  /* 画面遷移（改善4: 方向付き + 改善2: バウンス） */
   document.querySelectorAll('[data-screen]').forEach(btn => {
     btn.addEventListener('click', function() {
-      const target = this.dataset.screen; if (!target || target === 'record') return;
-      const cur = document.querySelector('.app-screen.active'), next = document.getElementById('screen-'+target);
-      if (!next || cur === next) return;
-      if (cur) cur.classList.add('screen-exit');
-      setTimeout(() => {
-        if (cur) cur.classList.remove('active','screen-exit');
-        next.classList.add('active','screen-enter');
-        requestAnimationFrame(() => next.classList.add('screen-enter-active'));
-        setTimeout(() => next.classList.remove('screen-enter','screen-enter-active'), 300);
-        updateFabVisibility();
-      }, 180);
+      const target = this.dataset.screen;
+      if (!target || target === 'record') return;
+      const curActive = document.querySelector('.app-screen.active');
+      const curId = curActive ? curActive.id.replace('screen-', '') : 'home';
+      const curIdx = TAB_ORDER.indexOf(curId);
+      const nextIdx = TAB_ORDER.indexOf(target);
+      const direction = nextIdx >= curIdx ? 'forward' : 'back';
+
+      // インサイトガード（未登録）
+      if (target === 'insight' && !isRegistered()) { openRegModal(); return; }
+
+      // タブバウンスアニメーション再トリガー
+      const icon = this.querySelector('.ph-light');
+      if (icon) {
+        icon.style.animation = 'none';
+        icon.offsetHeight; // reflow
+        icon.style.animation = '';
+        this.classList.add('tab-bounce');
+        setTimeout(() => this.classList.remove('tab-bounce'), 400);
+      }
+
+      // アクティブ状態更新
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      this.classList.add('active');
+
+      showScreen(target, direction);
     });
   });
 
@@ -2542,7 +2765,17 @@
     injectInsightLock();
     updateFabState();
     updateFabVisibility();
+    updateSettingsProfile();   // 修正3: プロフィール表示
+    hideInsightSkeleton(); // 初期はスケルトン非表示
+    checkInsightEmpty();   // EmptyState初期チェック
     if (isPremium()) document.querySelectorAll('.chart-blur-overlay,.report-lock-overlay').forEach(el => el.style.display = 'none');
+    // ホーム初期表示時にカウントアップ
+    setTimeout(() => {
+      const streak = getStreak();
+      const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
+      animateCount(document.getElementById('statStreak'), streak, 800);
+      animateCount(document.getElementById('statTotal'), Object.keys(records).length, 800);
+    }, 500);
     setTimeout(bindAll, 600);
   }
 
@@ -2552,6 +2785,31 @@
 })();
 </script>
 <style>
+  /* =============================================
+     修正1: スクロール修正（app-main.cssを補完）
+     ============================================= */
+  html, body { height: 100%; overflow: hidden; }
+  #app-shell {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .app-screen {
+    flex: 1;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: none;
+    flex-direction: column;
+  }
+  .app-screen.active { display: flex; }
+  .app-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 80px; /* タブバー分の余白 */
+  }
+
   /* PC対応 */
   .app-shell { max-width:430px; margin:0 auto; min-height:100vh; position:relative; background:#FBF7F2; box-shadow:0 0 30px rgba(0,0,0,0.08); }
   @media (min-width:768px) {
