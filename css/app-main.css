@@ -3257,3 +3257,9 @@ button:active,
     border-right: 1px solid #e8e4de;
   }
 }
+.welcome-slides, 
+.welcome-slide, 
+.welcome-desc {
+  width: 100% !important;
+  max-width: 1000px !important; /* PCでの理想的な幅 */
+}
