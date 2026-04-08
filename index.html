@@ -161,20 +161,24 @@
     <!-- Section 4: Profile -->
     <section class="section profile-section" id="profile" aria-labelledby="profile-title">
       <div class="container">
-        <div class="profile-grid">
-          <div class="profile-image">
-            <img src="images/logo-kenkou-kiroku.png" alt="sumi" style="width:100%;height:auto;max-width:200px;">
-          </div>
-          
-          <div class="profile-content">
-            <h2 class="section-title" id="profile-title">sumi</h2>
-            
-            <p class="profile-bio">
-              卵巣嚢腫の診断をきっかけに、からだと向き合い始めました。<br>
-              食事療法・プチ断食・チャクラの視点でセルフケアを続けた経験を、<br>
-              同じ悩みを持つ女性たちと分かち合うためにこのサイトを運営しています。
-            </p>
-          </div>
+       <!-- 1. ここに display:flex などを追加 -->
+<div class="profile-grid" style="display: flex; align-items: center; gap: 40px; justify-content: center; max-width: 900px; margin: 0 auto;">
+  
+  <div class="profile-image">
+    <img src="images/logo-kenkou-kiroku.png" alt="sumi" style="width:100%;height:auto;max-width:200px;">
+  </div>
+  
+  <!-- 2. ここに text-align: left などを追加 -->
+  <div class="profile-content" style="text-align: left; flex: 1;">
+    <h2 class="section-title" id="profile-title" style="margin-top: 0;">sumi</h2>
+    
+    <p class="profile-bio">
+      卵巣嚢腫の診断をきっかけに、からだと向き合い始めました。<br>
+      食事療法・プチ断食・チャクラの視点でセルフケアを続けた経験を、<br>
+      同じ悩みを持つ女性たちと分かち合うためにこのサイトを運営しています。
+    </p>
+  </div>
+</div>
         </div>
       </div>
     </section>
