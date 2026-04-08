@@ -863,10 +863,11 @@ width:100% !important;
 }
 .welcome-desc{
  font-size:0.9375rem;
-   color:var(--text-secondary);
-    line-height:1.9;
-   width:100%!important;
-   max-width:100%!important;
+ color:var(--text-secondary);
+ line-height:1.9;
+ width:100vw !important;
+ max-width:100% !important;
+ display: block !important;
 }
 .welcome-dots {
   display: flex;
