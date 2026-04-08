@@ -1,0 +1,351 @@
+# kk-app.html / js/kk-app.js 修正ガイド
+
+## 概要
+
+このドキュメントは、「健康記録アプリ」のトップページが表示されない不具合を修正するための手順書です。不具合の根本原因は、**新旧ロジックの混在**と**LocalStorageキーの不一致**です。本修正では、既存ユーザーのデータを壊さないよう配慮しながら、起動ロジックを外部JS（`js/kk-app.js`）に一本化します。
+
+---
+
+## 不具合の原因
+
+### 1. 二重の初期化処理
+- `js/kk-app.js` 内に `init()` 関数がある
+- `kk-app.html` のインラインスクリプトにも別の `init()` 関数がある
+- 両者が同時に実行され、最後に実行された方が画面表示を上書きする
+
+### 2. LocalStorageキーの不一致
+| 項目 | 外部JS（js/kk-app.js） | HTML内インラインJS |
+| :--- | :--- | :--- |
+| ユーザー名 | `kk_userName` | `kkUserName` |
+| オンボーディング完了 | `kk_onboarded` | `kk_welcome_done` |
+| 開始日 | `kk_startedAt` | （記録なし） |
+
+このキー名の不一致により、一方が保存した状態をもう一方が理解できず、起動時の判定が競合します。
+
+### 3. イベントリスナーの二重登録
+- `js/kk-app.js` で `#welcomeNextBtn` や `#welcomeSkipBtn` にイベントを登録
+- `kk-app.html` のインラインスクリプトでも同じボタンに別のイベントを登録
+- 1回のクリックで複数の処理が走り、意図しない挙動が発生
+
+---
+
+## 修正戦略
+
+### 戦略の3本柱
+
+1. **起動責任の一本化**
+   - `js/kk-app.js` が唯一の起動責任者となる
+   - `kk-app.html` 内のインライン初期化スクリプトは削除
+
+2. **データ移行（マイグレーション）**
+   - 既存ユーザーの旧形式キー（`kkUserName`, `kk_welcome_done`）を検知
+   - 新形式キー（`kk_userName`, `kk_onboarded`）に自動変換
+   - 既存データを失わない
+
+3. **二重起動の防止**
+   - `window.__kkAppBooted` フラグで二重起動を防止
+   - `DOMContentLoaded` で一度だけ確実に初期化が走る
+
+---
+
+## 修正内容の詳細
+
+### js/kk-app.js の主要な追加・変更
+
+#### 1. データ移行関数 `migrateLegacyStorage()`
+
+```javascript
+function migrateLegacyStorage() {
+  const legacyName =
+    localStorage.getItem('kkUserName') ||
+    localStorage.getItem('kk_username');
+
+  const legacyWelcomeDone =
+    localStorage.getItem('kk_welcome_done') === 'true';
+
+  if (!ls_get('userName') && legacyName) {
+    ls_set('userName', legacyName);
+  }
+
+  if (!ls_get('onboarded', false) && legacyWelcomeDone) {
+    ls_set('onboarded', true);
+  }
+
+  if (!ls_get('startedAt') && legacyWelcomeDone) {
+    ls_set('startedAt', today());
+  }
+}
+```
+
+**動作**：
+- 旧キー `kkUserName` または `kk_username` が存在すれば、新キー `kk_userName` に移行
+- 旧キー `kk_welcome_done` が `'true'` なら、新キー `kk_onboarded` に移行
+- 既に新キーが存在する場合は何もしない（二重移行を防止）
+
+#### 2. 改良された `init()` 関数
+
+```javascript
+async function init() {
+  if (window.__kkAppBooted) return;
+  window.__kkAppBooted = true;
+
+  migrateLegacyStorage(); // 既存データ移行
+
+  state.userName = ls_get('userName', '');
+  state.startedAt = ls_get('startedAt', null);
+  const onboarded = ls_get('onboarded', false);
+
+  initEventListeners();
+  // await fetchAllRecords(); // 必要に応じて追加
+
+  if (onboarded && state.userName) {
+    showScreen('home'); // オンボーディング済みならHome
+  } else {
+    showScreen('welcome'); // 未完了ならWelcome
+    initWelcome();
+  }
+}
+```
+
+**改善点**：
+- `window.__kkAppBooted` フラグで二重実行を防止
+- `migrateLegacyStorage()` を最初に呼び出し、既存データを新形式に変換
+- その後、新形式キーのみで判定
+
+#### 3. LocalStorage管理関数の統一
+
+```javascript
+const STORAGE_PREFIX = 'kk_';
+
+function ls_get(key, defaultValue = null) {
+  const item = localStorage.getItem(STORAGE_PREFIX + key);
+  if (item === null) return defaultValue;
+  try {
+    return JSON.parse(item);
+  } catch (e) {
+    return item;
+  }
+}
+
+function ls_set(key, value) {
+  localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+}
+```
+
+**利点**：
+- すべてのLocalStorage操作を `ls_get()` / `ls_set()` 経由に統一
+- キープレフィックス `kk_` を自動付与
+- JSON化による型安全性向上
+
+---
+
+### kk-app.html の主要な変更
+
+#### 削除対象（3ブロック）
+
+以下の3つのインラインスクリプトブロックを **完全に削除** してください：
+
+**1. 画面遷移の重複ブロック**
+```javascript
+// 削除対象：data-screenを持つボタン全部に対する画面遷移処理
+// 外部JSのinitEventListeners()で一元管理されるため不要
+```
+
+**2. Welcomeスライド制御の重複ブロック**
+```javascript
+// 削除対象：外部JSのinitWelcome() / goToSlide() / completeOnboarding()と重複
+// 保存キーがkkUserNameとkk_welcome_doneになっていて、外部JS側と不一致
+```
+
+**3. インラインのinit()と初回表示判定**
+```javascript
+// 削除対象：外部JSのinit()と競合
+// kk_welcome_done判定が外部JSのkk_onboarded判定とぶつかる
+```
+
+#### 残すべき部分
+
+以下は **削除しないでください**：
+
+- **Service Worker登録スクリプト**
+  ```javascript
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => {
+      console.log('Service Worker registration failed:', err);
+    });
+  }
+  ```
+
+- **外部JS読み込み**
+  ```html
+  <script src="js/kk-app.js"></script>
+  ```
+
+- **HTML構造**（Welcome画面、Home画面のマークアップ）
+
+#### 残すべき機能（別途対応）
+
+以下の機能が `kk-app.html` のインラインスクリプトに残っている場合は、段階的に `js/kk-app.js` に移行してください：
+
+- `openWizard()` まわりの記録ウィザード処理
+- `injectInsightLock()` のようなロックUI処理
+- PWAバナー処理
+- PCレイアウト調整
+- 完了アニメーション
+
+---
+
+## 適用手順
+
+### ステップ1: バックアップ作成
+
+```bash
+cp kk-app.html kk-app.html.backup
+cp js/kk-app.js js/kk-app.js.backup
+```
+
+### ステップ2: 修正ファイルの配置
+
+1. 提供された `js/kk-app.js` を既存ファイルに上書き
+2. 提供された `kk-app.html` を既存ファイルに上書き
+
+### ステップ3: ローカルテスト
+
+#### 3-1. ブラウザの開発者ツールでLocalStorageをクリア
+
+```javascript
+// ブラウザコンソールで実行
+localStorage.clear();
+```
+
+#### 3-2. ページをリロード
+
+- Welcome画面が表示されることを確認
+
+#### 3-3. オンボーディング完了フローをテスト
+
+- ユーザー名を入力して「完了」をクリック
+- Home画面に遷移することを確認
+
+#### 3-4. ブラウザを再起動してテスト
+
+- ページをリロード
+- Home画面が表示されることを確認（Welcome画面が表示されないこと）
+
+### ステップ4: 既存ユーザーのデータ移行テスト
+
+#### 4-1. 旧形式のLocalStorageを手動で設定
+
+```javascript
+// ブラウザコンソールで実行
+localStorage.setItem('kkUserName', 'テストユーザー');
+localStorage.setItem('kk_welcome_done', 'true');
+```
+
+#### 4-2. ページをリロード
+
+- Home画面が表示されることを確認
+- ブラウザコンソールで以下を実行して、新形式キーが作成されたことを確認
+
+```javascript
+localStorage.getItem('kk_userName');  // "テストユーザー" が返される
+localStorage.getItem('kk_onboarded');  // "true" が返される
+```
+
+### ステップ5: 本番環境への反映
+
+1. ステップ1-4で問題がないことを確認
+2. 本番環境に修正ファイルをデプロイ
+3. 本番環境でも同様のテストを実施
+
+---
+
+## トラブルシューティング
+
+### Q1: 修正後もWelcome画面が表示されない
+
+**原因**：LocalStorageに古いデータが残っている可能性
+
+**対処**：
+```javascript
+// ブラウザコンソールで実行
+localStorage.clear();
+location.reload();
+```
+
+### Q2: Welcome画面のボタンをクリックしても反応しない
+
+**原因**：イベントリスナーが正しく登録されていない
+
+**対処**：
+1. ブラウザの開発者ツール（F12）を開く
+2. Console タブで以下を実行して、エラーがないか確認
+   ```javascript
+   console.log(window.__kkAppBooted);  // true が返されるはず
+   ```
+3. Elements タブで `#welcomeNextBtn` が存在するか確認
+
+### Q3: 既存ユーザーのデータが失われた
+
+**原因**：移行処理が正しく実行されていない
+
+**対処**：
+1. ブラウザの開発者ツールで、以下を実行
+   ```javascript
+   console.log(localStorage);  // 旧キーが残っているか確認
+   ```
+2. `migrateLegacyStorage()` 関数が `init()` の最初で呼ばれているか確認
+
+---
+
+## 修正による影響範囲
+
+### 改善される機能
+- ✅ トップページ表示の不具合が解消
+- ✅ Welcome画面のボタン操作が正常化
+- ✅ オンボーディング完了後のHome画面表示が安定
+
+### 注意が必要な機能
+- ⚠️ 既存の `kk-app.html` インラインスクリプトに依存していた機能は、`js/kk-app.js` に移行が必要
+- ⚠️ LocalStorageキー名が変更されたため、直接 `localStorage.getItem('kkUserName')` などでアクセスしているコードは、`ls_get('userName')` に置き換える必要がある
+
+---
+
+## 今後の推奨事項
+
+### 短期（1-2週間）
+- 本番環境への反映後、ユーザーからのフィードバックを収集
+- 問題報告があれば、迅速に対応
+
+### 中期（1-3ヶ月）
+- 残存する `kk-app.html` インラインスクリプト（ウィザード処理など）を `js/kk-app.js` に段階的に移行
+- LocalStorageの操作を完全に `ls_get()` / `ls_set()` 経由に統一
+
+### 長期（3-6ヶ月）
+- `kk-app.html` をマークアップのみに簡潔化
+- すべてのロジックを `js/kk-app.js` に集約
+- ユニットテストの追加で、今後の不具合を未然に防止
+
+---
+
+## 参考資料
+
+- **修正前後の比較**：別紙「修正差分」を参照
+- **LocalStorageの仕様**：MDN Web Docs - [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
+- **DOMContentLoadedイベント**：MDN Web Docs - [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event)
+
+---
+
+## 質問・サポート
+
+修正の適用中に問題が発生した場合は、以下の情報を提供してください：
+
+1. エラーメッセージ（ブラウザコンソール）
+2. 現在の状態（Welcome画面が表示されない、ボタンが反応しない等）
+3. 実施したステップ（どこまで完了したか）
+4. ブラウザの種類とバージョン
+
+---
+
+**最終更新日**: 2026年4月8日  
+**作成者**: Manus AI
