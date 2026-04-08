@@ -3264,3 +3264,28 @@ button:active,
   width: 100% !important;
   max-width: 1000px !important; /* PCでの理想的な幅 */
 }
+.welcome-slides, 
+.welcome-slide, 
+.welcome-desc {
+  width: 100vw !important;        /* 画面の横幅いっぱいに強制 */
+  max-width: 100% !important;     /* 制限を解除 */
+  min-width: 100% !important;     /* 24pxなどの極小化を防止 */
+  left: 0 !important;             /* 左端に固定 */
+  transform: none !important;     /* JSによる画面外への追い出しを無効化 */
+  display: flex !important;       /* レイアウト構造を維持 */
+  align-items: center !important;  /* 中央寄せ */
+  justify-content: center !important;
+}
+.welcome-desc {
+  padding: 0 10% !important;      /* 左右に適度な余白を作る */
+  white-space: normal !important; /* 折り返しを正常にする */
+  word-break: normal !important;
+}
+#welcomeNextBtn {
+  width: 90% !important;
+  max-width: 350px !important;    /* ボタンが横に伸びすぎないように制限 */
+  margin: 20px auto !important;
+  display: block !important;
+  position: relative !important;
+  pointer-events: auto !important; /* クリック可能にする */
+}
