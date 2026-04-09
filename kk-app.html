@@ -2439,10 +2439,6 @@
   function isPremium()    { return localStorage.getItem('kk_premium') === 'true'; }
 
   /* ── 登録モーダル ── */
-  window.openRegModal = function() {
-    const m = document.getElementById('reg-modal');
-    if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-  };
   window.closeRegModal = function() {
     const m = document.getElementById('reg-modal');
     if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
