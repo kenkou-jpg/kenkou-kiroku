@@ -2611,8 +2611,7 @@
   function closeWizard() { wizard.classList.remove('wizard-open'); document.body.style.overflow = ''; }
 
   function goToStep(step) {
-    if (!isRegistered() && step >= 2) { closeWizard(); openRegModal(); return; }
-    document.querySelectorAll('.wizard-step').forEach(s => {
+   document.querySelectorAll('.wizard-step').forEach(s => {
       const n = parseInt(s.dataset.step);
       s.classList.remove('step-active','step-exit');
       if (n === step) s.classList.add('step-active');
