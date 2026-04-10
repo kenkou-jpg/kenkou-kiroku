@@ -2994,6 +2994,11 @@
   #kk-toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#3D2E3A; color:white; padding:10px 22px; border-radius:22px; font-size:0.875rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:600; white-space:nowrap; max-width:90vw; text-align:center; }
   #kk-toast.toast-show { opacity:1; }
 </style>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/kenkou-kiroku/service-worker.js');
+}
+</script>
 
 </body>
 </html>
