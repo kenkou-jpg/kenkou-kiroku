@@ -2432,14 +2432,28 @@ function checkInsightEmpty() {
   document.getElementById('wMemoSkip').addEventListener('click', saveWizardRecord);
 
   /* 保存 */
-  function saveWizardRecord() {
+function saveWizardRecord() {
     closeWizard();
-    const today = new Date().toISOString().split('T')[0];
+    const todayStr = new Date().toISOString().split('T')[0];
     try {
-      const ex = JSON.parse(localStorage.getItem('kkRecords') || '{}');
-      ex[today] = { ...wizardData, savedAt: new Date().toISOString() };
-      localStorage.setItem('kkRecords', JSON.stringify(ex));
-    } catch(e) {}
+      const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+      const record = {
+        record_date: todayStr,
+        id: todayStr,
+        chakra: wizardData.chakra,
+        food_score: wizardData.foodScore ? wizardData.foodScore * 2 : null,
+        food_ingredients: wizardData.foodItems,
+        fasting_hours: wizardData.fastingHours ? parseInt(wizardData.fastingHours) : null,
+        emotion: wizardData.emotion,
+        wellness_score: wizardData.bodyScore ? wizardData.bodyScore * 2 : null,
+        energy_score: wizardData.bodyScore ? wizardData.bodyScore * 2 : null,
+        emotion_notes: wizardData.memo,
+      };
+      const idx = records.findIndex(r => r.record_date === todayStr);
+      if (idx >= 0) { records[idx] = { ...records[idx], ...record }; }
+      else { records.push(record); }
+      localStorage.setItem('kk_records', JSON.stringify(records));
+    } catch(e) { console.error('Save error:', e); }
     showCompleteAnimation(); updateFabState();
   }
 
