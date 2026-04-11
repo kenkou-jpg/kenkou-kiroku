@@ -1276,7 +1276,43 @@
 
       <!-- ── 断食パネル ── -->
       <div class="record-panel" id="panel-fasting" role="tabpanel">
-        <h3 class="chakra-section-title">プチ断食を記録する</h3>
+        <!-- ── 断食タイマー（常時表示） ── -->
+      <div class="fasting-live-section" id="fastingLiveSection">
+        <h3 class="condition-memo-title">断食タイマー</h3>
+        <p class="condition-memo-sub">今日の断食時間をリアルタイムで計測します。</p>
+
+        <!-- プリセット -->
+        <div class="fasting-live-presets" id="fastingLivePresets">
+          <button class="fasting-live-preset-btn" data-hours="12">12h</button>
+          <button class="fasting-live-preset-btn selected" data-hours="14">14h</button>
+          <button class="fasting-live-preset-btn" data-hours="16">16h</button>
+        </div>
+
+        <!-- 円形プログレスバー -->
+        <div class="fasting-live-ring-wrap">
+          <svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+            <circle class="fasting-live-track" cx="100" cy="100" r="88"/>
+            <circle class="fasting-live-fill" id="fastingLiveRingFill" cx="100" cy="100" r="88"
+                    stroke-dasharray="552.92" stroke-dashoffset="552.92"/>
+          </svg>
+          <div class="fasting-live-center">
+            <div class="fasting-live-time" id="fastingLiveTime">00:00:00</div>
+            <div class="fasting-live-label" id="fastingLiveLabel">断食スタートを押してください</div>
+          </div>
+        </div>
+
+        <!-- メッセージ -->
+        <p class="fasting-live-msg" id="fastingLiveMsg"></p>
+
+        <!-- ボタン -->
+        <div class="fasting-live-btns">
+          <button class="fasting-live-start-btn" id="fastingLiveStartBtn">断食を始める</button>
+          <button class="fasting-live-stop-btn" id="fastingLiveStopBtn" style="display:none;">断食を終了する</button>
+        </div>
+
+
+      </div>
+<h3 class="chakra-section-title">プチ断食を記録する</h3>
         <p class="chakra-section-sub">16時間断食など、からだのオートファジーを促す<br>プチ断食の時間を記録しましょう。</p>
 
         <!-- タイマー表示 -->
