@@ -2179,6 +2179,272 @@
   <button class="pwa-dismiss-btn" id="pwaDismissBtn">✕</button>
 </div>
 
+<!-- ★ 修正: 記録画面 全イベント処理 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  /* ────────────────────────────────
+     ユーティリティ
+  ──────────────────────────────── */
+  function getVal(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+  }
+  function getSelected(selector) {
+    var el = document.querySelector(selector);
+    return el ? (el.dataset.val || el.dataset.chakra || el.dataset.emotion || null) : null;
+  }
+  function getMultiSelected(selector) {
+    return Array.from(document.querySelectorAll(selector)).map(function(c){ return c.dataset.val; });
+  }
+  function showToast(msg) {
+    var t = document.getElementById('kk-toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('toast-show');
+    setTimeout(function(){ t.classList.remove('toast-show'); }, 3000);
+  }
+  function bindSingle(selector) {
+    var items = document.querySelectorAll(selector);
+    items.forEach(function(item) {
+      item.addEventListener('click', function() {
+        items.forEach(function(i){ i.classList.remove('selected'); });
+        item.classList.add('selected');
+      });
+    });
+  }
+  function bindMulti(selector) {
+    document.querySelectorAll(selector).forEach(function(item) {
+      item.addEventListener('click', function() { item.classList.toggle('selected'); });
+    });
+  }
+
+  /* ────────────────────────────────
+     記録タブ切り替え
+  ──────────────────────────────── */
+  document.querySelectorAll('.record-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.record-tab').forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+      document.querySelectorAll('.record-panel').forEach(function(p){ p.classList.remove('active'); });
+      var panel = document.getElementById('panel-' + tab.dataset.tab);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  /* ────────────────────────────────
+     各パネルのUI
+  ──────────────────────────────── */
+  // チャクラ
+  bindSingle('#chakraSelector .chakra-item');
+  bindSingle('#chakraIntensityRow .intensity-btn');
+  bindMulti('#symptomChips .chip');
+
+  // チャクラ選択時にスコアグループ等を表示
+  document.querySelectorAll('#chakraSelector .chakra-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      ['chakraIntensityGroup','chakraScoreGroup','chakraNoteGroup'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+      });
+    });
+  });
+
+  // リズム
+  var cycleChips = document.querySelectorAll('#menstrualCycleChips .chip');
+  cycleChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      cycleChips.forEach(function(c){ c.classList.remove('selected'); });
+      chip.classList.add('selected');
+      var fg = document.getElementById('menstrualFlowGroup');
+      if (fg) fg.style.display = chip.dataset.val === 'menstruating' ? 'block' : 'none';
+    });
+  });
+  bindSingle('#menstrualFlowChips .chip');
+
+  // 食事
+  bindMulti('#bodyFeelChips .body-feel-chip');
+  bindMulti('#foodIngredientChips .chip');
+  bindSingle('#foodTimeSelector .food-time-card');
+
+  // 断食パネル
+  bindSingle('#fastingGoalSelect .fasting-goal-btn');
+  bindMulti('#fastingFeelChips .chip');
+
+  // 感情
+  bindSingle('#emotionSelector .emotion-item');
+
+  /* ────────────────────────────────
+     rangeスライダーの値表示
+  ──────────────────────────────── */
+  [
+    ['chakraScore','chakraScoreDisplay'],
+    ['foodScore','foodScoreDisplay'],
+    ['fastingScore','fastingScoreDisplay'],
+    ['wellnessScore','wellnessScoreDisplay'],
+    ['energyScore','energyScoreDisplay'],
+  ].forEach(function(pair) {
+    var inp = document.getElementById(pair[0]);
+    var disp = document.getElementById(pair[1]);
+    if (inp && disp) inp.addEventListener('input', function(){ disp.textContent = inp.value; });
+  });
+
+  /* ────────────────────────────────
+     体調スケール（conditionScaleRow）
+  ──────────────────────────────── */
+  bindSingle('#conditionScaleRow .condition-scale-btn');
+
+  /* ────────────────────────────────
+     体調保存ボタン
+  ──────────────────────────────── */
+  var condBtn = document.getElementById('conditionSaveBtn');
+  if (condBtn) {
+    condBtn.addEventListener('click', function() {
+      var todayStr = new Date().toISOString().split('T')[0];
+      try {
+        var records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+        var sel = document.querySelector('#conditionScaleRow .condition-scale-btn.selected');
+        var patch = {
+          record_date: todayStr,
+          id: todayStr,
+          condition_scale: sel ? parseInt(sel.dataset.scale) : null,
+          condition_memo: getVal('conditionMemoText'),
+        };
+        var idx = records.findIndex(function(r){ return r.record_date === todayStr; });
+        if (idx >= 0) records[idx] = Object.assign({}, records[idx], patch);
+        else records.push(patch);
+        localStorage.setItem('kk_records', JSON.stringify(records));
+        showToast('体調を記録しました ✓');
+      } catch(e) { console.error(e); }
+    });
+  }
+
+  /* ────────────────────────────────
+     断食ライブタイマー
+  ──────────────────────────────── */
+  var livePresets = document.querySelectorAll('#fastingLivePresets .fasting-live-preset-btn');
+  livePresets.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      livePresets.forEach(function(b){ b.classList.remove('selected'); });
+      btn.classList.add('selected');
+    });
+  });
+
+  var fastingInterval = null;
+  var fastingStart = null;
+
+  function updateFastingRing(elapsed, goal) {
+    var fill = document.getElementById('fastingLiveRingFill');
+    var timeEl = document.getElementById('fastingLiveTime');
+    var pctEl = document.getElementById('fastingLivePct');
+    if (!fill) return;
+    var pct = Math.min(elapsed / goal, 1);
+    var circ = 552.92;
+    fill.style.strokeDashoffset = circ * (1 - pct);
+    var h = Math.floor(elapsed / 3600);
+    var m = Math.floor((elapsed % 3600) / 60);
+    if (timeEl) timeEl.textContent = h + 'h ' + m + 'm';
+    if (pctEl) pctEl.textContent = Math.floor(pct * 100) + '%';
+  }
+
+  var startBtn = document.getElementById('fastingLiveStartBtn');
+  var stopBtn  = document.getElementById('fastingLiveStopBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', function() {
+      var selPreset = document.querySelector('#fastingLivePresets .fasting-live-preset-btn.selected');
+      var goalHours = selPreset ? parseInt(selPreset.dataset.hours) : 14;
+      fastingStart = Date.now();
+      localStorage.setItem('kk_fasting_start', fastingStart);
+      localStorage.setItem('kk_fasting_goal', goalHours);
+      startBtn.style.display = 'none';
+      if (stopBtn) stopBtn.style.display = 'block';
+      fastingInterval = setInterval(function() {
+        var elapsed = (Date.now() - fastingStart) / 1000;
+        updateFastingRing(elapsed, goalHours * 3600);
+      }, 1000);
+    });
+  }
+  if (stopBtn) {
+    stopBtn.addEventListener('click', function() {
+      clearInterval(fastingInterval);
+      localStorage.removeItem('kk_fasting_start');
+      stopBtn.style.display = 'none';
+      if (startBtn) startBtn.style.display = 'block';
+      var fill = document.getElementById('fastingLiveRingFill');
+      if (fill) fill.style.strokeDashoffset = 552.92;
+    });
+  }
+  // ページロード時に断食中なら再開
+  (function() {
+    var savedStart = localStorage.getItem('kk_fasting_start');
+    var savedGoal  = localStorage.getItem('kk_fasting_goal');
+    if (savedStart) {
+      fastingStart = parseInt(savedStart);
+      var goalHours = savedGoal ? parseInt(savedGoal) : 14;
+      if (startBtn) startBtn.style.display = 'none';
+      if (stopBtn) stopBtn.style.display = 'block';
+      fastingInterval = setInterval(function() {
+        var elapsed = (Date.now() - fastingStart) / 1000;
+        updateFastingRing(elapsed, goalHours * 3600);
+      }, 1000);
+    }
+  })();
+
+  /* ────────────────────────────────
+     記録を保存する（メインボタン）
+  ──────────────────────────────── */
+  var saveBtn = document.getElementById('saveRecordBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function() {
+      var todayStr = new Date().toISOString().split('T')[0];
+      try {
+        var records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+        var record = {
+          record_date: todayStr,
+          id: todayStr,
+          chakra:           getSelected('#chakraSelector .chakra-item.selected'),
+          chakra_intensity: getSelected('#chakraIntensityRow .intensity-btn.selected'),
+          chakra_score:     parseInt(getVal('chakraScore')) || null,
+          chakra_note:      getVal('chakraNote'),
+          symptoms:         getMultiSelected('#symptomChips .chip.selected'),
+          basal_temp:       parseFloat(getVal('basalTemp')) || null,
+          menstrual_cycle:  getSelected('#menstrualCycleChips .chip.selected'),
+          menstrual_flow:   getSelected('#menstrualFlowChips .chip.selected'),
+          rhythm_note:      getVal('rhythmNote'),
+          food_time:        getSelected('#foodTimeSelector .food-time-card.selected'),
+          food_content:     getVal('foodContent'),
+          body_feel:        getMultiSelected('#bodyFeelChips .body-feel-chip.selected'),
+          food_ingredients: getMultiSelected('#foodIngredientChips .chip.selected'),
+          food_score:       parseInt(getVal('foodScore')) || null,
+          food_note:        getVal('foodNote'),
+          fasting_feel:     getMultiSelected('#fastingFeelChips .chip.selected'),
+          fasting_score:    parseInt(getVal('fastingScore')) || null,
+          fasting_note:     getVal('fastingNote'),
+          emotion:          getSelected('#emotionSelector .emotion-item.selected'),
+          wellness_score:   parseInt(getVal('wellnessScore')) || null,
+          energy_score:     parseInt(getVal('energyScore')) || null,
+          emotion_note:     getVal('emotionNote'),
+          gratitude_note:   getVal('gratitudeNote'),
+        };
+        var idx = records.findIndex(function(r){ return r.record_date === todayStr; });
+        if (idx >= 0) records[idx] = Object.assign({}, records[idx], record);
+        else records.push(record);
+        localStorage.setItem('kk_records', JSON.stringify(records));
+        showToast('記録を保存しました ✓');
+        setTimeout(function() {
+          document.querySelectorAll('.app-screen').forEach(function(s){ s.classList.remove('active'); });
+          var home = document.getElementById('screen-home');
+          if (home) home.classList.add('active');
+          var fab = document.getElementById('homeRecordFab');
+          if (fab) fab.style.display = 'block';
+        }, 600);
+      } catch(e) { console.error('Save error:', e); }
+    });
+  }
+
+});
+</script>
+
 <!-- Service Worker登録 -->
 <script>
   if ("serviceWorker" in navigator) {
@@ -2190,7 +2456,7 @@
   }
 </script>
 <!-- スクリプト -->
-<script src="js/kk-app.js"></script>
+<!-- kk-app.js は存在しないため削除 -->
 <script>
 /* =====================================================
    ippo — 3層制御 + ウィザード v3
