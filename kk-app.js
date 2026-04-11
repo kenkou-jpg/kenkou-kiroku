@@ -1,5 +1,5 @@
 /* ============================================================
-   kenkou kiroku APP — Main JavaScript
+   ippo APP — Main JavaScript
    「蓄積が意味を持つ体験設計」
    ============================================================ */
 
@@ -173,58 +173,22 @@ function calcFastingHours(start, end) {
 // ────────────────────────────────────────────────────────────
 // TABLE API
 // ────────────────────────────────────────────────────────────
-async function apiGet(path) {
-  const res = await fetch(path);
-  if (!res.ok) throw new Error(`GET ${path} → ${res.status}`);
-  return res.json();
-}
-async function apiPost(path, body) {
-  const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  if (!res.ok) throw new Error(`POST ${path} → ${res.status}`);
-  return res.json();
-}
-async function apiDelete(path) {
-  const res = await fetch(path, { method: 'DELETE' });
-  if (!res.ok && res.status !== 204) throw new Error(`DELETE ${path} → ${res.status}`);
-}
-
 async function fetchAllRecords() {
-  try {
-    const data = await apiGet(`tables/${TABLE_NAME}?limit=500&sort=record_date`);
-    state.records = data.data || [];
-    return state.records;
-  } catch (e) {
-    console.warn('Records fetch failed, using local cache', e);
-    return state.records;
-  }
+  state.records = ls_get('records', []);
+  return state.records;
 }
 
 async function saveRecord(draft) {
   const todayStr = today();
-  // 同じ日付の既存レコードを確認
-  const existing = state.records.find(r => r.record_date === todayStr);
-  try {
-    let saved;
-    if (existing) {
-      // PATCH で更新
-      const res = await fetch(`tables/${TABLE_NAME}/${existing.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(draft),
-      });
-      saved = await res.json();
-    } else {
-      saved = await apiPost(`tables/${TABLE_NAME}`, { ...draft, record_date: todayStr });
-    }
-    // キャッシュ更新
-    const idx = state.records.findIndex(r => r.record_date === todayStr);
-    if (idx >= 0) state.records[idx] = saved;
-    else state.records.push(saved);
-    return saved;
-  } catch (e) {
-    console.error('Save failed', e);
-    throw e;
+  const record = { ...draft, record_date: todayStr, id: todayStr };
+  const idx = state.records.findIndex(r => r.record_date === todayStr);
+  if (idx >= 0) {
+    state.records[idx] = record;
+  } else {
+    state.records.push(record);
   }
+  ls_set('records', state.records);
+  return record;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -1177,7 +1141,7 @@ function exportData() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url;
-  a.download = `kenkou-kiroku-${today()}.csv`;
+  a.download = `ippo-${today()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   showToast('📤 CSVエクスポートが完了しました');
@@ -1204,18 +1168,12 @@ function buildCSV(records) {
 async function confirmDeleteAll() {
   const confirmed = confirm('⚠️ すべての記録を削除します。この操作は元に戻せません。本当によろしいですか？');
   if (!confirmed) return;
-  try {
-    for (const rec of state.records) {
-      await apiDelete(`tables/${TABLE_NAME}/${rec.id}`);
-    }
-    state.records = [];
-    ls_set('lastMilestone', 0);
-    showToast('🗑 すべての記録を削除しました');
-    renderHome();
-    renderSettings();
-  } catch (e) {
-    showToast('削除に失敗しました。もう一度お試しください。');
-  }
+  state.records = [];
+  ls_set('records', []);
+  ls_set('lastMilestone', 0);
+  showToast('すべての記録を削除しました');
+  renderHome();
+  renderSettings();
 }
 
 // ────────────────────────────────────────────────────────────
@@ -1665,34 +1623,6 @@ function initFeedbackListeners() {
       }, 2000);
     }
   });
-
-  // ── Premium モーダル ───────────────────────────────────
-  function openPremiumModal() {
-    const overlay = $('#premiumModalOverlay');
-    if (overlay) overlay.classList.add('open');
-  }
-  function closePremiumModal() {
-    const overlay = $('#premiumModalOverlay');
-    if (overlay) overlay.classList.remove('open');
-  }
-
-  // 「Premiumで解放する」ボタン全部に適用
-  document.addEventListener('click', e => {
-    if (e.target.closest('.premium-trigger')) {
-      e.preventDefault();
-      openPremiumModal();
-    }
-    // モーダル外タップで閉じる
-    if (e.target.id === 'premiumModalOverlay') {
-      closePremiumModal();
-    }
-  });
-
-  // 「あとで」リンク
-  $('#premiumModalClose')?.addEventListener('click', e => {
-    e.preventDefault();
-    closePremiumModal();
-  });
 }
 
 // ────────────────────────────────────────────────────────────
@@ -1731,97 +1661,6 @@ if (document.readyState === 'loading') {
 }
 
 // ────────────────────────────────────────────────────────────
-// 登録モーダル制御
-// ────────────────────────────────────────────────────────────
-
-/** 登録済みかどうかを確認する */
-function isRegistered() {
-  return localStorage.getItem('kk_registered') === 'true';
-}
-
-/** 登録モーダルを開く */
-function openRegModal() {
-  const modal = document.getElementById('registrationModal');
-  if (modal) {
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-}
-
-/** 登録モーダルを閉じる */
-function closeRegModal() {
-  const modal = document.getElementById('registrationModal');
-  if (modal) {
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-}
-
-/** 登録完了：localStorageにフラグを保存し、全ロックオーバーレイを非表示にする */
-function completeRegistration() {
-  localStorage.setItem('kk_registered', 'true');
-  unlockAllSections();
-  closeRegModal();
-  showToast('登録が完了しました！全ての機能が使えるようになりました。');
-}
-
-/** 全てのロックオーバーレイを非表示にする */
-function unlockAllSections() {
-  const lockIds = ['lockFood', 'lockCondition', 'lockFasting', 'lockGraph'];
-  lockIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-}
-
-/** 登録済みの場合は起動時にロック解除 */
-function initRegistrationState() {
-  if (isRegistered()) {
-    unlockAllSections();
-  }
-}
-
-// 登録モーダルのイベントリスナー初期化
-document.addEventListener('DOMContentLoaded', () => {
-  // LINEボタン → リンクを開いた後に登録完了とみなす
-  const lineBtn = document.getElementById('regLineBtn');
-  if (lineBtn) {
-    lineBtn.addEventListener('click', () => {
-      // LINEページへ遷移後、少し待ってから登録済みフラグをセット
-      setTimeout(completeRegistration, 1000);
-    });
-  }
-
-  // メール登録ボタン → モーダル内にメールフォームを表示（仮実装：登録完了）
-  const emailBtn = document.getElementById('regEmailBtn');
-  if (emailBtn) {
-    emailBtn.addEventListener('click', () => {
-      const email = prompt('メールアドレスを入力してください：');
-      if (email && email.includes('@')) {
-        completeRegistration();
-      } else if (email !== null) {
-        alert('正しいメールアドレスを入力してください。');
-      }
-    });
-  }
-
-  // 「あとで」ボタン → モーダルを閉じるだけ
-  const laterBtn = document.getElementById('regLaterBtn');
-  if (laterBtn) {
-    laterBtn.addEventListener('click', closeRegModal);
-  }
-
-  // オーバーレイ背景クリックで閉じる
-  const modal = document.getElementById('registrationModal');
-  if (modal) {
-    modal.addEventListener('click', e => {
-      if (e.target === modal) closeRegModal();
-    });
-  }
-
-  // 起動時に登録状態を反映
-  initRegistrationState();
-});
 
 // ────────────────────────────────────────────────────────────
 // F1-1: RHYTHM TAB LOGIC

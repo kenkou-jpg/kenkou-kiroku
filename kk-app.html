@@ -593,41 +593,7 @@
     }
     .chakra-visual-item.selected .chakra-visual-check { border-color:transparent; }
 
-    /* =====================================================
-       Premiumロックオーバーレイ（ウィザード内）
-       ===================================================== */
-    .wizard-step-lock {
-      position:absolute; inset:0;
-      background:rgba(251,247,242,0.94);
-      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-      z-index:10; display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      padding:24px 28px; text-align:center;
-    }
-    .wizard-lock-icon {
-      width:52px; height:52px; border-radius:50%;
-      background:linear-gradient(135deg,#C9A44A,#F5D020);
-      display:flex; align-items:center; justify-content:center;
-      margin-bottom:14px; box-shadow:0 4px 16px rgba(201,164,74,0.35);
-    }
-    .wizard-lock-badge {
-      display:inline-block; background:linear-gradient(135deg,#C9A44A,#E8C870);
-      color:white; font-size:0.6875rem; font-family:'Cormorant Garamond',serif;
-      letter-spacing:0.12em; padding:3px 10px; border-radius:12px; margin-bottom:10px;
-    }
-    .wizard-lock-title { font-family:'Noto Serif JP',serif; font-size:1rem; color:#3D2E3A; margin-bottom:8px; line-height:1.65; }
-    .wizard-lock-desc { font-size:0.8125rem; color:#A090A0; line-height:1.7; margin-bottom:18px; }
-    .wizard-lock-features { display:flex; flex-direction:column; gap:7px; width:100%; max-width:240px; margin-bottom:20px; text-align:left; }
-    .wizard-lock-feature { display:flex; align-items:center; gap:8px; font-size:0.8125rem; color:#6C4A67; }
-    .wizard-lock-feature-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-    .wizard-lock-btn {
-      width:100%; max-width:260px; height:48px; border-radius:24px;
-      background:linear-gradient(135deg,#C9A44A,#E8C870); border:none; color:white;
-      font-size:0.9375rem; font-family:'Noto Serif JP',serif; font-weight:600; cursor:pointer;
-      box-shadow:0 4px 16px rgba(201,164,74,0.35); transition:all 0.18s ease; margin-bottom:10px;
-    }
-    .wizard-lock-btn:active { transform:scale(0.97); }
-    .wizard-lock-skip { font-size:0.8125rem; color:#B0A0B0; cursor:pointer; padding:6px; }
+
 
     /* =====================================================
        改善1: Phosphor Icons タブバー
@@ -698,7 +664,7 @@
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
   <link rel="apple-touch-icon" href="images/icon-192.png">
-  <meta property="og:title" content="kenkou kiroku — からだの記録アプリ">
+  <meta property="og:title" content="ippo — からだに還る、一歩">
   <meta property="og:description" content="卵巣・女性のからだを食と意識で整える、蓄積型健康記録アプリ">
   <meta property="og:image" content="https://kenkou-jpg.github.io/kenkou-kiroku/images/og-image.jpg">
   <meta property="og:url" content="https://kenkou-jpg.github.io/kenkou-kiroku/kk-app.html">
@@ -900,7 +866,6 @@
       <div class="home-today-section">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--sp-3);">
           <h3 class="app-section-title">今日の記録</h3>
-          <button class="btn btn-sm btn-outline" id="homeRecordBtn">記録する</button>
         </div>
         <div class="home-today-card" id="todayCard">
           <!-- 未記録 or 記録済みは JS inject -->
@@ -941,7 +906,7 @@
       <div style="margin: 0 var(--sp-5) var(--sp-6); padding: var(--sp-5); background: var(--app-bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-light); text-align: center;">
         <p style="font-family: var(--font-accent); font-size: 0.6875rem; color: var(--text-muted); letter-spacing: 0.10em; margin-bottom: var(--sp-2);">wellness blog</p>
         <p style="font-family: var(--font-serif); font-size: 0.9375rem; color: var(--text-primary); margin-bottom: var(--sp-3);">食・チャクラ・断食の記事を読む</p>
-        <a href="https://kenkou-kiroku.com" class="btn btn-outline btn-sm">kenkou kiroku ブログへ →</a>
+        <a href="https://kenkou-kiroku.com" class="btn btn-outline btn-sm">ippo ブログへ →</a>
       </div>
 
     </div><!-- /app-content -->
@@ -1306,43 +1271,7 @@
           <button class="fasting-live-stop-btn" id="fastingLiveStopBtn" style="display:none;">断食を終了する</button>
         </div>
 
-        <!-- Premium限定カード：断食カレンダー -->
-        <div class="report-lock-card" style="margin: var(--sp-5) 0 0;">
-          <div class="report-lock-inner">
-            <p class="report-lock-en">Fasting Calendar</p>
-            <p class="report-lock-title">断食カレンダー</p>
-            <p class="report-lock-desc">過去の断食記録をカレンダーで振り返ります。継続日数・達成率が一目でわかります。</p>
-            <div style="height:44px; background:rgba(125,184,180,0.12); border-radius:8px; margin-top:10px;"></div>
-          </div>
-          <div class="report-lock-overlay">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-            </svg>
-            <span class="chart-lock-text">断食カレンダー</span>
-            <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-          </div>
-        </div>
 
-        <!-- Premium限定カード：生理周期連動モード -->
-        <div class="report-lock-card" style="margin: var(--sp-3) 0 0;">
-          <div class="report-lock-inner">
-            <p class="report-lock-en">Cycle Sync Mode</p>
-            <p class="report-lock-title">生理周期連動モード</p>
-            <p class="report-lock-desc">周期に合わせて断食時間を自動提案。「今日は黄体期なので12hでOK」など、からだに寄り添った断食をサポートします。</p>
-            <div style="height:44px; background:rgba(230,63,168,0.08); border-radius:8px; margin-top:10px;"></div>
-          </div>
-          <div class="report-lock-overlay">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-            </svg>
-            <span class="chart-lock-text">生理周期連動モード</span>
-            <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-          </div>
-        </div>
       </div>
 
       <!-- ── 断食パネル ── -->
@@ -1597,15 +1526,7 @@
           <div class="insight-chart-wrap" style="height: 200px;">
             <canvas id="wellnessChart"></canvas>
           </div>
-          <div class="chart-blur-overlay" id="wellnessLockOverlay">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-            </svg>
-            <span class="chart-lock-text">全期間のグラフを見る</span>
-            <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-          </div>
+
         </div>
       </div>
 
@@ -1616,15 +1537,7 @@
           <div class="insight-chart-wrap" style="height: 160px;">
             <canvas id="foodChart"></canvas>
           </div>
-          <div class="chart-blur-overlay" id="foodLockOverlay">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-            </svg>
-            <span class="chart-lock-text">全期間のグラフを見る</span>
-            <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-          </div>
+
         </div>
       </div>
 
@@ -1635,54 +1548,11 @@
           <div class="insight-chart-wrap" style="height: 200px;">
             <canvas id="chakraChart"></canvas>
           </div>
-          <div class="chart-blur-overlay" id="chakraLockOverlay">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-            </svg>
-            <span class="chart-lock-text">全期間のグラフを見る</span>
-            <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-          </div>
+
         </div>
       </div>
 
-      <!-- 週間・月間レポート ロックカード -->
-      <div class="report-lock-card">
-        <div class="report-lock-inner">
-          <p class="report-lock-en">Weekly Report</p>
-          <p class="report-lock-title">あなたの1週間の記録</p>
-          <p class="report-lock-desc">体調・食事・チャクラ・断食の傾向を自動でまとめます。先週との変化も一目でわかります。</p>
-          <div style="height:48px; background:rgba(125,184,180,0.15); border-radius:8px; margin-top:12px;"></div>
-        </div>
-        <div class="report-lock-overlay">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-          </svg>
-          <span class="chart-lock-text">週間レポート</span>
-          <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-        </div>
-      </div>
 
-      <div class="report-lock-card" style="margin-top: var(--sp-3);">
-        <div class="report-lock-inner">
-          <p class="report-lock-en">Monthly Report</p>
-          <p class="report-lock-title">1ヶ月のからだの変化</p>
-          <p class="report-lock-desc">長期的な傾向と、あなたに合った整え方を提案します。月経周期との相関も表示されます。</p>
-          <div style="height:48px; background:rgba(230,63,168,0.10); border-radius:8px; margin-top:12px;"></div>
-        </div>
-        <div class="report-lock-overlay">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="3" y="11" width="18" height="11" rx="2" stroke="#C9A96E" stroke-width="1.8"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="12" cy="16" r="1.5" fill="#C9A96E"/>
-          </svg>
-          <span class="chart-lock-text">月間レポート</span>
-          <button class="chart-unlock-btn premium-trigger">Premiumで解放する</button>
-        </div>
-      </div>
 
       <!-- アンロックカードセクション -->
       <div id="unlockCardsContainer" style="display:none;">
@@ -1703,36 +1573,6 @@
         </div>
       </div>
 
-      <!-- Premium 予告バナー -->
-      <div style="margin: var(--sp-5) var(--sp-5) 0; padding: var(--sp-5); background: linear-gradient(135deg, #F4EFF4, #EAF7F7); border-radius: var(--radius-lg); border: 1px solid var(--border-light); text-align:center;">
-        <p style="font-family: var(--font-accent); font-size: 0.6875rem; color: var(--plum); letter-spacing: 0.12em; margin-bottom: var(--sp-3);">coming soon — premium</p>
-        <p style="font-family: var(--font-serif); font-size: 0.9375rem; color: var(--text-primary); line-height: 1.8; margin-bottom: var(--sp-3);">
-          30日・90日の詳細分析、<br>
-          月経周期との相関グラフ、<br>
-          パーソナルレポートが届きます。
-        </p>
-        <div style="display: flex; flex-direction: column; gap: var(--sp-2); text-align:left; max-width: 280px; margin: 0 auto var(--sp-4);">
-          <div style="display:flex; align-items:center; gap: var(--sp-2); font-size:0.8125rem; color:var(--text-secondary);">
-            <div style="width:6px; height:6px; border-radius:50%; background:var(--plum); flex-shrink:0;"></div>
-            30日・90日・180日の長期トレンド分析
-          </div>
-          <div style="display:flex; align-items:center; gap: var(--sp-2); font-size:0.8125rem; color:var(--text-secondary);">
-            <div style="width:6px; height:6px; border-radius:50%; background:var(--teal); flex-shrink:0;"></div>
-            食事×ウェルネス×断食の相関分析
-          </div>
-          <div style="display:flex; align-items:center; gap: var(--sp-2); font-size:0.8125rem; color:var(--text-secondary);">
-            <div style="width:6px; height:6px; border-radius:50%; background:var(--pink); flex-shrink:0;"></div>
-            月経周期・ホルモンリズムとの連動記録
-          </div>
-          <div style="display:flex; align-items:center; gap: var(--sp-2); font-size:0.8125rem; color:var(--text-secondary);">
-            <div style="width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0;"></div>
-            毎月のパーソナルウェルネスレポート
-          </div>
-        </div>
-        <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.7;">
-          記録を続けていただいた方に、<br>優先してご案内します。
-        </p>
-      </div>
 
       <!-- 蓄積へのメッセージ -->
       <div style="margin: 0 var(--sp-5) var(--sp-8); padding: var(--sp-6); background: linear-gradient(135deg, #FBF7F2, #EAF7F7); border-radius: var(--radius-xl); text-align:center; border: 1px solid var(--border-light);">
@@ -1896,7 +1736,7 @@
 
       <!-- アプリ情報 -->
       <div class="settings-section" style="padding-top:0">
-        <p class="settings-section-title"> ippo について</p>
+        <p class="settings-section-title">ippo について</p>
         <div class="settings-list">
           <div class="settings-row" style="cursor:default;">
             <div class="settings-row-left">
@@ -1911,7 +1751,7 @@
           </div>
         </div>
         <div style="text-align: center; margin-top: var(--sp-6); padding-bottom: var(--sp-4);">
-          <p style="font-family: var(--font-accent); font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.10em;">kenkou kiroku</p>
+          <p style="font-family: var(--font-accent); font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.10em;">ippo</p>
           <p style="font-size: 0.6875rem; color: var(--text-muted); margin-top: 4px;">wellness record app</p>
           <p style="font-size: 0.6875rem; color: var(--border); margin-top: 4px;">v1.0.0</p>
           <p style="font-size: 0.6875rem; color: var(--text-muted); margin-top: var(--sp-3); line-height: 1.7;">
@@ -1951,76 +1791,9 @@
   <!-- Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- ══════════════════════════════════
-       【層2】登録モーダル (#reg-modal)
-       ══════════════════════════════════ -->
-  <div id="reg-modal" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px;">
-    <div style="background:white; border-radius:20px; padding:32px 24px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.18); position:relative;">
-      <!-- 閉じる -->
-      <button onclick="closeRegModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.25rem;color:#B0A0B0;cursor:pointer;">✕</button>
-      <!-- ロゴ -->
-      <img src="images/logo-kenkou-kiroku.png" alt="kenkou kiroku"
-           style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:2px solid #F2EAF0;"
-           onerror="this.style.display='none'">
-      <!-- タイトル -->
-      <p style="font-family:'Cormorant Garamond',serif;font-size:0.6875rem;color:#E63FA8;letter-spacing:0.12em;margin-bottom:8px;">無料登録</p>
-      <h2 style="font-family:'Noto Serif JP',serif;font-size:1.0625rem;color:#3D2E3A;line-height:1.65;margin-bottom:8px;">すべての無料機能を使うには<br>かんたん登録してください</h2>
-      <p style="font-size:0.8125rem;color:#A090A0;line-height:1.7;margin-bottom:24px;">食事・断食・感情の記録、グラフ、週間カレンダーなどが使えます。</p>
-      <!-- LINEボタン -->
-      <a href="https://page.line.me/384xpfml" target="_blank" rel="noopener"
-         onclick="setTimeout(completeRegistration, 1500)"
-         style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;background:#06C755;color:white;border-radius:25px;text-decoration:none;font-size:0.9375rem;font-weight:600;margin-bottom:12px;box-shadow:0 4px 14px rgba(6,199,85,0.35);transition:opacity 0.15s;"
-         onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="6" fill="white" opacity="0.2"/><path d="M11 4C7.13 4 4 6.8 4 10.25c0 2.08 1.1 3.93 2.82 5.13L6.3 17.5l2.2-1.1c.77.2 1.61.35 2.5.35 3.87 0 7-2.8 7-6.5S14.87 4 11 4z" fill="white"/></svg>
-        LINEで登録する（おすすめ）
-      </a>
-      <!-- メールボタン -->
-      <button onclick="registerByEmail()"
-         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;background:linear-gradient(135deg,#E63FA8,#C02E8E);color:white;border:none;border-radius:22px;font-size:0.9rem;font-weight:600;cursor:pointer;margin-bottom:16px;box-shadow:0 4px 14px rgba(230,63,168,0.3);">
-        <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><rect x="0.5" y="0.5" width="17" height="13" rx="2" stroke="white" stroke-opacity="0.8"/><path d="M1 1l8 7 8-7" stroke="white" stroke-opacity="0.8"/></svg>
-        メールアドレスで登録する
-      </button>
-      <!-- 注記 -->
-      <p style="font-size:0.75rem;color:#B0A0B0;margin-bottom:12px;">※無料です。1分で完了します</p>
-      <!-- あとで -->
-      <a href="#" onclick="closeRegModal();return false;" style="font-size:0.8125rem;color:#C0B0C0;text-decoration:none;">あとで →</a>
-    </div>
-  </div>
 
-  <!-- ══════════════════════════════════
-       【層3】Premiumモーダル (#premium-modal)
-       ══════════════════════════════════ -->
-  <div id="premium-modal" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.5); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:20px;">
-    <div style="background:white; border-radius:20px; padding:32px 24px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative;">
-      <button onclick="closePremiumModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.25rem;color:#B0A0B0;cursor:pointer;">✕</button>
-      <!-- 金色見出し -->
-      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#C9A44A,#F5D020);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 4px 16px rgba(201,164,74,0.4);">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="12" cy="16" r="1.5" fill="white"/>
-        </svg>
-      </div>
-      <p style="font-size:0.6875rem;letter-spacing:0.15em;color:#C9A44A;font-family:'Cormorant Garamond',serif;margin-bottom:6px;">PREMIUM</p>
-      <h2 style="font-family:'Noto Serif JP',serif;font-size:1.0625rem;background:linear-gradient(135deg,#C9A44A,#8B6914);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;line-height:1.5;">Premium — すべての機能を解放</h2>
-      <p style="font-size:1rem;font-weight:700;color:#3D2E3A;margin-bottom:16px;">月額500円（税込）</p>
-      <!-- 特典リスト -->
-      <div style="text-align:left;margin:0 auto 20px;max-width:260px;display:flex;flex-direction:column;gap:9px;">
-        <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#6C4A67;"><span style="color:#27B7B3;font-weight:700;">✓</span>全期間のグラフ・トレンド分析</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#6C4A67;"><span style="color:#E63FA8;font-weight:700;">✓</span>週間・月間レポート自動生成</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#6C4A67;"><span style="color:#C9A44A;font-weight:700;">✓</span>月経周期・ホルモンリズム連動</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#6C4A67;"><span style="color:#7C4DFF;font-weight:700;">✓</span>断食カレンダー・長期ログ</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#6C4A67;"><span style="color:#6C4A67;font-weight:700;">✓</span>パターン分析・パーソナル提案</div>
-      </div>
-      <!-- LINEボタン -->
-      <a href="https://page.line.me/384xpfml" target="_blank" rel="noopener"
-         style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;background:linear-gradient(135deg,#C9A44A,#E8C870);color:white;border-radius:25px;text-decoration:none;font-size:0.9375rem;font-weight:600;margin-bottom:10px;box-shadow:0 4px 14px rgba(201,164,74,0.4);">
-        LINEで先行登録する（無料）
-      </a>
-      <p style="font-size:0.75rem;color:#B0A0B0;line-height:1.65;margin-bottom:12px;">※現在は先行登録受付中です。<br>正式リリース時にご案内します。</p>
-      <a href="#" onclick="closePremiumModal();return false;" style="font-size:0.8125rem;color:#C0B0C0;text-decoration:none;">あとで →</a>
-    </div>
-  </div>
+
+
 
   <!-- ══════════════════════════════════
        FEEDBACK MODAL
@@ -2037,7 +1810,7 @@
       <!-- 送信フォーム（Formspree） -->
       <form id="feedbackForm" action="https://formspree.io/f/xjgpelwv" method="POST" novalidate>
         <!-- hidden fields -->
-        <input type="hidden" name="_subject" value="kenkou kiroku フィードバック">
+        <input type="hidden" name="_subject" value="ippo フィードバック">
         <input type="hidden" name="trigger_type" id="fbTriggerType" value="">
         <input type="hidden" name="record_count" id="fbRecordCount" value="">
         <input type="hidden" name="streak_days" id="fbStreakDays" value="">
@@ -2148,7 +1921,7 @@
   <!-- ヘッダー -->
   <div class="wizard-header">
     <button class="wizard-close-btn" id="wizardCloseBtn" aria-label="閉じる">✕</button>
-    <span style="font-family:'Cormorant Garamond',serif; font-size:0.8125rem; color:#A090A0; letter-spacing:0.1em;">kenkou kiroku</span>
+    <span style="font-family:'Cormorant Garamond',serif; font-size:0.8125rem; color:#A090A0; letter-spacing:0.1em;">ippo</span>
     <div style="width:36px;"></div>
   </div>
 
@@ -2420,7 +2193,7 @@
 <script src="js/kk-app.js"></script>
 <script>
 /* =====================================================
-   kenkou kiroku — 3層制御 + ウィザード v3
+   ippo — 3層制御 + ウィザード v3
    ===================================================== */
 (function() {
   'use strict';
@@ -2435,42 +2208,9 @@
   };
 
   /* ── 登録状態 ── */
-  function isRegistered() { return localStorage.getItem('kk_registered') === 'true'; }
-  function isPremium()    { return localStorage.getItem('kk_premium') === 'true'; }
+  function isRegistered() { return true; }
+  function isPremium()    { return true; }
 
-  /* ── 登録モーダル ── */
-  window.closeRegModal = function() {
-    const m = document.getElementById('reg-modal');
-    if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
-  };
-  window.completeRegistration = function() {
-    localStorage.setItem('kk_registered', 'true');
-    closeRegModal();
-    const lock = document.getElementById('insightRegLock');
-    if (lock) lock.style.display = 'none';
-    showToast('登録完了！すべての無料機能が使えます 🌸');
-  };
-  window.registerByEmail = function() {
-    const email = prompt('メールアドレスを入力してください');
-    if (email && email.includes('@')) {
-      localStorage.setItem('kk_registered', 'true');
-      localStorage.setItem('kk_email', email);
-      closeRegModal();
-      const lock = document.getElementById('insightRegLock');
-      if (lock) lock.style.display = 'none';
-      showToast('登録完了！すべての無料機能が使えます 🌸');
-    }
-  };
-
-  /* ── Premiumモーダル ── */
-  window.openPremiumModal = function() {
-    const m = document.getElementById('premium-modal');
-    if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-  };
-  window.closePremiumModal = function() {
-    const m = document.getElementById('premium-modal');
-    if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
-  };
 
 
   /* ─────────────────────────────────────
@@ -2590,6 +2330,9 @@
     t.classList.add('toast-show');
     setTimeout(() => t.classList.remove('toast-show'), 3000);
   }
+
+  /* ── インサイトロック注入 ── */
+
   /* ── ウィザード ── */
   const wizard   = document.getElementById('record-wizard');
   const complete = document.getElementById('wizard-complete');
@@ -2611,7 +2354,7 @@
   function closeWizard() { wizard.classList.remove('wizard-open'); document.body.style.overflow = ''; }
 
   function goToStep(step) {
-   document.querySelectorAll('.wizard-step').forEach(s => {
+    document.querySelectorAll('.wizard-step').forEach(s => {
       const n = parseInt(s.dataset.step);
       s.classList.remove('step-active','step-exit');
       if (n === step) s.classList.add('step-active');
@@ -2700,7 +2443,6 @@
   /* 保存 */
   function saveWizardRecord() {
     closeWizard();
-    if (!isRegistered()) return;
     const today = new Date().toISOString().split('T')[0];
     try {
       const ex = JSON.parse(localStorage.getItem('kkRecords') || '{}');
@@ -2758,8 +2500,6 @@
     });
     document.querySelectorAll('[data-screen="record"]').forEach(el => { el.onclick = null; el.addEventListener('click', openWizard); });
     // インサイトガード: showScreen()内で対応
-    // Premiumトリガー
-    document.querySelectorAll('.premium-trigger').forEach(btn => { btn.addEventListener('click', openPremiumModal); });
   }
 
   /* FAB表示 */
@@ -2783,7 +2523,6 @@
       const nextIdx = TAB_ORDER.indexOf(target);
       const direction = nextIdx >= curIdx ? 'forward' : 'back';
 
-      // インサイトガード（未登録）
       // タブバウンスアニメーション再トリガー
       const icon = this.querySelector('.ph-light');
       if (icon) {
@@ -2880,7 +2619,7 @@
     updateSettingsProfile();   // 修正3: プロフィール表示
     hideInsightSkeleton(); // 初期はスケルトン非表示
     checkInsightEmpty();   // EmptyState初期チェック
-    if (isPremium()) document.querySelectorAll('.chart-blur-overlay,.report-lock-overlay').forEach(el => el.style.display = 'none');
+
     // ホーム初期表示時にカウントアップ
     setTimeout(() => {
       const streak = getStreak();
@@ -2987,18 +2726,12 @@
     #record-wizard { max-width:430px; left:50%; right:auto; transform:translateX(-50%) translateY(100%); }
     #record-wizard.wizard-open { transform:translateX(-50%) translateY(0); }
     #wizard-complete, .home-record-fab, #pwa-banner { max-width:430px; left:50%; transform:translateX(-50%); right:auto; }
-    #reg-modal > div, #premium-modal > div { margin:auto; }
   }
 
   /* Toast */
   #kk-toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#3D2E3A; color:white; padding:10px 22px; border-radius:22px; font-size:0.875rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:600; white-space:nowrap; max-width:90vw; text-align:center; }
   #kk-toast.toast-show { opacity:1; }
 </style>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/kenkou-kiroku/service-worker.js');
-}
-</script>
 
 </body>
 </html>
