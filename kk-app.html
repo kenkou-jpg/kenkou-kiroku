@@ -2492,14 +2492,29 @@
       return streak;
     } catch(e) { return 0; }
   }
-
-  /* バインド */
+ /* バインド */
   function bindAll() {
     ['homeRecordBtn','quickRecordBtn','fabRecordBtn'].forEach(id => {
-      const el = document.getElementById(id); if (el) { el.onclick = null; el.addEventListener('click', openWizard); }
+      const el = document.getElementById(id);
+      if (el) {
+        el.onclick = null;
+        el.addEventListener('click', () => {
+          document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+          const rec = document.getElementById('screen-record');
+          if (rec) rec.classList.add('active');
+          updateFabVisibility();
+        });
+      }
     });
-    document.querySelectorAll('[data-screen="record"]').forEach(el => { el.onclick = null; el.addEventListener('click', openWizard); });
-    // インサイトガード: showScreen()内で対応
+    document.querySelectorAll('[data-screen="record"]').forEach(el => {
+      el.onclick = null;
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+        const rec = document.getElementById('screen-record');
+        if (rec) rec.classList.add('active');
+        updateFabVisibility();
+      });
+    });
   }
 
   /* FAB表示 */
