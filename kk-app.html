@@ -2289,37 +2289,27 @@ function checkInsightEmpty() {
   /* ─────────────────────────────────────
      修正3: 設定画面プロフィール動的表示
   ───────────────────────────────────── */
-  function updateSettingsProfile() {
-    // ユーザー名（kkUserName または kk_username、なければ「あなた」）
+ function updateSettingsProfile() {
     const userName = localStorage.getItem('kkUserName')
                   || localStorage.getItem('kk_username')
                   || 'あなた';
-
     const nameEl = document.getElementById('settingsName');
     const sinceEl = document.getElementById('settingsSince');
     const nameValEl = document.getElementById('settingNameValue');
-
     if (nameEl) nameEl.textContent = userName;
     if (nameValEl) nameValEl.textContent = userName;
-
-    // 開始日・記録日数
     if (sinceEl) {
       try {
-        const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
-        const keys = Object.keys(records).sort();
-        const count = keys.length;
+        const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+        const count = records.length;
         if (count > 0) {
-          const firstDate = new Date(keys[0]);
-          const y = firstDate.getFullYear();
-          const m = firstDate.getMonth() + 1;
-          const d = firstDate.getDate();
-          sinceEl.textContent = `開始日: ${y}年${m}月${d}日 — ${count}日分の記録`;
+          const sorted = records.map(r => r.record_date).sort();
+          const firstDate = new Date(sorted[0]);
+          sinceEl.textContent = `開始日: ${firstDate.getFullYear()}年${firstDate.getMonth()+1}月${firstDate.getDate()}日 — ${count}日分の記録`;
         } else {
           sinceEl.textContent = 'まだ記録がありません';
         }
-      } catch(e) {
-        sinceEl.textContent = '';
-      }
+      } catch(e) { sinceEl.textContent = ''; }
     }
   }
 
