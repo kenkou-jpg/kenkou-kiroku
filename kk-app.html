@@ -2345,7 +2345,24 @@ document.addEventListener('DOMContentLoaded', function() {
       if (todayRec) { fabBtn.classList.add('recorded'); fabBtn.innerHTML = '✓ 今日の記録済み'; }
       else { fabBtn.classList.remove('recorded'); fabBtn.textContent = '今日を記録する'; }
     }
-  }
+     // チャクラ診断テスト結果の反映
+    var savedType = localStorage.getItem('kk_chakra_test_type');
+    var savedDate = localStorage.getItem('kk_chakra_test_date');
+    var testTitle = document.getElementById('chakraTestBannerTitle');
+    var testDesc  = document.getElementById('chakraTestBannerDesc');
+    if (testTitle && testDesc && savedType) {
+      var TYPE_NAMES = {
+        root: 'グランディングタイプ', sacral: '女性性開花タイプ',
+        solar: '消化力回復タイプ', heart: '愛と受容タイプ',
+        throat: '自己表現解放タイプ', thirdeye: '直感・洞察覚醒タイプ',
+        crown: '全身統合・感情調和タイプ'
+      };
+      if (TYPE_NAMES[savedType]) {
+        testTitle.textContent = 'あなたのタイプ：' + TYPE_NAMES[savedType];
+        testDesc.textContent = '診断日：' + (savedDate || '—') + '　もう一度診断して変化を確認しましょう。';
+      }
+    }
+ }
 
   // ホーム画面表示のたびに更新
   document.querySelectorAll('[data-screen="home"]').forEach(function(btn) {
