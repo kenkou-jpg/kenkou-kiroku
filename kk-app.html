@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
- <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#FBF7F2">
   <title>ippo - からだを見つめ直すセルフレコードアプリ</title>
@@ -2258,7 +2257,7 @@
     updateFabVisibility();
     if (screenId === 'insight') {
       showInsightSkeleton();
-      setTimeout(() => { hideInsightSkeleton(); checkInsightEmpty(); }, 600);
+      setTimeout(() => { hideInsightSkeleton(); checkInsightEmpty(); renderInsightCharts(); }, 600);
     }
     if (screenId === 'home') {
       setTimeout(() => {
@@ -2322,12 +2321,7 @@
   /* ── インサイトロック注入 ── */
 
   /* ── ウィザード ── */
-  const wizard   = document.getElementById('record-wizard');
-  const complete = document.getElementById('wizard-complete');
-  const progressFill = document.getElementById('wizardProgressFill');
-  const stepLabel    = document.getElementById('wizardStepLabel');
-  const nextBtn  = document.getElementById('wizardNextBtn');
-  const backBtn  = document.getElementById('wizardBackBtn');
+  let wizard, complete, progressFill, stepLabel, nextBtn, backBtn;
 
   function openWizard() {
     currentStep = 1;
@@ -2335,11 +2329,11 @@
     document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('step-active','step-exit'));
     document.querySelectorAll('.wizard-scale-btn,.wizard-chip,.chakra-visual-item,.wizard-emotion-card').forEach(el => el.classList.remove('selected'));
     goToStep(1);
-    wizard.classList.add('wizard-open');
+    if (wizard) wizard.classList.add('wizard-open');
     document.body.style.overflow = 'hidden';
   }
 
-  function closeWizard() { wizard.classList.remove('wizard-open'); document.body.style.overflow = ''; }
+  function closeWizard() { if (wizard) wizard.classList.remove('wizard-open'); document.body.style.overflow = ''; }
 
   function goToStep(step) {
     document.querySelectorAll('.wizard-step').forEach(s => {
@@ -2350,83 +2344,97 @@
     });
     currentStep = step;
     const pct = ((step-1)/(TOTAL_STEPS-1))*100;
-    progressFill.style.width = pct + '%';
-    stepLabel.textContent = step + ' / ' + TOTAL_STEPS;
-    backBtn.style.visibility = step > 1 ? 'visible' : 'hidden';
+    if (progressFill) progressFill.style.width = pct + '%';
+    if (stepLabel) stepLabel.textContent = step + ' / ' + TOTAL_STEPS;
+    if (backBtn) backBtn.style.visibility = step > 1 ? 'visible' : 'hidden';
     const isLast = step === TOTAL_STEPS;
-    nextBtn.textContent = isLast ? '記録を保存する' : '次へ';
-    nextBtn.className = 'wizard-next-btn' + (isLast ? ' btn-teal' : '');
+    if (nextBtn) nextBtn.textContent = isLast ? '記録を保存する' : '次へ';
+    if (nextBtn) nextBtn.className = 'wizard-next-btn' + (isLast ? ' btn-teal' : '');
   }
 
-  nextBtn.addEventListener('click', () => { if (currentStep < TOTAL_STEPS) goToStep(currentStep+1); else saveWizardRecord(); });
-  backBtn.addEventListener('click', () => { if (currentStep > 1) goToStep(currentStep-1); });
-  document.getElementById('wizardCloseBtn').addEventListener('click', closeWizard);
+  function bindWizard() {
+    wizard      = document.getElementById('record-wizard');
+    complete    = document.getElementById('wizard-complete');
+    progressFill = document.getElementById('wizardProgressFill');
+    stepLabel   = document.getElementById('wizardStepLabel');
+    nextBtn     = document.getElementById('wizardNextBtn');
+    backBtn     = document.getElementById('wizardBackBtn');
 
-  /* Step1 */
-  document.querySelectorAll('#wBodyScaleRow .wizard-scale-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#wBodyScaleRow .wizard-scale-btn').forEach(b => b.classList.remove('selected'));
-      this.classList.add('selected'); wizardData.bodyScore = parseInt(this.dataset.val);
-      setTimeout(() => goToStep(2), 320);
-    });
-  });
+    if (nextBtn) nextBtn.addEventListener('click', () => { if (currentStep < TOTAL_STEPS) goToStep(currentStep+1); else saveWizardRecord(); });
+    if (backBtn) backBtn.addEventListener('click', () => { if (currentStep > 1) goToStep(currentStep-1); });
+    const closeBtn = document.getElementById('wizardCloseBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeWizard);
 
-  /* Step2 チャクラ */
-  document.querySelectorAll('#wChakraGrid .chakra-visual-item').forEach(card => {
-    card.addEventListener('click', function() {
-      document.querySelectorAll('#wChakraGrid .chakra-visual-item').forEach(c => c.classList.remove('selected'));
-      this.classList.add('selected'); wizardData.chakra = this.dataset.chakra;
-      const map = {root:'bodyChakra1',sacral:'bodyChakra2',solar:'bodyChakra3',heart:'bodyChakra4',throat:'bodyChakra5',third_eye:'bodyChakra6'};
-      document.querySelectorAll('.chakra-glow-point').forEach(p => p.classList.remove('active'));
-      const el = document.getElementById(map[this.dataset.chakra]); if (el) el.classList.add('active');
-      setTimeout(() => goToStep(3), 350);
+    /* Step1 */
+    document.querySelectorAll('#wBodyScaleRow .wizard-scale-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('#wBodyScaleRow .wizard-scale-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected'); wizardData.bodyScore = parseInt(this.dataset.val);
+        setTimeout(() => goToStep(2), 320);
+      });
     });
-  });
-  document.querySelectorAll('.chakra-glow-point').forEach(pt => {
-    pt.addEventListener('click', function() {
-      const item = document.querySelector('#wChakraGrid .chakra-visual-item[data-chakra="'+this.dataset.chakra+'"]');
-      if (item) item.click();
-    });
-  });
-  document.getElementById('wChakraSkip').addEventListener('click', () => goToStep(3));
 
-  /* Step3 食事 */
-  document.querySelectorAll('#wFoodScaleRow .wizard-scale-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#wFoodScaleRow .wizard-scale-btn').forEach(b => b.classList.remove('selected'));
-      this.classList.add('selected'); wizardData.foodScore = parseInt(this.dataset.val);
+    /* Step2 チャクラ */
+    document.querySelectorAll('#wChakraGrid .chakra-visual-item').forEach(card => {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('#wChakraGrid .chakra-visual-item').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected'); wizardData.chakra = this.dataset.chakra;
+        const map = {root:'bodyChakra1',sacral:'bodyChakra2',solar:'bodyChakra3',heart:'bodyChakra4',throat:'bodyChakra5',third_eye:'bodyChakra6'};
+        document.querySelectorAll('.chakra-glow-point').forEach(p => p.classList.remove('active'));
+        const el = document.getElementById(map[this.dataset.chakra]); if (el) el.classList.add('active');
+        setTimeout(() => goToStep(3), 350);
+      });
     });
-  });
-  document.querySelectorAll('#wFoodChips .wizard-chip').forEach(chip => {
-    chip.addEventListener('click', function() {
-      this.classList.toggle('selected');
-      const val = this.dataset.val, idx = wizardData.foodItems.indexOf(val);
-      if (idx === -1) wizardData.foodItems.push(val); else wizardData.foodItems.splice(idx,1);
+    document.querySelectorAll('.chakra-glow-point').forEach(pt => {
+      pt.addEventListener('click', function() {
+        const item = document.querySelector('#wChakraGrid .chakra-visual-item[data-chakra="'+this.dataset.chakra+'"]');
+        if (item) item.click();
+      });
     });
-  });
+    const chakraSkip = document.getElementById('wChakraSkip');
+    if (chakraSkip) chakraSkip.addEventListener('click', () => goToStep(3));
 
-  /* Step4 断食 */
-  document.querySelectorAll('#wFastingChips .wizard-chip').forEach(chip => {
-    chip.addEventListener('click', function() {
-      document.querySelectorAll('#wFastingChips .wizard-chip').forEach(c => c.classList.remove('selected'));
-      this.classList.add('selected'); wizardData.fastingHours = this.dataset.val;
-      setTimeout(() => goToStep(5), 320);
+    /* Step3 食事 */
+    document.querySelectorAll('#wFoodScaleRow .wizard-scale-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('#wFoodScaleRow .wizard-scale-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected'); wizardData.foodScore = parseInt(this.dataset.val);
+      });
     });
-  });
-  document.getElementById('wFastingSkip').addEventListener('click', () => goToStep(5));
-
-  /* Step5 感情 */
-  document.querySelectorAll('#wEmotionGrid .wizard-emotion-card').forEach(card => {
-    card.addEventListener('click', function() {
-      document.querySelectorAll('#wEmotionGrid .wizard-emotion-card').forEach(c => c.classList.remove('selected'));
-      this.classList.add('selected'); wizardData.emotion = this.dataset.emotion;
-      setTimeout(() => goToStep(6), 320);
+    document.querySelectorAll('#wFoodChips .wizard-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('selected');
+        const val = this.dataset.val, idx = wizardData.foodItems.indexOf(val);
+        if (idx === -1) wizardData.foodItems.push(val); else wizardData.foodItems.splice(idx,1);
+      });
     });
-  });
 
-  /* Step6 メモ */
-  document.getElementById('wMemoText').addEventListener('input', function() { wizardData.memo = this.value; });
-  document.getElementById('wMemoSkip').addEventListener('click', saveWizardRecord);
+    /* Step4 断食 */
+    document.querySelectorAll('#wFastingChips .wizard-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('#wFastingChips .wizard-chip').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected'); wizardData.fastingHours = this.dataset.val;
+        setTimeout(() => goToStep(5), 320);
+      });
+    });
+    const fastingSkip = document.getElementById('wFastingSkip');
+    if (fastingSkip) fastingSkip.addEventListener('click', () => goToStep(5));
+
+    /* Step5 感情 */
+    document.querySelectorAll('#wEmotionGrid .wizard-emotion-card').forEach(card => {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('#wEmotionGrid .wizard-emotion-card').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected'); wizardData.emotion = this.dataset.emotion;
+        setTimeout(() => goToStep(6), 320);
+      });
+    });
+
+    /* Step6 メモ */
+    const memoText = document.getElementById('wMemoText');
+    if (memoText) memoText.addEventListener('input', function() { wizardData.memo = this.value; });
+    const memoSkip = document.getElementById('wMemoSkip');
+    if (memoSkip) memoSkip.addEventListener('click', saveWizardRecord);
+  }
 
   /* 保存 */
   function saveWizardRecord() {
@@ -2460,11 +2468,12 @@
     const streak = getStreak();
     document.getElementById('completeTitle').textContent = (name ? name+'さん、' : '')+'記録できました 🌸';
     document.getElementById('completeSub').textContent = streak > 1 ? streak+'日連続記録中✨\n今日もからだの声を聴いてくれてありがとう。' : '今日もからだの声を\n聴いてくれてありがとう。';
-    complete.classList.add('complete-show');
-    setTimeout(() => complete.classList.remove('complete-show'), 3000);
+    if (complete) complete.classList.add('complete-show');
+    setTimeout(() => { if (complete) complete.classList.remove('complete-show'); }, 3000);
   }
 
   function spawnPetals() {
+    if (!complete) return;
     const colors = ['#E63FA8','#F2A8D8','#27B7B3','#7DD4D1','#F5D020'];
     for (let i = 0; i < 18; i++) {
       const p = document.createElement('div'); p.className = 'confetti-petal';
@@ -2501,6 +2510,180 @@
   }
 
   /* バインド */
+  /* ─────────────────────────────────────
+     ホーム画面の日付・挨拶・今日のメッセージを更新
+  ───────────────────────────────────── */
+  function updateHomeScreen() {
+    const now = new Date();
+    const hour = now.getHours();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const weekDays = ['日','月','火','水','木','金','土'];
+    const wday = weekDays[now.getDay()];
+
+    // 日付表示
+    const dateEl = document.getElementById('homeDateDisplay');
+    if (dateEl) dateEl.textContent = `${month}月${day}日（${wday}）`;
+
+    // 時間帯の挨拶
+    const timeEl = document.getElementById('homeTimeMsg');
+    if (timeEl) {
+      if (hour < 6)       timeEl.textContent = 'おやすみなさい';
+      else if (hour < 10) timeEl.textContent = 'おはようございます';
+      else if (hour < 17) timeEl.textContent = 'こんにちは';
+      else if (hour < 21) timeEl.textContent = 'こんばんは';
+      else                timeEl.textContent = 'お疲れさまです';
+    }
+
+    // 名前の挨拶
+    const name = localStorage.getItem('kkUserName') || localStorage.getItem('kk_username') || '';
+    const greetEl = document.getElementById('homeGreetingText');
+    if (greetEl) greetEl.textContent = name ? `${name}さん` : 'ようこそ';
+
+    const greetMsg = document.getElementById('homeGreetingMsg');
+    if (greetMsg) {
+      const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+      const today = now.toISOString().split('T')[0];
+      const hasToday = records.some(r => r.record_date === today);
+      greetMsg.textContent = hasToday
+        ? '今日の記録ができています ✓'
+        : 'からだの声を聴いてみましょう';
+    }
+
+    // 今日のメッセージ（季節・月別）
+    const messages = {
+      1:  ['冬の静けさの中に、からだを整える時間を。', '寒い日こそ、温かいものをていねいに。'],
+      2:  ['春の準備が始まる季節。からだも少しずつほぐして。', 'まだ寒い日に、自分をいたわる時間を。'],
+      3:  ['春の息吹とともに、新しいリズムを。', '変わり目のからだに、ゆっくり向き合って。'],
+      4:  ['桜のように、今のあなたのままで美しい。', '新しい季節の始まり。小さな一歩を大切に。'],
+      5:  ['からだが動きやすい季節。記録を続けていきましょう。', '心地よい風の中、からだの声を聴いて。'],
+      6:  ['梅雨の湿気に、からだが揺れる頃。水分とデトックスを意識して。', '雨音の中で、ゆっくり自分を見つめて。'],
+      7:  ['夏の熱にのまれず、クールダウンを忘れずに。', '暑さの中でも、からだのリズムを大切に。'],
+      8:  ['残暑のなかでも、からだに優しい選択を。', '夏の疲れが出やすい時期。休息も記録のうち。'],
+      9:  ['秋の始まり。からだのバランスを取り戻す季節。', '実りの季節、根菜で骨盤まわりを温めて。'],
+      10: ['秋の深まりとともに、内なる声を聴いて。', '気温差が大きい季節。体温調節を意識して。'],
+      11: ['冬支度の前に、からだをしっかり整えて。', '温活を始めるのに、いい季節です。'],
+      12: ['年の瀬の忙しさの中で、自分を後回しにしないで。', '一年のからだの変化を、振り返る時間を。'],
+    };
+    const msgList = messages[month] || messages[4];
+    const idx = day % msgList.length;
+    const quoteEl = document.getElementById('seasonQuoteText');
+    const subEl   = document.getElementById('seasonQuoteSub');
+    if (quoteEl) quoteEl.textContent = msgList[idx];
+    if (subEl)   subEl.textContent   = `${month}月のからだより`;
+
+    // 記録日表示
+    const dateRecord = document.getElementById('recordDateDisplay');
+    if (dateRecord) dateRecord.textContent = `${month}月${day}日（${wday}）の記録`;
+  }
+
+  /* ─────────────────────────────────────
+     インサイト グラフ描画
+  ───────────────────────────────────── */
+  let chartWellness = null, chartFood = null, chartChakra = null;
+
+  function renderInsightCharts() {
+    const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+    if (records.length === 0) return;
+
+    const sorted = [...records].sort((a, b) => a.record_date.localeCompare(b.record_date));
+    const recent = sorted.slice(-7);
+    const labels = recent.map(r => {
+      const d = new Date(r.record_date);
+      return `${d.getMonth()+1}/${d.getDate()}`;
+    });
+
+    // ウェルネス・エネルギー推移
+    const wellnessCanvas = document.getElementById('wellnessChart');
+    if (wellnessCanvas) {
+      if (chartWellness) chartWellness.destroy();
+      chartWellness = new Chart(wellnessCanvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'ウェルネス',
+            data: recent.map(r => r.wellness_score || null),
+            borderColor: '#E63FA8',
+            backgroundColor: 'rgba(230,63,168,0.1)',
+            tension: 0.4, fill: true, pointRadius: 4
+          }, {
+            label: 'エネルギー',
+            data: recent.map(r => r.energy_score || null),
+            borderColor: '#27B7B3',
+            backgroundColor: 'rgba(39,183,179,0.1)',
+            tension: 0.4, fill: false, pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { font: { size: 11 }, color: '#6B5E6A' } } },
+          scales: {
+            y: { min: 0, max: 10, ticks: { color: '#9E8E9D', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { ticks: { color: '#9E8E9D', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // 食事の質 推移
+    const foodCanvas = document.getElementById('foodChart');
+    if (foodCanvas) {
+      if (chartFood) chartFood.destroy();
+      chartFood = new Chart(foodCanvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: '食事スコア',
+            data: recent.map(r => r.food_score || null),
+            backgroundColor: 'rgba(39,183,179,0.7)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 0, max: 10, ticks: { color: '#9E8E9D', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { ticks: { color: '#9E8E9D', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // チャクラ別 記録頻度
+    const chakraCanvas = document.getElementById('chakraChart');
+    if (chakraCanvas) {
+      const chakraMap = { root:'第1', sacral:'第2', solar:'第3', heart:'第4', throat:'第5', third_eye:'第6' };
+      const freq = {};
+      recent.forEach(r => { if (r.chakra) freq[r.chakra] = (freq[r.chakra] || 0) + 1; });
+      const chakraLabels = Object.keys(chakraMap).map(k => chakraMap[k]);
+      const chakraData = Object.keys(chakraMap).map(k => freq[k] || 0);
+      if (chartChakra) chartChakra.destroy();
+      chartChakra = new Chart(chakraCanvas, {
+        type: 'bar',
+        data: {
+          labels: chakraLabels,
+          datasets: [{
+            label: '記録回数',
+            data: chakraData,
+            backgroundColor: ['#E63FA8','#F2A8D8','#27B7B3','#7DD4D1','#C9A44A','#8A7387'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { color: '#9E8E9D', font: { size: 10 }, stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { ticks: { color: '#9E8E9D', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+  }
+
   function bindAll() {
     ['homeRecordBtn','quickRecordBtn','fabRecordBtn'].forEach(id => {
       const el = document.getElementById(id);
@@ -2620,6 +2803,7 @@
       document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
       const home = document.getElementById('screen-home');
       if (home) home.classList.add('active');
+      updateHomeScreen();
       // FABを表示
       const fab = document.getElementById('homeRecordFab');
       if (fab) fab.style.display = 'block';
@@ -2659,6 +2843,8 @@
   /* 初期化 */
   function init() {
     applyPcLayout();
+    updateHomeScreen();
+    bindWizard();
     bindAll();
     updateFabState();
     updateFabVisibility();
@@ -2715,6 +2901,73 @@
           showToast('お名前を更新しました');
         }
       });
+    }
+
+    // 気になる症状
+    const conditionRow = document.getElementById('settingConditionRow');
+    if (conditionRow) {
+      conditionRow.addEventListener('click', () => {
+        const symptoms = ['下腹部痛','骨盤の重さ','子宮筋腫','お腹の張り','疲れやすい','冷え','生理中','生理前','生理後'];
+        const current = localStorage.getItem('kk_symptoms') || '';
+        const input = prompt('気になる症状を入力してください（例：冷え、疲れやすい）', current);
+        if (input !== null) {
+          localStorage.setItem('kk_symptoms', input.trim());
+          const val = document.getElementById('settingConditionValue');
+          if (val) val.textContent = input.trim() || '設定する';
+          showToast('症状を保存しました');
+        }
+      });
+      // 初期表示
+      const saved = localStorage.getItem('kk_symptoms');
+      const val = document.getElementById('settingConditionValue');
+      if (val && saved) val.textContent = saved;
+    }
+
+    // 断食目標時間
+    const fastingGoalRow = document.getElementById('settingFastingGoalRow');
+    if (fastingGoalRow) {
+      fastingGoalRow.addEventListener('click', () => {
+        const options = ['12h','14h','16h','18h'];
+        const current = localStorage.getItem('kk_fasting_goal') || '14h';
+        const idx = options.indexOf(current);
+        const next = options[(idx + 1) % options.length];
+        localStorage.setItem('kk_fasting_goal', next);
+        const val = document.getElementById('settingFastingGoalValue');
+        if (val) val.textContent = next;
+        showToast('断食目標を ' + next + ' に設定しました');
+      });
+      const saved = localStorage.getItem('kk_fasting_goal');
+      const val = document.getElementById('settingFastingGoalValue');
+      if (val && saved) val.textContent = saved;
+    }
+
+    // 記録履歴を見る
+    const historyRow = document.getElementById('historyRow');
+    if (historyRow) {
+      historyRow.addEventListener('click', () => {
+        const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+        if (records.length === 0) { showToast('まだ記録がありません'); return; }
+        const sorted = [...records].sort((a, b) => b.record_date.localeCompare(a.record_date));
+        const lines = sorted.slice(0, 10).map(r =>
+          `${r.record_date}｜体調:${r.wellness_score || '-'}｜食事:${r.food_score || '-'}｜断食:${r.fasting_hours ? r.fasting_hours+'h' : '-'}｜感情:${r.emotion || '-'}`
+        ).join('\n');
+        alert('最近の記録（直近10件）\n\n' + lines + (records.length > 10 ? '\n\n...他 '+(records.length-10)+' 件' : ''));
+      });
+    }
+
+    // 感想・ご意見を送る
+    const feedbackBtn = document.getElementById('settingsFeedbackBtn');
+    const feedbackModal = document.getElementById('feedbackModal');
+    if (feedbackBtn && feedbackModal) {
+      feedbackBtn.addEventListener('click', () => {
+        feedbackModal.classList.add('feedback-open');
+      });
+      const feedbackCloseBtn = document.getElementById('feedbackCloseBtn');
+      if (feedbackCloseBtn) {
+        feedbackCloseBtn.addEventListener('click', () => {
+          feedbackModal.classList.remove('feedback-open');
+        });
+      }
     }
 
     // ★ A-5: 初回アクセス判定 — ウェルカム画面を確実に表示
