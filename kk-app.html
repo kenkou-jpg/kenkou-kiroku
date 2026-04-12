@@ -14,8 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="ippo">
   <!-- Phosphor Icons -->
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/light/style.css">
-  <!-- Lottie Player -->
- <!-- Chart.js -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     /* =====================================================
@@ -646,12 +645,7 @@
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
     /* =====================================================
-       改善7: Lottie完了画面
-       ===================================================== */
-    .lottie-complete-wrap { display:flex; justify-content:center; margin-bottom:12px; }
-
-    /* =====================================================
-       改善8: Empty State
+       改善7: Empty State
        ===================================================== */
     .empty-state { text-align:center; padding:48px 24px 32px; }
     .empty-state .ph-light { font-size:60px; color:#D8D0D8; display:block; margin-bottom:14px; }
@@ -716,7 +710,7 @@
             <ellipse cx="70" cy="35" rx="14" ry="28" fill="url(#petalPink)" transform="rotate(288 70 70)"/>
             <!-- 中心 -->
             <circle cx="70" cy="70" r="14" fill="white" opacity="0.9"/>
-       <circle cx="70" cy="70" r="9" fill="url(#petalPink)" opacity="0.6"/>
+            <circle cx="70" cy="70" r="9" fill="url(#petalPink)" opacity="0.6"/>
           </svg>
         </div>
         <p class="welcome-tag">ippo</p>
@@ -1033,82 +1027,84 @@
             <div class="chip" data-val="period_before">生理前</div>
             <div class="chip" data-val="period_after">生理後</div>
             <div class="chip" data-val="none">特になし</div>
-           <div class="condition-memo-section" id="conditionMemoSection">
-        <h3 class="condition-memo-title">今日の体調</h3>
-        <p class="condition-memo-sub">からだの状態を5段階で記録しましょう。<br>続けると、自分のパターンが見えてきます。</p>
-
-        <!-- 5段階評価 -->
-        <div class="condition-scale-row" id="conditionScaleRow">
-          <!-- 1: つらい -->
-          <button class="condition-scale-btn" data-scale="1" aria-label="1 つらい">
-            <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="12" stroke="#bbb" stroke-width="1.5" fill="#f5f5f5"/>
-              <circle cx="10" cy="12" r="1.5" fill="#999"/>
-              <circle cx="18" cy="12" r="1.5" fill="#999"/>
-              <path d="M9 19 Q14 15.5 19 19" stroke="#999" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            </svg>
-            <span class="condition-scale-num">1</span>
-            <span>つらい</span>
-          </button>
-          <!-- 2: 少し重い -->
-          <button class="condition-scale-btn" data-scale="2" aria-label="2 少し重い">
-            <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="12" stroke="#c5b8a8" stroke-width="1.5" fill="#faf7f3"/>
-              <circle cx="10" cy="12" r="1.5" fill="#999"/>
-              <circle cx="18" cy="12" r="1.5" fill="#999"/>
-              <path d="M10 18.5 h8" stroke="#bbb" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span class="condition-scale-num">2</span>
-            <span>少し重い</span>
-          </button>
-          <!-- 3: ふつう -->
-          <button class="condition-scale-btn" data-scale="3" aria-label="3 ふつう">
-            <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="12" stroke="#a8c5c3" stroke-width="1.5" fill="#f0f7f7"/>
-              <circle cx="10" cy="12" r="1.5" fill="#7DB8B4"/>
-              <circle cx="18" cy="12" r="1.5" fill="#7DB8B4"/>
-              <path d="M10 18 Q14 19.5 18 18" stroke="#7DB8B4" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            </svg>
-            <span class="condition-scale-num">3</span>
-            <span>ふつう</span>
-          </button>
-          <!-- 4: まあまあ良い -->
-          <button class="condition-scale-btn" data-scale="4" aria-label="4 まあまあ良い">
-            <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="12" stroke="#7DB8B4" stroke-width="1.5" fill="#e6f4f3"/>
-              <circle cx="10" cy="12" r="1.5" fill="#5a9e9a"/>
-              <circle cx="18" cy="12" r="1.5" fill="#5a9e9a"/>
-              <path d="M9 17 Q14 21 19 17" stroke="#5a9e9a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            </svg>
-            <span class="condition-scale-num">4</span>
-            <span>まあまあ</span>
-          </button>
-          <!-- 5: とても良い -->
-          <button class="condition-scale-btn" data-scale="5" aria-label="5 とても良い">
-            <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="14" cy="14" r="12" stroke="#5a9e9a" stroke-width="1.5" fill="#d4eeed"/>
-              <circle cx="10" cy="11.5" r="2" fill="#3a7d7a"/>
-              <circle cx="18" cy="11.5" r="2" fill="#3a7d7a"/>
-              <path d="M8.5 16.5 Q14 22 19.5 16.5" stroke="#3a7d7a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            </svg>
-            <span class="condition-scale-num">5</span>
-            <span>とても良い</span>
-          </button>
+          </div>
         </div>
 
-        <!-- 自由記述 -->
-        <textarea
-          id="conditionMemoText"
-          class="form-textarea"
-          placeholder="からだの感覚を自由にメモしてください。骨盤まわりの重さ、温かさ、気分など何でも。"
-          rows="3"
-          maxlength="200"
-        ></textarea>
+        <!-- 今日の体調セクション -->
+        <div class="condition-memo-section" id="conditionMemoSection">
+          <h3 class="condition-memo-title">今日の体調</h3>
+          <p class="condition-memo-sub">からだの状態を5段階で記録しましょう。<br>続けると、自分のパターンが見えてきます。</p>
 
-        <!-- 保存ボタン -->
-        <button class="condition-save-btn" id="conditionSaveBtn">今日の体調を記録する</button>
-      </div>
-</div>
+          <!-- 5段階評価 -->
+          <div class="condition-scale-row" id="conditionScaleRow">
+            <!-- 1: つらい -->
+            <button class="condition-scale-btn" data-scale="1" aria-label="1 つらい">
+              <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <circle cx="14" cy="14" r="12" stroke="#bbb" stroke-width="1.5" fill="#f5f5f5"/>
+                <circle cx="10" cy="12" r="1.5" fill="#999"/>
+                <circle cx="18" cy="12" r="1.5" fill="#999"/>
+                <path d="M9 19 Q14 15.5 19 19" stroke="#999" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span class="condition-scale-num">1</span>
+              <span>つらい</span>
+            </button>
+            <!-- 2: 少し重い -->
+            <button class="condition-scale-btn" data-scale="2" aria-label="2 少し重い">
+              <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <circle cx="14" cy="14" r="12" stroke="#c5b8a8" stroke-width="1.5" fill="#faf7f3"/>
+                <circle cx="10" cy="12" r="1.5" fill="#999"/>
+                <circle cx="18" cy="12" r="1.5" fill="#999"/>
+                <path d="M10 18.5 h8" stroke="#bbb" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span class="condition-scale-num">2</span>
+              <span>少し重い</span>
+            </button>
+            <!-- 3: ふつう -->
+            <button class="condition-scale-btn" data-scale="3" aria-label="3 ふつう">
+              <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <circle cx="14" cy="14" r="12" stroke="#a8c5c3" stroke-width="1.5" fill="#f0f7f7"/>
+                <circle cx="10" cy="12" r="1.5" fill="#7DB8B4"/>
+                <circle cx="18" cy="12" r="1.5" fill="#7DB8B4"/>
+                <path d="M10 18 Q14 19.5 18 18" stroke="#7DB8B4" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span class="condition-scale-num">3</span>
+              <span>ふつう</span>
+            </button>
+            <!-- 4: まあまあ良い -->
+            <button class="condition-scale-btn" data-scale="4" aria-label="4 まあまあ良い">
+              <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <circle cx="14" cy="14" r="12" stroke="#7DB8B4" stroke-width="1.5" fill="#e6f4f3"/>
+                <circle cx="10" cy="12" r="1.5" fill="#5a9e9a"/>
+                <circle cx="18" cy="12" r="1.5" fill="#5a9e9a"/>
+                <path d="M9 17 Q14 21 19 17" stroke="#5a9e9a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span class="condition-scale-num">4</span>
+              <span>まあまあ</span>
+            </button>
+            <!-- 5: とても良い -->
+            <button class="condition-scale-btn" data-scale="5" aria-label="5 とても良い">
+              <svg class="condition-scale-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <circle cx="14" cy="14" r="12" stroke="#5a9e9a" stroke-width="1.5" fill="#d4eeed"/>
+                <circle cx="10" cy="11.5" r="2" fill="#3a7d7a"/>
+                <circle cx="18" cy="11.5" r="2" fill="#3a7d7a"/>
+                <path d="M8.5 16.5 Q14 22 19.5 16.5" stroke="#3a7d7a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span class="condition-scale-num">5</span>
+              <span>とても良い</span>
+            </button>
+          </div>
+
+          <!-- 自由記述 -->
+          <textarea
+            id="conditionMemoText"
+            class="form-textarea"
+            placeholder="からだの感覚を自由にメモしてください。骨盤まわりの重さ、温かさ、気分など何でも。"
+            rows="3"
+            maxlength="200"
+          ></textarea>
+
+          <!-- 保存ボタン -->
+          <button class="condition-save-btn" id="conditionSaveBtn">今日の体調を記録する</button>
         </div>
       </div>
 
@@ -1234,49 +1230,46 @@
         </div>
       </div>
 
-      <!-- ── 体調メモセクション（食事パネルの直下、常時表示） ── -->
-     
-      <!-- ── 断食タイマー（常時表示） ── -->
+
 
       <!-- ── 断食パネル ── -->
       <div class="record-panel" id="panel-fasting" role="tabpanel">
-        <!-- ── 断食タイマー（常時表示） ── -->
-      <div class="fasting-live-section" id="fastingLiveSection">
-        <h3 class="condition-memo-title">断食タイマー</h3>
-        <p class="condition-memo-sub">今日の断食時間をリアルタイムで計測します。</p>
+        <!-- 断食タイマーセクション -->
+        <div class="fasting-live-section" id="fastingLiveSection">
+          <h3 class="condition-memo-title">断食タイマー</h3>
+          <p class="condition-memo-sub">今日の断食時間をリアルタイムで計測します。</p>
 
-        <!-- プリセット -->
-        <div class="fasting-live-presets" id="fastingLivePresets">
-          <button class="fasting-live-preset-btn" data-hours="12">12h</button>
-          <button class="fasting-live-preset-btn selected" data-hours="14">14h</button>
-          <button class="fasting-live-preset-btn" data-hours="16">16h</button>
-        </div>
+          <!-- プリセット -->
+          <div class="fasting-live-presets" id="fastingLivePresets">
+            <button class="fasting-live-preset-btn" data-hours="12">12h</button>
+            <button class="fasting-live-preset-btn selected" data-hours="14">14h</button>
+            <button class="fasting-live-preset-btn" data-hours="16">16h</button>
+          </div>
 
-        <!-- 円形プログレスバー -->
-        <div class="fasting-live-ring-wrap">
-          <svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
-            <circle class="fasting-live-track" cx="100" cy="100" r="88"/>
-            <circle class="fasting-live-fill" id="fastingLiveRingFill" cx="100" cy="100" r="88"
-                    stroke-dasharray="552.92" stroke-dashoffset="552.92"/>
-          </svg>
-          <div class="fasting-live-center">
-            <div class="fasting-live-time" id="fastingLiveTime">00:00:00</div>
-            <div class="fasting-live-label" id="fastingLiveLabel">断食スタートを押してください</div>
+          <!-- 円形プログレスバー -->
+          <div class="fasting-live-ring-wrap">
+            <svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+              <circle class="fasting-live-track" cx="100" cy="100" r="88"/>
+              <circle class="fasting-live-fill" id="fastingLiveRingFill" cx="100" cy="100" r="88"
+                      stroke-dasharray="552.92" stroke-dashoffset="552.92"/>
+            </svg>
+            <div class="fasting-live-center">
+              <div class="fasting-live-time" id="fastingLiveTime">00:00:00</div>
+              <div class="fasting-live-label" id="fastingLiveLabel">断食スタートを押してください</div>
+            </div>
+          </div>
+
+          <!-- メッセージ -->
+          <p class="fasting-live-msg" id="fastingLiveMsg"></p>
+
+          <!-- ボタン -->
+          <div class="fasting-live-btns">
+            <button class="fasting-live-start-btn" id="fastingLiveStartBtn">断食を始める</button>
+            <button class="fasting-live-stop-btn" id="fastingLiveStopBtn" style="display:none;">断食を終了する</button>
           </div>
         </div>
 
-        <!-- メッセージ -->
-        <p class="fasting-live-msg" id="fastingLiveMsg"></p>
-
-        <!-- ボタン -->
-        <div class="fasting-live-btns">
-          <button class="fasting-live-start-btn" id="fastingLiveStartBtn">断食を始める</button>
-          <button class="fasting-live-stop-btn" id="fastingLiveStopBtn" style="display:none;">断食を終了する</button>
-        </div>
-
-
-      </div>
-<h3 class="chakra-section-title">プチ断食を記録する</h3>
+        <h3 class="chakra-section-title">プチ断食を記録する</h3>
         <p class="chakra-section-sub">16時間断食など、からだのオートファジーを促す<br>プチ断食の時間を記録しましょう。</p>
 
         <!-- タイマー表示 -->
@@ -1767,7 +1760,7 @@
   <!-- ══════════════════════════════════
        BOTTOM NAVIGATION
        ══════════════════════════════════ -->
- <nav class="app-nav" id="appNav" aria-label="メインナビゲーション" style="display:none;">
+  <nav class="app-nav" id="appNav" aria-label="メインナビゲーション" style="display:none;">
     <button class="nav-item active" data-screen="home" aria-label="ホーム">
       <i class="ph-light ph-house"></i>
       <span class="nav-label">ホーム</span>
@@ -1787,7 +1780,6 @@
       <span class="nav-label">設定</span>
     </button>
   </nav>
-
 
   <!-- Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -2139,6 +2131,15 @@
 <!-- =====================================================
      記録完了アニメーション
      ===================================================== -->
+<div id="wizard-complete">
+  <div class="complete-checkmark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <p class="complete-title" id="completeTitle">記録できました 🌸</p>
+  <p class="complete-sub" id="completeSub">今日もからだの声を<br>聴いてくれてありがとう。</p>
+</div>
 
 <!-- =====================================================
      FABボタン（ホーム画面）
@@ -2166,662 +2167,6 @@
   <button class="pwa-dismiss-btn" id="pwaDismissBtn">✕</button>
 </div>
 
-<!-- ★ 修正: 記録画面 全イベント処理 -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-
-  /* ────────────────────────────────
-     ユーティリティ
-  ──────────────────────────────── */
-  function getVal(id) {
-    var el = document.getElementById(id);
-    return el ? el.value : '';
-  }
-  function getSelected(selector) {
-    var el = document.querySelector(selector);
-    return el ? (el.dataset.val || el.dataset.chakra || el.dataset.emotion || null) : null;
-  }
-  function getMultiSelected(selector) {
-    return Array.from(document.querySelectorAll(selector)).map(function(c){ return c.dataset.val; });
-  }
-  function showToast(msg) {
-    var t = document.getElementById('kk-toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('toast-show');
-    setTimeout(function(){ t.classList.remove('toast-show'); }, 3000);
-  }
-  function bindSingle(selector) {
-    var items = document.querySelectorAll(selector);
-    items.forEach(function(item) {
-      item.addEventListener('click', function() {
-        items.forEach(function(i){ i.classList.remove('selected'); });
-        item.classList.add('selected');
-      });
-    });
-  }
-  function bindMulti(selector) {
-    document.querySelectorAll(selector).forEach(function(item) {
-      item.addEventListener('click', function() { item.classList.toggle('selected'); });
-    });
-  }
-
-  /* ────────────────────────────────
-     ホーム画面の更新
-  ──────────────────────────────── */
-  var WEEKDAYS = ['日','月','火','水','木','金','土'];
-  var TIME_MSGS = [
-    [5,  'おはようございます', 'からだを目覚めさせる朝の時間。'],
-    [10, 'おはようございます', '今日のからだの状態を確認してみましょう。'],
-    [14, 'こんにちは',         '午後の一息。今日の体調はいかがですか？'],
-    [18, 'おつかれさまです',   '一日の振り返りをしてみましょう。'],
-    [22, 'こんばんは',         '今日のからだの声を記録しておきましょう。'],
-    [24, 'おやすみなさい',     'ゆっくり休んでください。'],
-  ];
-  var SEASON_MSGS = [
-    '骨盤まわりを温めることは、ホルモンバランスを整える第一歩。',
-    'からだのリズムを知ることは、自分を知ること。',
-    '小さな記録が、大きな気づきになります。',
-    '今日のからだの声に、静かに耳を傾けてみてください。',
-    '食事・断食・感情、すべてがつながっています。',
-  ];
-  var CHAKRA_LABELS = { root:'第1チャクラ（骨盤底）', sacral:'第2チャクラ（子宮）', solar:'第3チャクラ（腹部）', heart:'第4チャクラ（胸）', throat:'第5チャクラ（喉）', third_eye:'第6チャクラ（眉間）' };
-  var EMOTION_LABELS = { peaceful:'穏やか・平和', happy:'うれしい・満たされ', tired:'疲れ・重さ', anxious:'不安・緊張', irritated:'イライラ・焦り' };
-  var CYCLE_LABELS   = { menstruating:'生理中', 'pre-ovulation':'卵胞期', ovulation:'排卵期', luteal:'黄体期', unknown:'不明' };
-
-  function updateHome() {
-    var now   = new Date();
-    var today = now.toISOString().split('T')[0];
-    var hour  = now.getHours();
-    var userName = localStorage.getItem('kkUserName') || 'あなた';
-
-    // グリーティング
-    var dateEl = document.getElementById('homeDateDisplay');
-    var timeMsgEl = document.getElementById('homeTimeMsg');
-    var greetEl   = document.getElementById('homeGreetingText');
-    var greetMsg  = document.getElementById('homeGreetingMsg');
-    if (dateEl) dateEl.textContent = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 (' + WEEKDAYS[now.getDay()] + ')';
-    var tm = TIME_MSGS[TIME_MSGS.length - 1];
-    for (var i = 0; i < TIME_MSGS.length; i++) { if (hour < TIME_MSGS[i][0]) { tm = TIME_MSGS[i]; break; } }
-    if (timeMsgEl) timeMsgEl.textContent = tm[2];
-    if (greetEl)   greetEl.textContent   = tm[1] + '、' + userName + 'さん';
-
-    // 季節メッセージ
-    var sqText = document.getElementById('seasonQuoteText');
-    var sqSub  = document.getElementById('seasonQuoteSub');
-    var msgIdx = now.getDate() % SEASON_MSGS.length;
-    if (sqText) sqText.textContent = SEASON_MSGS[msgIdx];
-    if (sqSub)  sqSub.textContent  = '今日も、ていねいに。';
-
-    // 記録データ
-    var records;
-    try { records = JSON.parse(localStorage.getItem('kk_records') || '[]'); } catch(e) { records = []; }
-    var todayRec = records.find(function(r){ return r.record_date === today; });
-
-    // 統計
-    var streak = (function() {
-      var dates = new Set(records.map(function(r){ return r.record_date; }));
-      var s = 0, d = new Date(); d.setHours(0,0,0,0);
-      for (var i = 0; i < 365; i++) {
-        var k = d.toISOString().split('T')[0];
-        if (dates.has(k)) { s++; d.setDate(d.getDate()-1); }
-        else if (i === 0) { d.setDate(d.getDate()-1); }
-        else break;
-      }
-      return s;
-    })();
-    var streakEl = document.getElementById('statStreak');
-    var totalEl  = document.getElementById('statTotal');
-    var fastEl   = document.getElementById('statFasting');
-    if (streakEl) streakEl.textContent = streak;
-    if (totalEl)  totalEl.textContent  = records.length;
-    if (fastEl) {
-      // 今週の断食スコア合計
-      var weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
-      var weekStr   = weekStart.toISOString().split('T')[0];
-      var fastSum   = records.filter(function(r){ return r.record_date >= weekStr && r.fasting_score; })
-                             .reduce(function(s,r){ return s + (r.fasting_score||0); }, 0);
-      fastEl.textContent = fastSum > 0 ? fastSum : '—';
-    }
-
-    // 週間カレンダー
-    var cal = document.getElementById('weekCalendar');
-    if (cal) {
-      var recordedDates = new Set(records.map(function(r){ return r.record_date; }));
-      var html = '';
-      for (var i = 6; i >= 0; i--) {
-        var d2 = new Date(now); d2.setDate(now.getDate() - i);
-        var ds = d2.toISOString().split('T')[0];
-        var isToday   = ds === today;
-        var isRecorded = recordedDates.has(ds);
-        html += '<div class="week-day' + (isToday ? ' today' : '') + '">' +
-          '<div class="week-day-name">' + WEEKDAYS[d2.getDay()] + '</div>' +
-          '<div class="week-day-flower' + (isRecorded ? ' recorded' : '') + '">' + (isRecorded ? '🌸' : '·') + '</div>' +
-          '<div class="week-day-num">' + d2.getDate() + '</div>' +
-          '</div>';
-      }
-      cal.innerHTML = html;
-    }
-
-    // 今日の記録サマリー
-    var emptyState    = document.getElementById('todayEmptyState');
-    var recordedState = document.getElementById('todayRecordedState');
-    var logRows       = document.getElementById('todayLogRows');
-    if (todayRec) {
-      if (emptyState)    emptyState.style.display    = 'none';
-      if (recordedState) recordedState.style.display = 'block';
-      if (logRows) {
-        var rows = '';
-        if (todayRec.chakra)          rows += '<div class="today-log-row"><span class="today-log-label">チャクラ</span><span class="today-log-val">' + (CHAKRA_LABELS[todayRec.chakra] || todayRec.chakra) + '</span></div>';
-        if (todayRec.menstrual_cycle) rows += '<div class="today-log-row"><span class="today-log-label">周期</span><span class="today-log-val">' + (CYCLE_LABELS[todayRec.menstrual_cycle] || todayRec.menstrual_cycle) + '</span></div>';
-        if (todayRec.basal_temp)      rows += '<div class="today-log-row"><span class="today-log-label">基礎体温</span><span class="today-log-val">' + todayRec.basal_temp + '℃</span></div>';
-        if (todayRec.wellness_score)  rows += '<div class="today-log-row"><span class="today-log-label">ウェルネス</span><span class="today-log-val">' + todayRec.wellness_score + ' / 10</span></div>';
-        if (todayRec.food_score)      rows += '<div class="today-log-row"><span class="today-log-label">食事スコア</span><span class="today-log-val">' + todayRec.food_score + ' / 10</span></div>';
-        if (todayRec.emotion)         rows += '<div class="today-log-row"><span class="today-log-label">感情</span><span class="today-log-val">' + (EMOTION_LABELS[todayRec.emotion] || todayRec.emotion) + '</span></div>';
-        if (!rows) rows = '<div style="padding:1rem;text-align:center;font-size:0.875rem;color:var(--text-muted);">記録しました ✓</div>';
-        logRows.innerHTML = rows;
-      }
-    } else {
-      if (emptyState)    emptyState.style.display    = 'block';
-      if (recordedState) recordedState.style.display = 'none';
-    }
-
-    // FABの状態
-    var fabBtn = document.getElementById('fabRecordBtn');
-    if (fabBtn) {
-      if (todayRec) { fabBtn.classList.add('recorded'); fabBtn.innerHTML = '✓ 今日の記録済み'; }
-      else { fabBtn.classList.remove('recorded'); fabBtn.textContent = '今日を記録する'; }
-    }
-     // チャクラ診断テスト結果の反映
-    var savedType = localStorage.getItem('kk_chakra_test_type');
-    var savedDate = localStorage.getItem('kk_chakra_test_date');
-    var testTitle = document.getElementById('chakraTestBannerTitle');
-    var testDesc  = document.getElementById('chakraTestBannerDesc');
-    if (testTitle && testDesc && savedType) {
-      var TYPE_NAMES = {
-        root: 'グランディングタイプ', sacral: '女性性開花タイプ',
-        solar: '消化力回復タイプ', heart: '愛と受容タイプ',
-        throat: '自己表現解放タイプ', thirdeye: '直感・洞察覚醒タイプ',
-        crown: '全身統合・感情調和タイプ'
-      };
-      if (TYPE_NAMES[savedType]) {
-        testTitle.textContent = 'あなたのタイプ：' + TYPE_NAMES[savedType];
-        testDesc.textContent = '診断日：' + (savedDate || '—') + '　もう一度診断して変化を確認しましょう。';
-      }
-    }
- }
-
-  // ホーム画面表示のたびに更新
-  document.querySelectorAll('[data-screen="home"]').forEach(function(btn) {
-    btn.addEventListener('click', function() { setTimeout(updateHome, 100); });
-  });
-  // 記録保存後にホームへ遷移する処理と連動させるため、保存後にも呼ぶ
-  // （saveBtn の setTimeout 内で updateHome を呼ぶよう後述で対応済み）
-
-  // 初期表示
-  updateHome();
-
-  /* ────────────────────────────────
-     インサイト画面：チャート & サマリー
-  ──────────────────────────────── */
-  var chartInstances = {};
-
-  function getRecords(days) {
-    try {
-      var all = JSON.parse(localStorage.getItem('kk_records') || '[]');
-      var cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - days);
-      var cutStr = cutoff.toISOString().split('T')[0];
-      return all.filter(function(r){ return r.record_date >= cutStr; })
-                .sort(function(a,b){ return a.record_date.localeCompare(b.record_date); });
-    } catch(e) { return []; }
-  }
-
-  function avg(arr) {
-    var vals = arr.filter(function(v){ return v != null && !isNaN(v); });
-    if (!vals.length) return null;
-    return (vals.reduce(function(s,v){ return s+v; },0) / vals.length).toFixed(1);
-  }
-
-  function getStreak() {
-    try {
-      var all = JSON.parse(localStorage.getItem('kk_records') || '[]');
-      var dates = all.map(function(r){ return r.record_date; }).sort().reverse();
-      if (!dates.length) return 0;
-      var streak = 0, d = new Date();
-      for (var i = 0; i < 365; i++) {
-        var s = d.toISOString().split('T')[0];
-        if (dates.indexOf(s) >= 0) { streak++; d.setDate(d.getDate()-1); }
-        else if (i === 0) { d.setDate(d.getDate()-1); } // 今日未記録は許容
-        else break;
-      }
-      return streak;
-    } catch(e) { return 0; }
-  }
-
-  function renderInsight(days) {
-    var recs = getRecords(days);
-    var allRecs = JSON.parse(localStorage.getItem('kk_records') || '[]');
-
-    // サマリー
-    var totalEl = document.getElementById('insightTotalDays');
-    var streakEl = document.getElementById('insightMaxStreak');
-    var avgFoodEl = document.getElementById('insightAvgFood');
-    var avgWellEl = document.getElementById('insightAvgWellness');
-    if (totalEl) totalEl.textContent = allRecs.length;
-    if (streakEl) streakEl.textContent = getStreak();
-    if (avgFoodEl) avgFoodEl.textContent = avg(recs.map(function(r){ return r.food_score; })) || '—';
-    if (avgWellEl) avgWellEl.textContent = avg(recs.map(function(r){ return r.wellness_score; })) || '—';
-
-    // ヒーローメッセージ
-    var heroDesc = document.getElementById('insightHeroDesc');
-    if (heroDesc && allRecs.length > 0) {
-      heroDesc.textContent = allRecs.length + '日分の記録が積み重なっています。';
-    }
-
-    var labels = recs.map(function(r){ return r.record_date.slice(5); }); // MM-DD
-
-    // ── ウェルネス・エネルギーチャート ──
-    var wCtx = document.getElementById('wellnessChart');
-    if (wCtx) {
-      if (chartInstances.wellness) chartInstances.wellness.destroy();
-      chartInstances.wellness = new Chart(wCtx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'ウェルネス',
-              data: recs.map(function(r){ return r.wellness_score; }),
-              borderColor: '#E63FA8',
-              backgroundColor: 'rgba(230,63,168,0.08)',
-              tension: 0.4, fill: true, pointRadius: 4,
-              spanGaps: true,
-            },
-            {
-              label: 'エネルギー',
-              data: recs.map(function(r){ return r.energy_score; }),
-              borderColor: '#27B7B3',
-              backgroundColor: 'rgba(39,183,179,0.06)',
-              tension: 0.4, fill: false, pointRadius: 4,
-              spanGaps: true,
-            }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { labels: { font: { size: 11 }, color: '#6C4A67' } } },
-          scales: {
-            y: { min: 0, max: 10, ticks: { stepSize: 2, color: '#A090A0', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { ticks: { color: '#A090A0', font: { size: 10 } }, grid: { display: false } }
-          }
-        }
-      });
-    }
-
-    // ── 食事の質チャート ──
-    var fCtx = document.getElementById('foodChart');
-    if (fCtx) {
-      if (chartInstances.food) chartInstances.food.destroy();
-      chartInstances.food = new Chart(fCtx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: '食事スコア',
-            data: recs.map(function(r){ return r.food_score; }),
-            backgroundColor: 'rgba(39,183,179,0.6)',
-            borderColor: '#27B7B3',
-            borderRadius: 6, borderWidth: 1,
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { min: 0, max: 10, ticks: { stepSize: 2, color: '#A090A0', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { ticks: { color: '#A090A0', font: { size: 10 } }, grid: { display: false } }
-          }
-        }
-      });
-    }
-
-    // ── チャクラ別記録頻度チャート ──
-    var cCtx = document.getElementById('chakraChart');
-    if (cCtx) {
-      var chakraNames = ['第1','第2','第3','第4','第5','第6'];
-      var chakraKeys  = ['root','sacral','solar','heart','throat','third_eye'];
-      var chakraColors = ['#E63FA8','#FF9A4A','#F5D020','#6BCB6B','#27B7B3','#6C4A67'];
-      var counts = chakraKeys.map(function(k){
-        return recs.filter(function(r){ return r.chakra === k; }).length;
-      });
-      if (chartInstances.chakra) chartInstances.chakra.destroy();
-      chartInstances.chakra = new Chart(cCtx, {
-        type: 'bar',
-        data: {
-          labels: chakraNames,
-          datasets: [{
-            label: '記録回数',
-            data: counts,
-            backgroundColor: chakraColors.map(function(c){ return c + 'AA'; }),
-            borderColor: chakraColors,
-            borderRadius: 6, borderWidth: 1.5,
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#A090A0', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { ticks: { color: '#A090A0', font: { size: 10 } }, grid: { display: false } }
-          }
-        }
-      });
-    }
-  }
-
-  // 期間タブ切り替え
-  document.querySelectorAll('.insight-period-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.insight-period-tab').forEach(function(t){ t.classList.remove('active'); });
-      tab.classList.add('active');
-      renderInsight(parseInt(tab.dataset.period));
-    });
-  });
-
-  // インサイト画面に遷移したときに描画
-  document.querySelectorAll('[data-screen="insight"]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      setTimeout(function() {
-        var activePeriod = document.querySelector('.insight-period-tab.active');
-        renderInsight(activePeriod ? parseInt(activePeriod.dataset.period) : 7);
-      }, 300);
-    });
-  });
-
-  // 初期描画（インサイト画面がすでにactiveの場合に備えて）
-  if (document.querySelector('#screen-insight.active')) {
-    renderInsight(7);
-  }
-
-  /* ────────────────────────────────
-     記録タブ切り替え
-  ──────────────────────────────── */
-document.querySelectorAll('.record-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.record-tab').forEach(function(t){ t.classList.remove('active'); });
-      tab.classList.add('active');
-      document.querySelectorAll('.record-panel').forEach(function(p){ p.classList.remove('active'); p.style.display = 'none'; });
-      var panel = document.getElementById('panel-' + tab.dataset.tab);
-      if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
-    });
-  });
-
-
-  /* ────────────────────────────────
-     各パネルのUI
-  ──────────────────────────────── */
-  // チャクラ
-  bindSingle('#chakraSelector .chakra-item');
-  bindSingle('#chakraIntensityRow .intensity-btn');
-  bindMulti('#symptomChips .chip');
-
-  // チャクラ選択時にスコアグループ等を表示
-  document.querySelectorAll('#chakraSelector .chakra-item').forEach(function(item) {
-    item.addEventListener('click', function() {
-      ['chakraIntensityGroup','chakraScoreGroup','chakraNoteGroup'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) el.style.display = 'block';
-      });
-    });
-  });
-
-  // リズム
-  var cycleChips = document.querySelectorAll('#menstrualCycleChips .chip');
-  cycleChips.forEach(function(chip) {
-    chip.addEventListener('click', function() {
-      cycleChips.forEach(function(c){ c.classList.remove('selected'); });
-      chip.classList.add('selected');
-      var fg = document.getElementById('menstrualFlowGroup');
-      if (fg) fg.style.display = chip.dataset.val === 'menstruating' ? 'block' : 'none';
-    });
-  });
-  bindSingle('#menstrualFlowChips .chip');
-
-  // 食事
-  bindMulti('#bodyFeelChips .body-feel-chip');
-  bindMulti('#foodIngredientChips .chip');
-  bindSingle('#foodTimeSelector .food-time-card');
-
-  // 断食パネル
-  bindSingle('#fastingGoalSelect .fasting-goal-btn');
-  bindMulti('#fastingFeelChips .chip');
-
-  // 感情
-  bindSingle('#emotionSelector .emotion-item');
-
-  /* ────────────────────────────────
-     rangeスライダーの値表示
-  ──────────────────────────────── */
-  [
-    ['chakraScore','chakraScoreDisplay'],
-    ['foodScore','foodScoreDisplay'],
-    ['fastingScore','fastingScoreDisplay'],
-    ['wellnessScore','wellnessScoreDisplay'],
-    ['energyScore','energyScoreDisplay'],
-  ].forEach(function(pair) {
-    var inp = document.getElementById(pair[0]);
-    var disp = document.getElementById(pair[1]);
-    if (inp && disp) inp.addEventListener('input', function(){ disp.textContent = inp.value; });
-  });
-
-  /* ────────────────────────────────
-     体調スケール（conditionScaleRow）
-  ──────────────────────────────── */
-  bindSingle('#conditionScaleRow .condition-scale-btn');
-
-  /* ────────────────────────────────
-     体調保存ボタン
-  ──────────────────────────────── */
-  var condBtn = document.getElementById('conditionSaveBtn');
-  if (condBtn) {
-    condBtn.addEventListener('click', function() {
-      var todayStr = new Date().toISOString().split('T')[0];
-      try {
-        var records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-        var sel = document.querySelector('#conditionScaleRow .condition-scale-btn.selected');
-        var patch = {
-          record_date: todayStr,
-          id: todayStr,
-          condition_scale: sel ? parseInt(sel.dataset.scale) : null,
-          condition_memo: getVal('conditionMemoText'),
-        };
-        var idx = records.findIndex(function(r){ return r.record_date === todayStr; });
-        if (idx >= 0) records[idx] = Object.assign({}, records[idx], patch);
-        else records.push(patch);
-        localStorage.setItem('kk_records', JSON.stringify(records));
-        showToast('体調を記録しました ✓');
-      } catch(e) { console.error(e); }
-    });
-  }
-
-  /* ────────────────────────────────
-     断食ライブタイマー
-  ──────────────────────────────── */
-  var livePresets = document.querySelectorAll('#fastingLivePresets .fasting-live-preset-btn');
-  livePresets.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      livePresets.forEach(function(b){ b.classList.remove('selected'); });
-      btn.classList.add('selected');
-    });
-  });
-
-  var fastingInterval = null;
-  var fastingStart = null;
-
-  function updateFastingRing(elapsed, goal) {
-    var fill = document.getElementById('fastingLiveRingFill');
-    var timeEl = document.getElementById('fastingLiveTime');
-    var pctEl = document.getElementById('fastingLivePct');
-    if (!fill) return;
-    var pct = Math.min(elapsed / goal, 1);
-    var circ = 552.92;
-    fill.style.strokeDashoffset = circ * (1 - pct);
-    var h = Math.floor(elapsed / 3600);
-    var m = Math.floor((elapsed % 3600) / 60);
-    if (timeEl) timeEl.textContent = h + 'h ' + m + 'm';
-    if (pctEl) pctEl.textContent = Math.floor(pct * 100) + '%';
-  }
-
-  var startBtn = document.getElementById('fastingLiveStartBtn');
-  var stopBtn  = document.getElementById('fastingLiveStopBtn');
-  if (startBtn) {
-    startBtn.addEventListener('click', function() {
-      var selPreset = document.querySelector('#fastingLivePresets .fasting-live-preset-btn.selected');
-      var goalHours = selPreset ? parseInt(selPreset.dataset.hours) : 14;
-      fastingStart = Date.now();
-      localStorage.setItem('kk_fasting_start', fastingStart);
-      localStorage.setItem('kk_fasting_goal', goalHours);
-      startBtn.style.display = 'none';
-      if (stopBtn) stopBtn.style.display = 'block';
-      fastingInterval = setInterval(function() {
-        var elapsed = (Date.now() - fastingStart) / 1000;
-        updateFastingRing(elapsed, goalHours * 3600);
-      }, 1000);
-    });
-  }
-  if (stopBtn) {
-    stopBtn.addEventListener('click', function() {
-      clearInterval(fastingInterval);
-      localStorage.removeItem('kk_fasting_start');
-      stopBtn.style.display = 'none';
-      if (startBtn) startBtn.style.display = 'block';
-      var fill = document.getElementById('fastingLiveRingFill');
-      if (fill) fill.style.strokeDashoffset = 552.92;
-    });
-  }
-  // ページロード時に断食中なら再開
-  (function() {
-    var savedStart = localStorage.getItem('kk_fasting_start');
-    var savedGoal  = localStorage.getItem('kk_fasting_goal');
-    if (savedStart) {
-      fastingStart = parseInt(savedStart);
-      var goalHours = savedGoal ? parseInt(savedGoal) : 14;
-      if (startBtn) startBtn.style.display = 'none';
-      if (stopBtn) stopBtn.style.display = 'block';
-      fastingInterval = setInterval(function() {
-        var elapsed = (Date.now() - fastingStart) / 1000;
-        updateFastingRing(elapsed, goalHours * 3600);
-      }, 1000);
-    }
-  })();
-
-  /* ────────────────────────────────
-     記録を保存する（メインボタン）
-  ──────────────────────────────── */
-  var saveBtn = document.getElementById('saveRecordBtn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', function() {
-      var todayStr = new Date().toISOString().split('T')[0];
-      try {
-        var records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-        var record = {
-          record_date: todayStr,
-          id: todayStr,
-          chakra:           getSelected('#chakraSelector .chakra-item.selected'),
-          chakra_intensity: getSelected('#chakraIntensityRow .intensity-btn.selected'),
-          chakra_score:     parseInt(getVal('chakraScore')) || null,
-          chakra_note:      getVal('chakraNote'),
-          symptoms:         getMultiSelected('#symptomChips .chip.selected'),
-          basal_temp:       parseFloat(getVal('basalTemp')) || null,
-          menstrual_cycle:  getSelected('#menstrualCycleChips .chip.selected'),
-          menstrual_flow:   getSelected('#menstrualFlowChips .chip.selected'),
-          rhythm_note:      getVal('rhythmNote'),
-          food_time:        getSelected('#foodTimeSelector .food-time-card.selected'),
-          food_content:     getVal('foodContent'),
-          body_feel:        getMultiSelected('#bodyFeelChips .body-feel-chip.selected'),
-          food_ingredients: getMultiSelected('#foodIngredientChips .chip.selected'),
-          food_score:       parseInt(getVal('foodScore')) || null,
-          food_note:        getVal('foodNote'),
-          fasting_feel:     getMultiSelected('#fastingFeelChips .chip.selected'),
-          fasting_score:    parseInt(getVal('fastingScore')) || null,
-          fasting_note:     getVal('fastingNote'),
-          emotion:          getSelected('#emotionSelector .emotion-item.selected'),
-          wellness_score:   parseInt(getVal('wellnessScore')) || null,
-          energy_score:     parseInt(getVal('energyScore')) || null,
-          emotion_note:     getVal('emotionNote'),
-          gratitude_note:   getVal('gratitudeNote'),
-        };
-        var idx = records.findIndex(function(r){ return r.record_date === todayStr; });
-        if (idx >= 0) records[idx] = Object.assign({}, records[idx], record);
-        else records.push(record);
-        localStorage.setItem('kk_records', JSON.stringify(records));
-        showToast('記録を保存しました ✓');
-        setTimeout(function() {
-          document.querySelectorAll('.app-screen').forEach(function(s){ s.classList.remove('active'); });
-          var home = document.getElementById('screen-home');
-          if (home) home.classList.add('active');
-          var fab = document.getElementById('homeRecordFab');
-          if (fab) fab.style.display = 'block';
-          updateHome();
-        }, 600);
-      } catch(e) { console.error('Save error:', e); }
-    });
-  }
-  /* ────────────────────────────────
-     設定画面のボタン
-  ──────────────────────────────── */
-  var deleteRow = document.getElementById('deleteDataRow');
-  if (deleteRow) {
-    deleteRow.addEventListener('click', function() {
-      var confirmed = confirm('⚠️ すべての記録を削除します。この操作は元に戻せません。本当によろしいですか？');
-      if (!confirmed) return;
-      localStorage.removeItem('kk_records');
-      showToast('すべての記録を削除しました');
-      setTimeout(function(){ updateHome(); }, 300);
-    });
-  }
-
-  var exportRow = document.getElementById('exportDataRow');
-  if (exportRow) {
-    exportRow.addEventListener('click', function() {
-      try {
-        var records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-        if (records.length === 0) { showToast('エクスポートする記録がありません'); return; }
-        var headers = Object.keys(records[0]);
-        var csv = headers.join(',') + '\n' + records.map(function(r) {
-          return headers.map(function(h) {
-            var v = r[h];
-            if (Array.isArray(v)) v = v.join(';');
-            return '"' + (v != null ? String(v).replace(/"/g, '""') : '') + '"';
-          }).join(',');
-        }).join('\n');
-        var blob = new Blob([csv], { type: 'text/csv' });
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'ippo-' + new Date().toISOString().split('T')[0] + '.csv';
-        a.click();
-        showToast('CSVをダウンロードしました');
-      } catch(e) { showToast('エクスポートに失敗しました'); }
-    });
-  }
-
-  var nameRow = document.getElementById('settingNameRow');
-  if (nameRow) {
-    nameRow.addEventListener('click', function() {
-      var current = localStorage.getItem('kkUserName') || '';
-      var newName = prompt('お名前を入力してください', current);
-      if (newName !== null && newName.trim()) {
-        localStorage.setItem('kkUserName', newName.trim());
-        showToast('お名前を更新しました');
-        updateHome();
-      }
-    });
-  }
-
-});
-</script>
-
 <!-- Service Worker登録 -->
 <script>
   if ("serviceWorker" in navigator) {
@@ -2833,7 +2178,7 @@ document.querySelectorAll('.record-tab').forEach(function(tab) {
   }
 </script>
 <!-- スクリプト -->
-<!-- kk-app.js は存在しないため削除 -->
+<script src="js/kk-app.js"></script>
 <script>
 /* =====================================================
    ippo — 3層制御 + ウィザード v3
@@ -2885,7 +2230,7 @@ document.querySelectorAll('.record-tab').forEach(function(tab) {
   /* ─────────────────────────────────────
      改善8: EmptyState制御
   ───────────────────────────────────── */
-function checkInsightEmpty() {
+  function checkInsightEmpty() {
     try {
       const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
       const hasData = records.length > 0;
@@ -2896,11 +2241,10 @@ function checkInsightEmpty() {
     } catch(e) {}
   }
 
-
   /* ─────────────────────────────────────
      改善4: 方向付き画面遷移
   ───────────────────────────────────── */
-    const TAB_ORDER = ['home', 'insight', 'record', 'settings'];
+  const TAB_ORDER = ['home', 'insight', 'record', 'settings'];
   function showScreen(screenId, direction) {
     const cur = document.querySelector('.app-screen.active');
     const next = document.getElementById('screen-' + screenId);
@@ -2919,9 +2263,9 @@ function checkInsightEmpty() {
     if (screenId === 'home') {
       setTimeout(() => {
         const streak = getStreak();
-        const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+        const records = JSON.parse(localStorage.getItem('kkRecords') || '{}');
         animateCount(document.getElementById('statStreak'), streak, 700);
-        animateCount(document.getElementById('statTotal'), records.length, 700);
+        animateCount(document.getElementById('statTotal'), Object.keys(records).length, 700);
       }, 200);
     }
     if (screenId === 'settings') {
@@ -2932,15 +2276,20 @@ function checkInsightEmpty() {
   /* ─────────────────────────────────────
      修正3: 設定画面プロフィール動的表示
   ───────────────────────────────────── */
- function updateSettingsProfile() {
+  function updateSettingsProfile() {
+    // ユーザー名（kkUserName または kk_username、なければ「あなた」）
     const userName = localStorage.getItem('kkUserName')
                   || localStorage.getItem('kk_username')
                   || 'あなた';
+
     const nameEl = document.getElementById('settingsName');
     const sinceEl = document.getElementById('settingsSince');
     const nameValEl = document.getElementById('settingNameValue');
+
     if (nameEl) nameEl.textContent = userName;
     if (nameValEl) nameValEl.textContent = userName;
+
+    // 開始日・記録日数
     if (sinceEl) {
       try {
         const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
@@ -2948,11 +2297,16 @@ function checkInsightEmpty() {
         if (count > 0) {
           const sorted = records.map(r => r.record_date).sort();
           const firstDate = new Date(sorted[0]);
-          sinceEl.textContent = `開始日: ${firstDate.getFullYear()}年${firstDate.getMonth()+1}月${firstDate.getDate()}日 — ${count}日分の記録`;
+          const y = firstDate.getFullYear();
+          const m = firstDate.getMonth() + 1;
+          const d = firstDate.getDate();
+          sinceEl.textContent = `開始日: ${y}年${m}月${d}日 — ${count}日分の記録`;
         } else {
           sinceEl.textContent = 'まだ記録がありません';
         }
-      } catch(e) { sinceEl.textContent = ''; }
+      } catch(e) {
+        sinceEl.textContent = '';
+      }
     }
   }
 
@@ -3075,7 +2429,7 @@ function checkInsightEmpty() {
   document.getElementById('wMemoSkip').addEventListener('click', saveWizardRecord);
 
   /* 保存 */
-function saveWizardRecord() {
+  function saveWizardRecord() {
     closeWizard();
     const todayStr = new Date().toISOString().split('T')[0];
     try {
@@ -3097,7 +2451,8 @@ function saveWizardRecord() {
       else { records.push(record); }
       localStorage.setItem('kk_records', JSON.stringify(records));
     } catch(e) { console.error('Save error:', e); }
-    showCompleteAnimation(); updateFabState();
+    showCompleteAnimation();
+    updateFabState();
   }
 
   function showCompleteAnimation() {
@@ -3105,9 +2460,6 @@ function saveWizardRecord() {
     const streak = getStreak();
     document.getElementById('completeTitle').textContent = (name ? name+'さん、' : '')+'記録できました 🌸';
     document.getElementById('completeSub').textContent = streak > 1 ? streak+'日連続記録中✨\n今日もからだの声を聴いてくれてありがとう。' : '今日もからだの声を\n聴いてくれてありがとう。';
-    // Lottie再生
-    const lottie = document.getElementById('completeLottie');
-    if (lottie) { try { lottie.stop(); lottie.play(); } catch(e) {} }
     complete.classList.add('complete-show');
     setTimeout(() => complete.classList.remove('complete-show'), 3000);
   }
@@ -3121,132 +2473,79 @@ function saveWizardRecord() {
     }
   }
 
- function updateFabState() {
+  function updateFabState() {
     const today = new Date().toISOString().split('T')[0];
     const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-    const fabBtn = document.getElementById('fabRecordBtn'); if (!fabBtn) return;
+    const fabBtn = document.getElementById('fabRecordBtn');
+    if (!fabBtn) return;
     const hasToday = records.some(r => r.record_date === today);
     if (hasToday) { fabBtn.classList.add('recorded'); fabBtn.innerHTML = '✓ 今日の記録済み'; }
     else { fabBtn.classList.remove('recorded'); fabBtn.textContent = '今日を記録する'; }
   }
 
- function getStreak() {
-  try {
-    const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-    const dates = new Set(records.map(r => r.record_date));
-    let streak = 0;
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    for (let i = 0; i < 365; i++) {
-      const key = d.toISOString().split('T')[0];
-      if (dates.has(key)) { streak++; d.setDate(d.getDate() - 1); }
-      else if (i === 0) { d.setDate(d.getDate() - 1); }
-      else break;
-    }
-    return streak;
-  } catch(e) { return 0; }
-}
-/* バインド */
+  function getStreak() {
+    try {
+      const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+      const dates = new Set(records.map(r => r.record_date));
+      let streak = 0;
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      for (let i = 0; i < 365; i++) {
+        const key = d.toISOString().split('T')[0];
+        if (dates.has(key)) { streak++; d.setDate(d.getDate() - 1); }
+        else if (i === 0) { d.setDate(d.getDate() - 1); }
+        else break;
+      }
+      return streak;
+    } catch(e) { return 0; }
+  }
+
+  /* バインド */
   function bindAll() {
     ['homeRecordBtn','quickRecordBtn','fabRecordBtn'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.onclick = null;
         el.addEventListener('click', () => {
-          openRecordScreen();
+          document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+          const rec = document.getElementById('screen-record');
+          if (rec) rec.classList.add('active');
+          updateFabVisibility();
         });
       }
     });
     document.querySelectorAll('[data-screen="record"]').forEach(el => {
       el.onclick = null;
       el.addEventListener('click', () => {
-        openRecordScreen();
+        document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+        const rec = document.getElementById('screen-record');
+        if (rec) rec.classList.add('active');
+        updateFabVisibility();
       });
     });
-  }
-
-  /* 記録画面を開く（チャクラタブ＋データ自動入力） */
-  function openRecordScreen() {
-    // 画面切替
-    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
-    const rec = document.getElementById('screen-record');
-    if (rec) rec.classList.add('active');
-
-    // チャクラタブをアクティブに
-    document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.record-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
-    var firstTab = document.querySelector('.record-tab[data-tab="chakra"]');
-    var firstPanel = document.getElementById('panel-chakra');
-    if (firstTab) firstTab.classList.add('active');
-    if (firstPanel) { firstPanel.classList.add('active'); firstPanel.style.display = ''; }
-
-    // 保存済みデータがあれば各フィールドに入力
-    loadRecordToFields();
-
-    updateFabVisibility();
-  }
-
-  /* 今日の記録を各フィールドに自動入力 */
-  function loadRecordToFields() {
-    var todayStr = new Date().toISOString().split('T')[0];
-    var records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-    var rec = records.find(function(r) { return r.record_date === todayStr; });
-    if (!rec) return;
-
-    // チャクラ
-    if (rec.chakra) {
-      document.querySelectorAll('#chakraSelector .chakra-item, .chakra-item').forEach(function(el) {
-        el.classList.remove('selected');
-        if (el.dataset.chakra === rec.chakra) el.classList.add('selected');
+    
+    // タブ切り替え処理
+    document.querySelectorAll('.record-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        if (!tabName) return;
+        
+        // タブボタンのアクティブ状态を更新
+        document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // パネルの表示/非表示を明示的に設定
+        document.querySelectorAll('.record-panel').forEach(panel => {
+          panel.style.display = 'none';
+          panel.classList.remove('active');
+        });
+        const activePanel = document.getElementById('panel-' + tabName);
+        if (activePanel) {
+          activePanel.style.display = 'block';
+          activePanel.classList.add('active');
+        }
       });
-    }
-
-    // 体調スコア
-    if (rec.wellness_score) {
-      document.querySelectorAll('.condition-btn').forEach(function(btn) {
-        btn.classList.remove('active');
-        if (parseInt(btn.dataset.score) === Math.round(rec.wellness_score / 2)) btn.classList.add('active');
-      });
-    }
-
-    // 断食時間
-    if (rec.fasting_hours) {
-      var fh = document.getElementById('fastingHoursInput') || document.getElementById('fastingStartTime');
-      if (fh) fh.value = rec.fasting_hours;
-    }
-
-    // 断食スコア
-    if (rec.fasting_score) {
-      var fs = document.getElementById('fastingScore');
-      var fsd = document.getElementById('fastingScoreDisplay');
-      if (fs) { fs.value = rec.fasting_score; if (fsd) fsd.textContent = rec.fasting_score; }
-    }
-
-    // 感情
-    if (rec.emotion) {
-      document.querySelectorAll('#emotionSelector .emotion-item').forEach(function(el) {
-        el.classList.remove('selected');
-        if (el.dataset.emotion === rec.emotion) el.classList.add('selected');
-      });
-    }
-
-    // 感情メモ
-    if (rec.emotion_notes) {
-      var en = document.getElementById('emotionJournal') || document.getElementById('emotionNote');
-      if (en) en.value = rec.emotion_notes;
-    }
-
-    // 食事メモ
-    if (rec.food_note) {
-      var fn = document.getElementById('foodNote');
-      if (fn) fn.value = rec.food_note;
-    }
-
-    // 断食メモ
-    if (rec.fasting_note) {
-      var ftn = document.getElementById('fastingNote');
-      if (ftn) ftn.value = rec.fasting_note;
-    }
+    });
   }
 
   /* FAB表示 */
@@ -3370,11 +2669,53 @@ function saveWizardRecord() {
     // ホーム初期表示時にカウントアップ
     setTimeout(() => {
       const streak = getStreak();
-    const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
-animateCount(document.getElementById('statStreak'), streak, 800);
-animateCount(document.getElementById('statTotal'), records.length, 800);
+      const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+      animateCount(document.getElementById('statStreak'), streak, 800);
+      animateCount(document.getElementById('statTotal'), records.length, 800);
     }, 500);
     setTimeout(bindAll, 600);
+
+    // ★ 設定画面ボタンハンドラーを追加
+    const deleteDataRow = document.getElementById('deleteDataRow');
+    if (deleteDataRow) {
+      deleteDataRow.addEventListener('click', () => {
+        if (confirm('本当にすべての記録を削除しますか？')) {
+          localStorage.removeItem('kk_records');
+          localStorage.removeItem('kk_username');
+          localStorage.removeItem('kk_fasting_goal');
+          showToast('すべての記録を削除しました');
+          updateSettingsProfile();
+          checkInsightEmpty();
+          updateFabState();
+        }
+      });
+    }
+    const exportDataRow = document.getElementById('exportDataRow');
+    if (exportDataRow) {
+      exportDataRow.addEventListener('click', () => {
+        const records = JSON.parse(localStorage.getItem('kk_records') || '[]');
+        if (records.length === 0) { showToast('エクスポートするデータがありません'); return; }
+        const csv = 'Date,Chakra,Food Score,Fasting Hours,Emotion,Wellness Score,Notes\n' + records.map(r => `"${r.record_date}","${r.chakra || ''}",${r.food_score || ''},${r.fasting_hours || ''},"${r.emotion || ''}",${r.wellness_score || ''},"${(r.emotion_notes || '').replace(/"/g, '""')}"`).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `kk-records-${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        showToast('データをエクスポートしました');
+      });
+    }
+    const settingNameRow = document.getElementById('settingNameRow');
+    if (settingNameRow) {
+      settingNameRow.addEventListener('click', () => {
+        const currentName = localStorage.getItem('kk_username') || localStorage.getItem('kkUserName') || 'あなた';
+        const newName = prompt('お名前を入力してください', currentName);
+        if (newName && newName.trim()) {
+          localStorage.setItem('kk_username', newName.trim());
+          updateSettingsProfile();
+          showToast('お名前を更新しました');
+        }
+      });
+    }
 
     // ★ A-5: 初回アクセス判定 — ウェルカム画面を確実に表示
     const hasSeenWelcome = localStorage.getItem('kk_welcome_done');
@@ -3478,12 +2819,6 @@ animateCount(document.getElementById('statTotal'), records.length, 800);
   /* Toast */
   #kk-toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#3D2E3A; color:white; padding:10px 22px; border-radius:22px; font-size:0.875rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:600; white-space:nowrap; max-width:90vw; text-align:center; }
   #kk-toast.toast-show { opacity:1; }
-@keyframes completePopIn {
-  0% { transform: scale(0); opacity: 0; }
-  60% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-#screen-welcome.active ~ #homeRecordFab { display: none !important; }
 </style>
 
 </body>

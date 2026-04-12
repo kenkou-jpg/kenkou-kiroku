@@ -1837,7 +1837,8 @@ width:100% !important;
   font-size: 0.875rem;
   font-family: var(--font-sans);
   backdrop-filter: blur(10px);
-  opacity: 0;
+  opacity: 0 !important;
+  display: none;
   transition: all var(--duration-normal) var(--ease-out);
   z-index: 200;
   max-width: calc(var(--app-max-width) - var(--sp-10));
@@ -1846,7 +1847,8 @@ width:100% !important;
   white-space: nowrap;
 }
 .toast.show {
-  opacity: 1;
+  display: block;
+  opacity: 1 !important;
   transform: translateX(-50%) translateY(0);
 }
 
