@@ -29,6 +29,9 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // ✅ chrome-extension:// など http/https 以外を除外
+  if (!e.request.url.startsWith('http')) return;
+
   // ネットワーク優先、失敗時キャッシュ
   e.respondWith(
     fetch(e.request)
@@ -44,7 +47,6 @@ self.addEventListener('fetch', e => {
       )
   );
 });
-
 self.addEventListener('push', e => {
   const data = e.data ? e.data.json() : {};
   e.waitUntil(
