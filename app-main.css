@@ -870,24 +870,6 @@ width:100% !important;
  max-width:100% !important;
  display: block !important;
 }
-.welcome-dots {
-  display: flex;
-  justify-content: center;
-  gap: var(--sp-2);
-  margin: var(--sp-8) 0;
-}
-.welcome-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--border);
-  transition: all var(--duration-normal) var(--ease-out);
-}
-.welcome-dot.active {
-  width: 20px;
-  border-radius: var(--radius-full);
-  background: var(--pink);
-}
 
 .welcome-actions {
   padding: 0 var(--sp-8) var(--sp-10);
@@ -2975,19 +2957,23 @@ input[type="checkbox"].toggle,
   text-align: center;
   padding: 40px 24px;
 }
-
+.welcome-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 32px 0;
+}
 .welcome-dot {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
-  background: #ddd;
+  background: rgba(108, 74, 103, 0.2);
   transition: all 0.3s ease;
 }
 .welcome-dot.active {
-  background: #7DB8B4;
   width: 24px;
+  background: #27B7B3;
 }
-
 .welcome-next-btn,
 #welcomeNextBtn,
 .onboarding-btn {
