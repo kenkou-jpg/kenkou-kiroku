@@ -2579,6 +2579,66 @@
         this.classList.add('selected');
       });
     });
+
+    // 症状チップ（複数選択）
+    document.querySelectorAll('#symptomChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('selected');
+      });
+    });
+
+    // 月経周期チップ
+    document.querySelectorAll('#menstrualCycleChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('#menstrualCycleChips .chip').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    // 月経量チップ
+    document.querySelectorAll('#menstrualFlowChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('#menstrualFlowChips .chip').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    // 体調ボタン（1〜5）
+    document.querySelectorAll('.body-condition-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.body-condition-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    // 食後体感チップ
+    document.querySelectorAll('#bodyFeelChips .body-feel-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('selected');
+      });
+    });
+
+    // 食材チップ
+    document.querySelectorAll('#foodIngredientChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('selected');
+      });
+    });
+
+    // 断食体感チップ
+    document.querySelectorAll('#fastingFeelChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('selected');
+      });
+    });
+
+    // 感情ボタン
+    document.querySelectorAll('.emotion-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.emotion-item').forEach(i => i.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
   }
 
   /* FAB表示 */
