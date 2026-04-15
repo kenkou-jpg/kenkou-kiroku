@@ -2241,7 +2241,7 @@
   #kk-toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#3D2E3A; color:white; padding:10px 22px; border-radius:22px; font-size:0.875rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:600; white-space:nowrap; max-width:90vw; text-align:center; }
   #kk-toast.toast-show { opacity:1; }
   
-  /* フィードバックモーダル表示 */
+    /* フィードバックモーダル */
     .feedback-overlay {
       position: fixed;
       inset: 0;
@@ -2252,7 +2252,7 @@
       justify-content: center;
     }
     .feedback-overlay.feedback-show {
-      display: flex;
+      display: flex !important;
     }
     .feedback-modal {
       background: #FBF7F2;
@@ -2276,6 +2276,7 @@
       font-size: 1rem;
       color: #6C4A67;
       cursor: pointer;
+      z-index: 10;
     }
     .feedback-step { display: none; }
     .feedback-step.active { display: block; }
