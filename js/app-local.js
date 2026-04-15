@@ -874,6 +874,16 @@ function bindAllEvents() {
       btn.classList.add('selected');
     });
   });
+   
+  /* 体調記録ボタン */
+  var condSaveBtn = $('#conditionSaveBtn');
+  if (condSaveBtn) {
+    condSaveBtn.addEventListener('click', function() {
+      var rec = buildRecordFromUI();
+      saveRecordLocal(rec);
+      showToast('今日の体調を記録しました');
+    });
+  }
 
   /* 保存ボタン */
   var saveBtn = $('#saveRecordBtn');
