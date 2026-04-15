@@ -722,6 +722,75 @@ function initSettings() {
       }
     });
   }
+   // フィードバック評価ボタン
+
+$$('.feedback-rating-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+
+    $$('.feedback-rating-btn').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+    var next = $('#fbStep1Next');
+    if (next) next.disabled = false;
+  });
+});
+
+// ステップ1 次へ
+var fbS1 = $('#fbStep1Next');
+if (fbS1) {
+  fbS1.addEventListener('click', function() {
+
+    $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
+    var step2 = $$('.feedback-step')[1];
+    if (step2) step2.classList.add('active');
+  });
+}
+
+// ステップ2 次へ
+var fbS2 = $('#fbStep2Next');
+if (fbS2) {
+  fbS2.addEventListener('click', function() {
+
+    $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
+    var step3 = $$('.feedback-step')[2];
+    if (step3) step3.classList.add('active');
+  });
+}
+
+// ステップ2 戻る
+var fbS2Back = $('#fbStep2Back');
+if (fbS2Back) {
+  fbS2Back.addEventListener('click', function() {
+
+    $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
+    var step1 = $$('.feedback-step')[0];
+    if (step1) step1.classList.add('active');
+  });
+}
+
+// ステップ3 戻る
+var fbS3Back = $('#fbStep3Back');
+if (fbS3Back) {
+  fbS3Back.addEventListener('click', function() {
+
+    $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
+    var step2 = $$('.feedback-step')[1];
+    if (step2) step2.classList.add('active');
+  });
+}
+
+// 送信ボタン
+var fbSubmit = $('#fbSubmitBtn');
+if (fbSubmit) {
+  fbSubmit.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
+    var complete = $('#feedbackComplete');
+    if (complete) complete.style.display = 'block';
+    showToast('フィードバックを送信しました');
+  });
+}
+
    
   // 記録履歴を見る
   var historyRow = $('#historyRow');
