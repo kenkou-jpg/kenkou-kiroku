@@ -2240,6 +2240,51 @@
   /* Toast */
   #kk-toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#3D2E3A; color:white; padding:10px 22px; border-radius:22px; font-size:0.875rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:600; white-space:nowrap; max-width:90vw; text-align:center; }
   #kk-toast.toast-show { opacity:1; }
+  
+  /* フィードバックモーダル表示 */
+    .feedback-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 400;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .feedback-overlay.feedback-show {
+      display: flex;
+    }
+    .feedback-modal {
+      background: #FBF7F2;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 430px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+    .feedback-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(108,74,103,0.08);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1rem;
+      color: #6C4A67;
+      cursor: pointer;
+    }
+    .feedback-step { display: none; }
+    .feedback-step.active { display: block; }
+    .feedback-complete { display: none; text-align: center; padding: 32px 0; }
+
+    /* インサイト見出し色修正 */
+    .insight-hero-main {
+      color: #3D2E3A !important;
+    }
 </style>
 <script src="js/app-local.js"></script>
 </body>
