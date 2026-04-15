@@ -798,13 +798,36 @@ var fbSubmit = $('#fbSubmitBtn');
 if (fbSubmit) {
   fbSubmit.addEventListener('click', function(e) {
     e.preventDefault();
+    var form = $('#feedbackForm');
+    var rating = $('.feedback-rating-btn.selected');
+    var reasons = $$('#fbReasonChips .chip.selected').map(function(c){ return c.textContent; });
+    var comment = $('#fbComment') ? $('#fbComment').value : '';
+    
+    // Formspreeに送信
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        rating: rating ? rating.dataset.rating + ' - ' + rating.dataset.label : '',
+        reasons: reasons.join(', '),
+        comment: comment
+      })
+    }).then(function(res) {
+      if (res.ok) {
 
-    $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
-    var complete = $('#feedbackComplete');
-    if (complete) complete.style.display = 'block';
-    showToast('フィードバックを送信しました');
+        $$('.feedback-step').forEach(function(s) { s.classList.remove('active'); });
+        var complete = $('#feedbackComplete');
+        if (complete) complete.style.display = 'block';
+        showToast('フィードバックを送信しました');
+      } else {
+        showToast('送信に失敗しました。もう一度お試しください');
+      }
+    }).catch(function() {
+      showToast('送信に失敗しました');
+    });
   });
 }
+
 
    
   // 記録履歴を見る
