@@ -854,6 +854,102 @@
           <!-- JS inject -->
         </div>
       </div>
+<!-- ══════════════════════════════════
+     CRYSTAL CALENDAR（チャクラ・カレンダー）
+     ══════════════════════════════════ -->
+<section class="lp-calendar-section" id="crystalCalendarSection">
+  <div class="lp-section-header">
+    <div class="lp-section-title">
+      <span class="lp-crystal-icon">💎</span>
+      <span>チャクラ・カレンダー</span>
+    </div>
+    <div class="lp-section-sub">CRYSTAL HEALING TRACKER</div>
+  </div>
+
+  <!-- 月ナビ -->
+  <div class="lp-month-nav">
+    <button class="lp-nav-btn" id="calPrev" aria-label="前月">◀</button>
+    <div class="lp-month-label" id="calMonthLabel"></div>
+    <button class="lp-nav-btn" id="calNext" aria-label="翌月">▶</button>
+  </div>
+
+  <!-- 曜日ヘッダー -->
+  <div class="lp-cal-weekdays">
+    <div class="lp-cal-wd">日</div>
+    <div class="lp-cal-wd">月</div>
+    <div class="lp-cal-wd">火</div>
+    <div class="lp-cal-wd">水</div>
+    <div class="lp-cal-wd">木</div>
+    <div class="lp-cal-wd">金</div>
+    <div class="lp-cal-wd">土</div>
+  </div>
+
+  <!-- 日グリッド -->
+  <div class="lp-cal-days" id="calDaysGrid"></div>
+
+  <!-- 統計ストリップ -->
+  <div class="lp-stats-strip">
+    <div class="lp-stat">
+      <div class="lp-stat-num" id="calStreak">0日</div>
+      <div class="lp-stat-label">連続ケア</div>
+    </div>
+    <div class="lp-stat">
+      <div class="lp-stat-num" id="calDone">0</div>
+      <div class="lp-stat-label">達成日</div>
+    </div>
+    <div class="lp-stat">
+      <div class="lp-stat-num" id="calCrystals">0</div>
+      <div class="lp-stat-label">クリスタル</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     MELT LIGHT BAR（光の溶融バー）
+     ══════════════════════════════════ -->
+<section class="lp-melt-section" id="meltLightSection">
+  <div class="lp-melt-label">✦ 光の溶融 — 浄化の道</div>
+  <div class="lp-melt-track">
+    <div class="lp-melt-fill" id="meltFill" style="width:0%">
+      <div class="lp-melt-particle">✦</div>
+    </div>
+  </div>
+  <div class="lp-melt-pct" id="meltPct">0%</div>
+</section>
+
+<!-- ══════════════════════════════════
+     DAY DETAIL MODAL
+     ══════════════════════════════════ -->
+<div class="lp-modal-overlay" id="calModalOverlay">
+  <div class="lp-modal" id="calDayModal">
+    <div class="lp-modal-title" id="calModalTitle"></div>
+    <div class="lp-modal-date" id="calModalDate"></div>
+
+    <div class="lp-modal-section">
+      <div class="lp-modal-section-label">🍊 第2チャクラ・フード</div>
+      <div class="lp-modal-foods" id="calModalFoods"></div>
+    </div>
+
+    <div class="lp-modal-section">
+      <div class="lp-modal-section-label">⏳ 断食プロトコル</div>
+      <div class="lp-modal-fast">
+        <span class="lp-fast-icon">🌙</span>
+        <span class="lp-fast-desc" id="calModalFastDesc">オートファジー断食</span>
+        <span class="lp-fast-time" id="calModalFastTime"></span>
+      </div>
+    </div>
+
+    <div class="lp-modal-section" id="calModalRecordSection" style="display:none">
+      <div class="lp-modal-section-label">📋 今日の記録</div>
+      <div class="lp-modal-record-summary" id="calModalRecordSummary"></div>
+    </div>
+
+    <div class="lp-modal-actions">
+      <button class="lp-modal-btn lp-btn-secondary" id="calModalClose">閉じる</button>
+      <button class="lp-modal-btn lp-btn-primary" id="calModalDone">✦ 達成する</button>
+    </div>
+  </div>
+</div>
 
       <!-- 今日の記録サマリー -->
       <div class="home-today-section">
