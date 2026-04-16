@@ -2400,6 +2400,155 @@
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+/* ── Dark theme overrides for inline styles ── */
+#record-wizard {
+  background: #06080f !important;
+}
+.wizard-step {
+  background: transparent !important;
+}
+.wizard-scale-btn {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: #e8e4f0 !important;
+}
+.wizard-scale-btn.selected {
+  background: linear-gradient(135deg, #b07fff, #6a3fff) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+.wizard-chip {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.wizard-chip.selected {
+  background: rgba(176,127,255,0.12) !important;
+  border-color: #b07fff !important;
+  color: #b07fff !important;
+}
+.wizard-chakra-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.wizard-chakra-card.selected {
+  background: rgba(176,127,255,0.10) !important;
+  border-color: #b07fff !important;
+}
+.wizard-chakra-name {
+  color: #e8e4f0 !important;
+}
+.wizard-emotion-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.wizard-emotion-card .emotion-name {
+  color: rgba(232,228,240,0.75) !important;
+}
+.wizard-emotion-card.selected {
+  background: rgba(176,127,255,0.10) !important;
+  border-color: #b07fff !important;
+}
+.wizard-textarea {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: #e8e4f0 !important;
+}
+.wizard-textarea:focus {
+  border-color: #b07fff !important;
+}
+.wizard-question {
+  color: #e8e4f0 !important;
+}
+.wizard-sub {
+  color: rgba(232,228,240,0.45) !important;
+}
+.wizard-close-btn {
+  background: rgba(255,255,255,0.06) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.wizard-back-btn {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.wizard-next-btn {
+  background: linear-gradient(135deg, #b07fff, #6a3fff) !important;
+  box-shadow: 0 4px 18px rgba(176,127,255,0.35) !important;
+}
+.wizard-next-btn.btn-teal {
+  background: linear-gradient(135deg, #5af0d0, #3dd4b0) !important;
+  box-shadow: 0 4px 18px rgba(90,240,208,0.35) !important;
+}
+#wizard-complete {
+  background: linear-gradient(160deg, #06080f, #0b1025) !important;
+}
+.complete-checkmark {
+  background: linear-gradient(135deg, #b07fff, #5af0d0) !important;
+}
+.complete-title {
+  color: #e8e4f0 !important;
+}
+.complete-sub {
+  color: rgba(232,228,240,0.45) !important;
+}
+
+/* 記録画面の白背景パネル修正 */
+.record-panel {
+  background: transparent !important;
+}
+.chakra-section-title {
+  color: #e8e4f0 !important;
+}
+.chakra-section-sub {
+  color: rgba(232,228,240,0.55) !important;
+}
+
+/* ナビバーのダーク化 */
+.app-nav {
+  background: rgba(11,16,37,0.95) !important;
+  border-top-color: rgba(255,255,255,0.08) !important;
+}
+
+/* PWAバナー */
+#pwa-banner {
+  background: #0b1025 !important;
+  border-top-color: rgba(255,255,255,0.08) !important;
+}
+.pwa-text strong { color: #e8e4f0 !important; }
+.pwa-text span { color: rgba(232,228,240,0.45) !important; }
+
+/* FABボタン */
+.home-record-fab-btn {
+  background: linear-gradient(135deg, #b07fff, #6a3fff) !important;
+  box-shadow: 0 6px 24px rgba(176,127,255,0.4) !important;
+}
+.home-record-fab-btn.recorded {
+  background: linear-gradient(135deg, #5af0d0, #3dd4b0) !important;
+  box-shadow: 0 6px 24px rgba(90,240,208,0.35) !important;
+}
+
+/* スケルトンローディング */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%) !important;
+  background-size: 200% 100% !important;
+}
+
+/* チャクラビジュアルリスト */
+.chakra-visual-item {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.chakra-visual-item.selected {
+  background: rgba(176,127,255,0.10) !important;
+  border-color: #b07fff !important;
+}
+.chakra-visual-name {
+  color: #e8e4f0 !important;
+}
+.chakra-visual-area {
+  color: rgba(232,228,240,0.45) !important;
+}
 </style>
 <script src="js/app-local.js"></script>
 </body>
