@@ -3838,5 +3838,157 @@ div.condition-memo-section > *:first-child {
   </div>
 </div>
 </script>
+  <script>
+(function(){
+  /* ── 月の満ち欠け計算＆表示 ── */
+  var PHASES = [
+    { name:'新月',     icon:'🌑', msg:'はじまりのとき。意図を静かに種まきしましょう。' },
+    { name:'三日月',   icon:'🌒', msg:'小さな芽が動き出す。直感を信じてみて。' },
+    { name:'上弦の月', icon:'🌓', msg:'行動のとき。からだが前に進みたがっています。' },
+    { name:'十日夜の月', icon:'🌔', msg:'満ちていく力。自分を信じて続けましょう。' },
+    { name:'満月',     icon:'🌕', msg:'満ちるとき。感謝とともに、手放す準備を。' },
+    { name:'十六夜の月', icon:'🌖', msg:'内省のとき。からだの声をじっくり聴いて。' },
+    { name:'下弦の月', icon:'🌗', msg:'手放しのとき。不要なものを静かに流しましょう。' },
+    { name:'二十六夜の月', icon:'🌘', msg:'浄化のとき。次の新月に向けて、こころを空に。' }
+  ];
+
+  function getMoonAge(year, month, day){
+    var jd = julianDay(year, month, day);
+    var age = ((jd - 2451550.1) % 29.530588853);
+    if(age < 0) age += 29.530588853;
+    return age;
+  }
+
+  function julianDay(y, m, d){
+    if(m <= 2){ y--; m += 12; }
+    var A = Math.floor(y/100);
+    var B = 2 - A + Math.floor(A/4);
+    return Math.floor(365.25*(y+4716)) + Math.floor(30.6001*(m+1)) + d + B - 1524.5;
+  }
+
+  function getPhaseIndex(age){
+    var i = Math.round(age / 29.530588853 * 8) % 8;
+    return i;
+  }
+
+  function drawMoon(ctx, age, size){
+    var W = size, H = size, cx = W/2, cy = H/2, r = W/2 - 10;
+    ctx.clearRect(0,0,W,H);
+
+    /* 月光グロー */
+    var glowStrength = 1 - Math.abs(age - 14.765) / 14.765;
+    var glow = ctx.createRadialGradient(cx,cy,r*0.8,cx,cy,r*1.5);
+    glow.addColorStop(0,'rgba(255,250,230,'+(glowStrength*0.15)+')');
+    glow.addColorStop(1,'rgba(255,250,230,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0,0,W,H);
+
+    /* 月本体（明るい面） */
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle = '#ffeedd';
+    ctx.fill();
+
+    /* クレーター */
+    var craters = [[0.3,0.35,0.08],[0.55,0.6,0.06],[0.4,0.65,0.05],[0.65,0.35,0.04],[0.5,0.45,0.07]];
+    for(var c=0;c<craters.length;c++){
+      ctx.beginPath();
+      ctx.arc(cx+(craters[c][0]-0.5)*r*2, cy+(craters[c][1]-0.5)*r*2, r*craters[c][2], 0, Math.PI*2);
+      ctx.fillStyle='rgba(200,190,170,0.3)';
+      ctx.fill();
+    }
+
+    /* 影（月齢に応じて） */
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.clip();
+
+    var phase = (age / 29.530588853) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r, -Math.PI/2, Math.PI/2, false);
+    var sweepX = Math.cos(phase) * r;
+    ctx.bezierCurveTo(cx+sweepX, cy+r*0.6, cx+sweepX, cy-r*0.6, cx, cy-r);
+    ctx.fillStyle='rgba(6,8,15,0.92)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function spawnSparkles(wrap, count){
+    for(var i=0;i<count;i++){
+      var s = document.createElement('div');
+      s.className='moon-sparkle';
+      var angle = Math.random()*Math.PI*2;
+      var dist = 50+Math.random()*60;
+      s.style.setProperty('--mx', Math.cos(angle)*dist+'px');
+      s.style.setProperty('--my', Math.sin(angle)*dist+'px');
+      s.style.left = (90+Math.cos(angle)*20)+'px';
+      s.style.top = (90+Math.sin(angle)*20)+'px';
+      s.style.animationDelay = (Math.random()*0.8)+'s';
+      s.style.animationDuration = (1.5+Math.random()*1.5)+'s';
+      wrap.appendChild(s);
+      (function(el){ setTimeout(function(){ el.remove(); },3500); })(s);
+    }
+  }
+
+  function showMoon(year, month, day){
+    var overlay = document.getElementById('moonOverlay');
+    var canvas = document.getElementById('moonCanvas');
+    var wrap = document.getElementById('moonCanvasWrap');
+    if(!overlay || !canvas) return;
+
+    var age = getMoonAge(year, month, day);
+    var pi = getPhaseIndex(age);
+    var P = PHASES[pi];
+
+    document.getElementById('moonDateLabel').textContent = year+'年'+month+'月'+day+'日';
+    document.getElementById('moonPhaseName').textContent = P.name;
+    document.getElementById('moonPhaseSub').textContent = '月齢 '+age.toFixed(1)+' 日';
+    document.getElementById('moonAgeText').textContent = '月齢 '+age.toFixed(1)+' / 29.5 日';
+    document.getElementById('moonAgeBarFill').style.width = (age/29.530588853*100)+'%';
+    document.getElementById('moonMsgIcon').textContent = P.icon;
+    document.getElementById('moonMsgText').textContent = P.msg;
+
+    overlay.classList.add('show');
+    wrap.classList.remove('appear');
+    void wrap.offsetWidth;
+    wrap.classList.add('appear');
+
+    var ctx = canvas.getContext('2d');
+    drawMoon(ctx, age, 180);
+    spawnSparkles(wrap, 12);
+  }
+
+  /* カレンダーの日付クリックをフック */
+  document.addEventListener('click', function(e){
+    var dayEl = e.target.closest('.lp-day');
+    if(!dayEl) return;
+    var day = parseInt(dayEl.dataset.day);
+    if(!day || day <= 0) return;
+    var header = document.querySelector('.lp-cal-title');
+    if(!header) return;
+    var text = header.textContent;
+    var match = text.match(/(\d{4})年\s*(\d{1,2})月/);
+    if(!match) return;
+    showMoon(parseInt(match[1]), parseInt(match[2]), day);
+  });
+
+  /* 閉じるボタン */
+  var closeBtn = document.getElementById('moonOverlayClose');
+  if(closeBtn){
+    closeBtn.addEventListener('click', function(){
+      document.getElementById('moonOverlay').classList.remove('show');
+    });
+  }
+  /* オーバーレイ外クリック */
+  var overlay = document.getElementById('moonOverlay');
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) overlay.classList.remove('show');
+    });
+  }
+})();
+</script>
 </body>
 </html>
