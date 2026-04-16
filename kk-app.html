@@ -3114,7 +3114,10 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
+}
+body {
+  background: #06080f !important;
 }
 #app-shell {
   position: relative;
@@ -3123,11 +3126,18 @@
 }
 .app-screen,
 .app-screen.active,
-#screen-welcome {
+#screen-welcome,
+#screen-home,
+#screen-record,
+#screen-insight,
+#screen-settings {
   background: transparent !important;
 }
-body {
-  background: #06080f !important;
+#screen-home .app-content,
+#screen-insight .app-content,
+#screen-record .app-content,
+#screen-settings .app-content {
+  background: transparent !important;
 }
 .app-header {
   background: rgba(6,8,15,0.85) !important;
