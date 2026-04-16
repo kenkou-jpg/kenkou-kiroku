@@ -233,8 +233,18 @@ function renderTodaySummary(rec) {
   var EMO_NAMES = { peaceful:'穏やか', happy:'うれしい', tired:'疲れ', anxious:'不安', irritated:'イライラ' };
   var rows = '';
   if (rec.chakra) rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-chakra">ch</div><div><div class="home-today-item-label">チャクラ</div><div class="home-today-item-value">' + (CHAKRA_NAMES[rec.chakra] || rec.chakra) + '</div></div></div>';
-  if (rec.food_content) rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-food">fo</div><div><div class="home-today-item-label">食事</div><div class="home-today-item-value">' + rec.food_content.slice(0, 20) + '</div></div></div>';
-  if (rec.fasting_hours) rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-fasting">fa</div><div><div class="home-today-item-label">断食</div><div class="home-today-item-value">' + rec.fasting_hours + 'h ' + (rec.fasting_minutes || 0) + 'm</div></div></div>';
+   if (rec.meals) {
+    var MEAL_LABELS = { morning: '朝', lunch: '昼', dinner: '夕', snack: '間食' };
+    Object.keys(rec.meals).forEach(function(key) {
+      var meal = rec.meals[key];
+      if (meal && meal.content) {
+        rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-food">fo</div><div><div class="home-today-item-label">' + (MEAL_LABELS[key] || key) + '</div><div class="home-today-item-value">' + meal.content.slice(0, 20) + '</div></div></div>';
+      }
+    });
+  } else if (rec.food_content) {
+    rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-food">fo</div><div><div class="home-today-item-label">食事</div><div class="home-today-item-value">' + rec.food_content.slice(0, 20) + '</div></div></div>';
+  }
+if (rec.fasting_hours) rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-fasting">fa</div><div><div class="home-today-item-label">断食</div><div class="home-today-item-value">' + rec.fasting_hours + 'h ' + (rec.fasting_minutes || 0) + 'm</div></div></div>';
   if (rec.emotion) rows += '<div class="home-today-log-row"><div class="home-today-icon today-icon-emotion">em</div><div><div class="home-today-item-label">感情</div><div class="home-today-item-value">' + (EMO_NAMES[rec.emotion] || rec.emotion) + '</div></div></div>';
   rowsEl.innerHTML = rows;
 }
