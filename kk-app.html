@@ -2549,6 +2549,230 @@
 .chakra-visual-area {
   color: rgba(232,228,240,0.45) !important;
 }
+  /* ── インサイト画面のダーク化 ── */
+#screen-insight .app-content,
+#screen-insight {
+  background: #06080f !important;
+}
+
+/* インサイトのカード（記録日数・最長連続日数等） */
+.insight-stat-card,
+.insight-card,
+.insight-pattern-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #e8e4f0 !important;
+}
+.insight-stat-card .stat-number,
+.insight-stat-number {
+  color: #b07fff !important;
+}
+.insight-stat-card .stat-label,
+.insight-stat-label {
+  color: rgba(232,228,240,0.45) !important;
+}
+
+/* インサイトのパターンメッセージカード */
+.insight-message-card,
+.insight-summary-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* グラフ背景のカード */
+.chart-card,
+.insight-chart-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* インサイト内の全app-card */
+#screen-insight .app-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+#screen-insight .app-card-padded {
+  background: rgba(255,255,255,0.045) !important;
+}
+
+/* from your records カード */
+#screen-insight .card-pink,
+#screen-insight .card-teal,
+#screen-insight .card-plum,
+#screen-insight .card-gold {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* ── 記録画面の白い部分 ── */
+
+/* 体調カード・食事カード等の白背景 */
+#screen-record .app-card,
+#screen-record .app-card-padded {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+#screen-record .card-pink,
+#screen-record .card-teal,
+#screen-record .card-plum,
+#screen-record .card-gold {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* 記録画面内のセクションタイトル */
+#screen-record .app-section-title,
+#screen-record h3,
+#screen-record h4 {
+  color: #e8e4f0 !important;
+}
+#screen-record .app-section-sub {
+  color: #b07fff !important;
+}
+
+/* 体調の5段階ボタン */
+.condition-btn,
+.condition-scale-btn {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.condition-btn.selected,
+.condition-scale-btn.selected {
+  background: rgba(176,127,255,0.15) !important;
+  border-color: #b07fff !important;
+  color: #b07fff !important;
+}
+
+/* 食事の時間帯カード */
+.food-time-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.food-time-card.selected {
+  background: rgba(90,240,208,0.10) !important;
+  border-color: #5af0d0 !important;
+  color: #5af0d0 !important;
+}
+
+/* 断食目標ボタン */
+.fasting-goal-btn {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.fasting-goal-btn.selected {
+  background: rgba(255,217,122,0.12) !important;
+  border-color: #ffd97a !important;
+  color: #ffd97a !important;
+}
+
+/* 感情カード */
+.emotion-item {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.emotion-item.selected {
+  background: rgba(176,127,255,0.10) !important;
+  border-color: #b07fff !important;
+}
+.emotion-item .emotion-label {
+  color: rgba(232,228,240,0.75) !important;
+}
+
+/* 体感チップ（食後の体感・断食中の体感） */
+.body-feel-chip {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(232,228,240,0.75) !important;
+}
+.body-feel-chip.selected {
+  background: rgba(176,127,255,0.12) !important;
+  border-color: #b07fff !important;
+  color: #b07fff !important;
+}
+
+/* テキスト入力フィールド */
+#screen-record .form-input,
+#screen-record .form-textarea,
+#screen-record textarea,
+#screen-record input[type="text"],
+#screen-record input[type="number"] {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: #e8e4f0 !important;
+}
+#screen-record .form-input:focus,
+#screen-record .form-textarea:focus,
+#screen-record textarea:focus,
+#screen-record input:focus {
+  border-color: #b07fff !important;
+  box-shadow: 0 0 0 3px rgba(176,127,255,0.15) !important;
+}
+
+/* 記録画面のラベルテキスト */
+#screen-record .form-label {
+  color: rgba(232,228,240,0.75) !important;
+}
+#screen-record .form-sub-label {
+  color: rgba(232,228,240,0.45) !important;
+}
+
+/* レンジスライダーの値表示 */
+#screen-record .range-value-display {
+  color: #b07fff !important;
+}
+#screen-record .range-labels span,
+#screen-record .range-labels {
+  color: rgba(232,228,240,0.45) !important;
+}
+
+/* 断食タイマー表示 */
+.fasting-timer-display,
+.fasting-time-display {
+  color: #e8e4f0 !important;
+}
+.fasting-timer-card,
+.fasting-display-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* 保存ボタン */
+#screen-record .btn-primary {
+  background: linear-gradient(135deg, #b07fff, #6a3fff) !important;
+  box-shadow: 0 4px 16px rgba(176,127,255,0.35) !important;
+}
+
+/* ── 設定画面の残り ── */
+#screen-settings .app-content {
+  background: #06080f !important;
+}
+#screen-settings .settings-row {
+  border-bottom-color: rgba(255,255,255,0.06) !important;
+}
+.settings-row-label {
+  color: #e8e4f0 !important;
+}
+.settings-row-arrow {
+  color: rgba(232,228,240,0.45) !important;
+}
+.settings-row-value {
+  color: rgba(232,228,240,0.55) !important;
+}
+.settings-section-title {
+  color: rgba(232,228,240,0.45) !important;
+}
+.settings-about-card {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.settings-danger-row,
+.settings-row.danger {
+  color: #ff6eb0 !important;
+}
+
 </style>
 <script src="js/app-local.js"></script>
 </body>
