@@ -356,12 +356,33 @@ function buildRecordFromUI() {
   // FIX: 月経周期
   var cycleEl = $('#menstrualCycleChips .chip.selected'); rec.cycle_phase = cycleEl ? cycleEl.dataset.val : null;
   var rmEl = $('#rhythmNote'); rec.rhythm_memo = rmEl ? rmEl.value.trim() : '';
-  var ftEl = $('.food-time-card.selected'); rec.food_time = ftEl ? ftEl.dataset.time : null;
-  var fcEl = $('#foodContent'); rec.food_content = fcEl ? fcEl.value.trim() : '';
-  rec.body_feel = $$('#bodyFeelChips .body-feel-chip.selected').map(function(c) { return c.dataset.val; });
-  rec.food_ingredients = $$('#foodIngredientChips .chip.selected').map(function(c) { return c.dataset.val; });
-  var fsEl = $('#foodScore'); rec.food_score = fsEl ? parseInt(fsEl.value) : 5;
-  var fnEl = $('#foodNote'); rec.food_notes = fnEl ? fnEl.value.trim() : '';
+  var ftEl = $('.food-time-card.selected');
+  var currentTime = ftEl ? ftEl.dataset.time : 'other';
+  var fcEl = $('#foodContent');
+  var currentFood = fcEl ? fcEl.value.trim() : '';
+  var existingRec = getTodayRecord();
+  var meals = (existingRec && existingRec.meals) ? existingRec.meals : {};
+  if (currentFood) {
+    meals[currentTime] = {
+      content: currentFood,
+      body_feel: $$('#bodyFeelChips .body-feel-chip.selected').map(function(c) { return c.dataset.val; }),
+      ingredients: $$('#foodIngredientChips .chip.selected').map(function(c) { return c.dataset.val; }),
+      score: $('#foodScore') ? parseInt($('#foodScore').value) : 5,
+      notes: $('#foodNote') ? $('#foodNote').value.trim() : ''
+    };
+  }
+  rec.meals = meals;
+  var allFoods = [];
+  var MEAL_LABELS = { morning: '朝', lunch: '昼', dinner: '夕', snack: '間食' };
+  Object.keys(meals).forEach(function(key) {
+    if (meals[key].content) {
+      allFoods.push((MEAL_LABELS[key] || key) + ':' + meals[key].content);
+    }
+  });
+  rec.food_content = allFoods.join(' / ');
+  rec.food_time = currentTime;
+  rec.food_score = $('#foodScore') ? parseInt($('#foodScore').value) : 5;
+  rec.food_notes = $('#foodNote') ? $('#foodNote').value.trim() : '';
   var fstEl = $('#fastingStartTime'); rec.fasting_start = fstEl ? fstEl.value : '20:00';
   var fenEl = $('#fastingEndTime'); rec.fasting_end = fenEl ? fenEl.value : '12:00';
   var goalBtn = $('.fasting-goal-btn.selected');
