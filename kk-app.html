@@ -3107,6 +3107,24 @@
   background: linear-gradient(135deg, rgba(176,127,255,0.08), rgba(176,127,255,0.03)) !important;
   border-color: rgba(176,127,255,0.20) !important;
 }
+/* ── 星空を透過させる ── */
+#app-shell {
+  background: transparent !important;
+  position: relative;
+  z-index: 1;
+}
+.app-screen {
+  background: transparent !important;
+}
+.app-screen.active {
+  background: transparent !important;
+}
+#screen-welcome {
+  background: transparent !important;
+}
+body {
+  background: #06080f !important;
+}
 
 </style>
 <script src="js/app-local.js"></script>
