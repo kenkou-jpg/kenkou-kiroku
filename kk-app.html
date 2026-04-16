@@ -3147,6 +3147,38 @@ body {
   background: rgba(6,8,15,0.85) !important;
   backdrop-filter: blur(12px) !important;
 }
+  
+/* ── インサイト：グラフ枠のダーク化 ── */
+#screen-insight .app-card,
+#screen-insight .app-card-padded,
+#screen-insight [class*="chart"],
+#screen-insight canvas,
+#wellnessChart,
+#foodChart,
+#chakraChart {
+  background: transparent !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* グラフの親要素（白背景のdiv） */
+#screen-insight .app-content .app-card,
+#screen-insight .app-content > div,
+#screen-insight .app-content section,
+#screen-insight .app-content .app-card-padded {
+  background: rgba(255,255,255,0.045) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* canvas を包む div にインラインで白が付いている場合 */
+#screen-insight div[style*="background: white"],
+#screen-insight div[style*="background:white"],
+#screen-insight div[style*="background: #fff"],
+#screen-insight div[style*="background:#fff"],
+#screen-insight div[style*="background: rgb(255"],
+#screen-insight div[style*="background-color: white"],
+#screen-insight div[style*="background-color:white"] {
+  background: rgba(255,255,255,0.045) !important;
+}
 
 </style>
     <script src="js/app-local.js"></script>
