@@ -12,55 +12,71 @@
    DESIGN TOKENS
    ============================================ */
 :root {
-  /* ── Color Palette ── */
-  --app-bg:           #FBF7F2;
-  --app-bg-sub:       #F5EDE3;
-  --app-bg-card:      #FFFFFF;
-  --app-bg-air:       #EAF7F7;
-  --app-bg-deep:      #F0E4F0;
+  /* ── Luminous Path Color Palette ── */
+  --app-bg:           #06080f;
+  --app-bg-sub:       #0b1025;
+  --app-bg-card:      rgba(255,255,255,0.045);
+  --app-bg-air:       rgba(90,240,208,0.05);
+  --app-bg-deep:      rgba(176,127,255,0.08);
 
   /* Brand Colors */
-  --pink:             #E63FA8;
-  --pink-soft:        #F2A8D8;
-  --pink-light:       #FAE8F4;
-  --pink-pale:        #FDF3FA;
-  --teal:             #27B7B3;
-  --teal-soft:        #7DD4D1;
-  --teal-light:       #C8ECEB;
-  --teal-pale:        #EEF9F9;
-  --teal-dark:        #1E9490;
-  --gold:             #C9A44A;
-  --gold-light:       #F0DFB8;
-  --plum:             #6C4A67;
-  --plum-light:       #C8AAC4;
-  --plum-pale:        #F2ECF1;
+  --pink:             #b07fff;
+  --pink-soft:        #c9a8ff;
+  --pink-light:       rgba(176,127,255,0.12);
+  --pink-pale:        rgba(176,127,255,0.06);
+  --teal:             #5af0d0;
+  --teal-soft:        #8df5e0;
+  --teal-light:       rgba(90,240,208,0.12);
+  --teal-pale:        rgba(90,240,208,0.06);
+  --teal-dark:        #3dd4b0;
+  --gold:             #ffd97a;
+  --gold-light:       rgba(255,217,122,0.12);
+  --plum:             #c9a8ff;
+  --plum-light:       rgba(176,127,255,0.25);
+  --plum-pale:        rgba(176,127,255,0.06);
+
+  /* Luminous Path Exclusive */
+  --sacral:           #ff7a3c;
+  --sacral-glow:      rgba(255,122,60,0.35);
+  --crystal-blue:     #6ecfff;
+  --crystal-violet:   #b07fff;
+  --crystal-rose:     #ff6eb0;
+  --crystal-gold:     #ffd97a;
+  --crystal-teal:     #5af0d0;
+  --midnight:         #06080f;
+  --deep-navy:        #0b1025;
+  --glass:            rgba(255,255,255,0.045);
+  --glass-border:     rgba(255,255,255,0.08);
 
   /* Text */
-  --text-primary:     #3D2E3A;
-  --text-secondary:   #6B5468;
-  --text-muted:       #A090A0;
-  --text-accent:      #E63FA8;
-  --text-teal:        #27B7B3;
+  --text-primary:     #e8e4f0;
+  --text-secondary:   rgba(232,228,240,0.75);
+  --text-muted:       rgba(232,228,240,0.45);
+  --text-accent:      #b07fff;
+  --text-teal:        #5af0d0;
   --white:            #FFFFFF;
 
   /* Borders */
-  --border:           rgba(108, 74, 103, 0.12);
-  --border-light:     rgba(108, 74, 103, 0.06);
-  --border-pink:      rgba(230, 63, 168, 0.20);
-  --border-teal:      rgba(39, 183, 179, 0.20);
+  --border:           rgba(255,255,255,0.10);
+  --border-light:     rgba(255,255,255,0.06);
+  --border-pink:      rgba(176,127,255,0.25);
+  --border-teal:      rgba(90,240,208,0.25);
 
   /* Shadows */
-  --shadow-xs:        0 1px 4px rgba(108, 74, 103, 0.08);
-  --shadow-sm:        0 2px 10px rgba(108, 74, 103, 0.10);
-  --shadow-md:        0 6px 24px rgba(108, 74, 103, 0.12);
-  --shadow-lg:        0 12px 40px rgba(108, 74, 103, 0.14);
-  --shadow-glow-pink: 0 0 20px rgba(230, 63, 168, 0.20);
-  --shadow-glow-teal: 0 0 20px rgba(39, 183, 179, 0.20);
+  --shadow-xs:        0 1px 4px rgba(0,0,0,0.3);
+  --shadow-sm:        0 2px 10px rgba(0,0,0,0.3);
+  --shadow-md:        0 6px 24px rgba(0,0,0,0.4);
+  --shadow-lg:        0 12px 40px rgba(0,0,0,0.5);
+  --shadow-glow-pink: 0 0 20px rgba(176,127,255,0.30);
+  --shadow-glow-teal: 0 0 20px rgba(90,240,208,0.30);
 
   /* ── Typography ── */
   --font-serif:  'Noto Serif JP', 'Georgia', serif;
-  --font-sans:   'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-sans:   'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
   --font-accent: 'Cormorant Garamond', Georgia, serif;
+
+  /* （以下 --sp-*, --radius-*, --ease-*, --duration-* はそのまま変更なし） */
+
 
   /* ── Spacing ── */
   --sp-1:  0.25rem;
