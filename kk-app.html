@@ -3503,9 +3503,18 @@ div.condition-memo-section > *:first-child {
   window.addEventListener('resize', function(){ resize(); init(); });
 })();
   </script>
-   <script>
-    (function(){
-      /* ── 光の粒子 体調セレクター ── */
+ <script>
+(function(){
+  /* ★ 親カードの白背景を強制除去 ★ */
+  var memo = document.getElementById('conditionMemoSection');
+  if(memo){
+    var cards = memo.querySelectorAll('.app-card, .app-card-padded');
+    cards.forEach(function(c){
+      c.style.cssText += 'background:transparent!important;border:none!important;box-shadow:none!important;';
+    });
+  }
+
+  /* ── 光の粒子 体調セレクター ── */
   var LEVELS = [
     { label:'かすかな灯',   sub:'からだが重く、霧の中にいるような感覚',     color:[120,90,160],  particles:8,  speed:0.3, glow:0.15 },
     { label:'うっすらと光る', sub:'少しだけ、光が見えはじめている',           color:[160,140,200], particles:16, speed:0.5, glow:0.25 },
