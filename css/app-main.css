@@ -3516,3 +3516,269 @@ button:active,
   z-index: 1;
 }
 
+/* ============================================
+   LUMINOUS PATH — DARK THEME OVERRIDES
+   ============================================ */
+
+body {
+  background-color: var(--midnight);
+}
+
+#app-shell {
+  background: var(--midnight);
+  box-shadow: none;
+}
+
+.app-screen {
+  background: var(--midnight);
+}
+
+/* ── Navigation ── */
+.app-nav {
+  background: rgba(11,16,37,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Header ── */
+.app-header.scrolled {
+  background: rgba(6,8,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+/* ── Cards glass effect ── */
+.app-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+}
+.app-card:hover {
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* ── Gradient Cards ── */
+.card-pink {
+  background: linear-gradient(135deg, rgba(176,127,255,0.10) 0%, rgba(176,127,255,0.04) 100%);
+  border-color: var(--border-pink);
+}
+.card-teal {
+  background: linear-gradient(135deg, rgba(90,240,208,0.10) 0%, rgba(90,240,208,0.04) 100%);
+  border-color: var(--border-teal);
+}
+.card-plum {
+  background: linear-gradient(135deg, rgba(176,127,255,0.08) 0%, rgba(176,127,255,0.03) 100%);
+  border-color: var(--border-pink);
+}
+.card-gold {
+  background: linear-gradient(135deg, rgba(255,217,122,0.10) 0%, rgba(255,217,122,0.04) 100%);
+  border-color: rgba(255,217,122,0.20);
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--crystal-violet) 0%, #6a3fff 100%);
+  box-shadow: 0 4px 16px rgba(176,127,255,0.35);
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(176,127,255,0.50);
+}
+.btn-teal {
+  background: linear-gradient(135deg, var(--crystal-teal) 0%, #3dd4b0 100%);
+  box-shadow: 0 4px 16px rgba(90,240,208,0.35);
+}
+.btn-outline {
+  border-color: var(--glass-border);
+  color: var(--text-secondary);
+}
+.btn-outline:hover {
+  background: rgba(176,127,255,0.08);
+  border-color: var(--border-pink);
+  color: var(--crystal-violet);
+}
+
+/* ── Form elements ── */
+.form-input,
+.form-textarea,
+.form-select {
+  background: var(--glass);
+  border-color: var(--glass-border);
+  color: var(--text-primary);
+}
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--crystal-violet);
+  box-shadow: 0 0 0 3px rgba(176,127,255,0.15);
+}
+
+/* ── Chips ── */
+.chip {
+  background: var(--glass);
+  border-color: var(--glass-border);
+  color: var(--text-secondary);
+}
+.chip:hover {
+  background: rgba(176,127,255,0.10);
+  border-color: var(--border-pink);
+  color: var(--crystal-violet);
+}
+.chip.selected {
+  background: rgba(176,127,255,0.15);
+  border-color: var(--crystal-violet);
+  color: var(--crystal-violet);
+}
+
+/* ── Welcome screen ── */
+#screen-welcome {
+  background: linear-gradient(160deg, #06080f 0%, #0b1025 40%, #101835 100%);
+}
+.welcome-deco-1 {
+  background: radial-gradient(circle, rgba(176,127,255,0.15) 0%, transparent 70%);
+}
+.welcome-deco-2 {
+  background: radial-gradient(circle, rgba(90,240,208,0.12) 0%, transparent 70%);
+}
+.welcome-deco-3 {
+  background: radial-gradient(circle, rgba(255,217,122,0.10) 0%, transparent 70%);
+}
+
+/* ── Home stat cards ── */
+.home-stat-card {
+  background: var(--glass);
+  border-color: var(--glass-border);
+}
+
+/* ── Week calendar ── */
+.week-day-circle {
+  background: var(--glass);
+  color: var(--text-muted);
+}
+.week-day.recorded .week-day-circle {
+  background: linear-gradient(135deg, rgba(176,127,255,0.15), rgba(90,240,208,0.15));
+  border-color: var(--border-pink);
+  color: var(--crystal-violet);
+}
+.week-day.today .week-day-circle {
+  background: linear-gradient(135deg, var(--crystal-violet), var(--crystal-teal));
+  color: white;
+  box-shadow: 0 4px 12px rgba(176,127,255,0.40);
+}
+
+/* ── Today card ── */
+.home-today-card {
+  background: var(--glass);
+  border-color: var(--glass-border);
+}
+.today-icon-chakra   { background: rgba(176,127,255,0.12); color: var(--crystal-violet); }
+.today-icon-food     { background: rgba(90,240,208,0.12);  color: var(--crystal-teal); }
+.today-icon-fasting  { background: rgba(255,217,122,0.12); color: var(--crystal-gold); }
+.today-icon-emotion  { background: rgba(255,110,176,0.12); color: var(--crystal-rose); }
+
+.home-today-log-row:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* ── Season quote ── */
+.season-quote-card {
+  background: linear-gradient(135deg, rgba(176,127,255,0.06) 0%, rgba(90,240,208,0.06) 100%);
+  border-color: var(--glass-border);
+}
+.season-quote-card::before {
+  background: radial-gradient(circle, rgba(176,127,255,0.12) 0%, transparent 70%);
+}
+
+/* ── Milestone ── */
+.milestone-banner {
+  background: linear-gradient(135deg, rgba(255,217,122,0.08) 0%, rgba(176,127,255,0.08) 50%, rgba(90,240,208,0.08) 100%);
+  border-color: rgba(255,217,122,0.20);
+}
+
+/* ── Record screen ── */
+.record-header-section {
+  background: linear-gradient(160deg, rgba(176,127,255,0.08) 0%, var(--midnight) 100%);
+  border-bottom-color: var(--glass-border);
+}
+.record-tabs {
+  background: rgba(255,255,255,0.03);
+}
+.record-tab.active {
+  background: var(--glass);
+  color: var(--crystal-violet);
+  box-shadow: 0 0 12px rgba(176,127,255,0.15);
+}
+
+/* ── Chakra items ── */
+.chakra-item {
+  background: var(--glass);
+  border-color: var(--glass-border);
+}
+.chakra-item:hover {
+  border-color: var(--border-pink);
+  background: rgba(176,127,255,0.06);
+}
+.chakra-item.selected {
+  border-color: var(--crystal-violet);
+  background: rgba(176,127,255,0.10);
+  box-shadow: 0 0 0 3px rgba(176,127,255,0.15);
+}
+
+/* ── Range slider ── */
+input[type="range"] {
+  background: linear-gradient(to right, var(--crystal-violet) 0%, var(--crystal-violet) 50%, var(--glass-border) 50%);
+}
+input[type="range"]::-webkit-slider-thumb {
+  background: var(--deep-navy);
+  border-color: var(--crystal-violet);
+  box-shadow: 0 0 8px rgba(176,127,255,0.40);
+}
+
+/* ── Nav record ring ── */
+.nav-record-ring {
+  background: linear-gradient(135deg, var(--crystal-violet), var(--crystal-teal));
+  box-shadow: 0 4px 16px rgba(176,127,255,0.40);
+}
+
+/* ── Settings rows ── */
+.settings-row {
+  border-bottom-color: var(--glass-border);
+}
+
+/* ── Feedback overlay ── */
+.feedback-overlay {
+  background: rgba(6,8,15,0.75);
+  backdrop-filter: blur(10px);
+}
+.feedback-modal {
+  background: var(--deep-navy) !important;
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Toggle ── */
+.toggle-track {
+  background: var(--glass-border);
+}
+.toggle-track::after {
+  background: var(--text-muted);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: linear-gradient(135deg, var(--crystal-violet), var(--crystal-teal));
+}
+.toggle-switch input:checked + .toggle-track::after {
+  background: white;
+}
+
+/* ── Intensity buttons ── */
+.intensity-btn:hover,
+.intensity-btn.selected {
+  border-color: var(--crystal-violet);
+  background: rgba(176,127,255,0.10);
+  color: var(--crystal-violet);
+}
+
+/* ── Logo accent ── */
+.app-header-logo .logo-i {
+  color: var(--crystal-violet);
+}
+
