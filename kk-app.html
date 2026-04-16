@@ -3349,12 +3349,12 @@ body {
 
 </style>
     <script src="js/app-local.js"></script>
-
+  <!-- ① 星空 -->
    <script>
 (function(){
   var c = document.getElementById('starfield');
   if(!c) return;
-  c.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-0;';
+  c.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:0;';
   var ctx = c.getContext('2d');
   var stars = [];
   var N = 160;
@@ -3394,9 +3394,10 @@ body {
   draw();
   window.addEventListener('resize', function(){ resize(); init(); });
 })();
-  <script>
-(function(){
-  /* ── 光の粒子 体調セレクター ── */
+  </script>
+   <script>
+    (function(){
+      /* ── 光の粒子 体調セレクター ── */
   var LEVELS = [
     { label:'かすかな灯',   sub:'からだが重く、霧の中にいるような感覚',     color:[120,90,160],  particles:8,  speed:0.3, glow:0.15 },
     { label:'うっすらと光る', sub:'少しだけ、光が見えはじめている',           color:[160,140,200], particles:16, speed:0.5, glow:0.25 },
