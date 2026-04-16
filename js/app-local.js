@@ -1105,3 +1105,293 @@ if (document.readyState === 'loading') {
 } else {
   initApp();
 }
+/* ============================================
+   PHASE 2 — CRYSTAL CALENDAR + MELT LIGHT
+   ============================================ */
+(function() {
+  'use strict';
+
+  // ── 定数 ──
+  var CRYSTALS = ['💎','🔮','✨','💜','🌟','🧿','💠'];
+  var WDAY_NAMES = ['日','月','火','水','木','金','土'];
+  var FOOD_SETS = [
+    [{t:'orange',n:'にんじん'},{t:'orange',n:'かぼちゃ'},{t:'teal',n:'アボカド'},{t:'violet',n:'ブルーベリー'}],
+    [{t:'orange',n:'さつまいも'},{t:'teal',n:'ほうれん草'},{t:'orange',n:'マンゴー'},{t:'violet',n:'紫キャベツ'}],
+    [{t:'teal',n:'ブロッコリー'},{t:'orange',n:'みかん'},{t:'violet',n:'赤ビーツ'},{t:'teal',n:'アスパラ'}],
+    [{t:'orange',n:'パパイヤ'},{t:'teal',n:'ケール'},{t:'violet',n:'なす'},{t:'orange',n:'オレンジ'}],
+    [{t:'violet',n:'いちご'},{t:'teal',n:'きゅうり'},{t:'orange',n:'くるみ'},{t:'teal',n:'ズッキーニ'}]
+  ];
+  var FAST_OPTIONS = ['16:8','18:6','14:10','16:8','18:6'];
+  var MELT_GOAL = 30; // 30日で100%
+
+  // ── 状態 ──
+  var now = new Date();
+  var calYear = now.getFullYear();
+  var calMonth = now.getMonth();
+  var selectedDay = null;
+
+  // ── ヘルパー：達成日の保存・取得 ──
+  function getDoneDays() {
+    try { return JSON.parse(localStorage.getItem('lp_done_days') || '[]'); }
+    catch(e) { return []; }
+  }
+  function saveDoneDays(arr) {
+    localStorage.setItem('lp_done_days', JSON.stringify(arr));
+  }
+  function isDone(dateStr) {
+    return getDoneDays().indexOf(dateStr) !== -1;
+  }
+  function markDone(dateStr) {
+    var arr = getDoneDays();
+    if (arr.indexOf(dateStr) === -1) {
+      arr.push(dateStr);
+      saveDoneDays(arr);
+    }
+  }
+
+  // ── ヘルパー：記録データとの連携 ──
+  function getRecordForDate(dateStr) {
+    // ippoの既存記録（getAllRecords）と連携
+    if (typeof getAllRecords === 'function') {
+      var all = getAllRecords();
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].date === dateStr) return all[i];
+      }
+    }
+    return null;
+  }
+
+  function dateStr(y, m, d) {
+    return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  }
+
+  // ── カレンダー描画 ──
+  function buildCalendar() {
+    var label = document.getElementById('calMonthLabel');
+    var grid = document.getElementById('calDaysGrid');
+    if (!label || !grid) return;
+
+    label.textContent = calYear + '年 ' + (calMonth + 1) + '月';
+    grid.innerHTML = '';
+
+    var firstDow = new Date(calYear, calMonth, 1).getDay();
+    var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    var todayDate = new Date();
+
+    // 空白セル
+    for (var e = 0; e < firstDow; e++) {
+      var empty = document.createElement('div');
+      empty.className = 'lp-cal-day lp-empty';
+      grid.appendChild(empty);
+    }
+
+    // 日セル
+    for (var d = 1; d <= daysInMonth; d++) {
+      var el = document.createElement('div');
+      el.className = 'lp-cal-day';
+      var ds = dateStr(calYear, calMonth, d);
+
+      var isToday = (d === todayDate.getDate() && calMonth === todayDate.getMonth() && calYear === todayDate.getFullYear());
+      if (isToday) el.classList.add('lp-today');
+
+      var done = isDone(ds);
+      var rec = getRecordForDate(ds);
+
+      if (done) {
+        el.classList.add('lp-done');
+        var ci = ((calMonth + d) % CRYSTALS.length);
+        el.innerHTML = '<div class="lp-crystal">' + CRYSTALS[ci] + '</div><div class="lp-day-num">' + d + '</div>';
+      } else if (rec) {
+        el.classList.add('lp-has-record');
+        el.innerHTML = '<div class="lp-day-num">' + d + '</div>';
+      } else {
+        el.innerHTML = '<div class="lp-day-num">' + d + '</div>';
+      }
+
+      el.setAttribute('data-day', d);
+      el.addEventListener('click', (function(day) {
+        return function() { openDayModal(day); };
+      })(d));
+
+      grid.appendChild(el);
+    }
+
+    updateStats();
+    updateMelt();
+  }
+
+  // ── 統計更新 ──
+  function updateStats() {
+    var doneDays = getDoneDays();
+    var todayDate = new Date();
+
+    // 連続ケア計算
+    var streak = 0;
+    var checkDate = new Date(todayDate);
+    while (true) {
+      var ds = dateStr(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
+      if (isDone(ds) || getRecordForDate(ds)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    var el1 = document.getElementById('calStreak');
+    var el2 = document.getElementById('calDone');
+    var el3 = document.getElementById('calCrystals');
+    if (el1) el1.textContent = streak + '日';
+    if (el2) el2.textContent = doneDays.length;
+    if (el3) el3.textContent = doneDays.length;
+  }
+
+  // ── 光の溶融バー更新 ──
+  function updateMelt() {
+    var doneDays = getDoneDays();
+    var pct = Math.min(100, Math.round((doneDays.length / MELT_GOAL) * 100));
+    var fill = document.getElementById('meltFill');
+    var pctEl = document.getElementById('meltPct');
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  }
+
+  // ── モーダル開閉 ──
+  function openDayModal(d) {
+    selectedDay = d;
+    var ds = dateStr(calYear, calMonth, d);
+    var done = isDone(ds);
+    var rec = getRecordForDate(ds);
+
+    var titleEl = document.getElementById('calModalTitle');
+    var dateEl = document.getElementById('calModalDate');
+    var foodsEl = document.getElementById('calModalFoods');
+    var fastEl = document.getElementById('calModalFastTime');
+    var recSection = document.getElementById('calModalRecordSection');
+    var recSummary = document.getElementById('calModalRecordSummary');
+    var doneBtn = document.getElementById('calModalDone');
+
+    if (!titleEl) return;
+
+    // タイトル
+    titleEl.textContent = done ? d + '日 ✦ 達成済み' : d + '日 のケアプラン';
+
+    // 日付
+    var w = new Date(calYear, calMonth, d).getDay();
+    dateEl.textContent = calYear + '年' + (calMonth + 1) + '月' + d + '日（' + WDAY_NAMES[w] + '） • 第2チャクラケア';
+
+    // フード提案
+    var fi = ((calMonth + d) % FOOD_SETS.length);
+    foodsEl.innerHTML = '';
+    FOOD_SETS[fi].forEach(function(f) {
+      var tag = document.createElement('div');
+      tag.className = 'lp-food-tag ' + f.t;
+      tag.textContent = f.n;
+      foodsEl.appendChild(tag);
+    });
+
+    // 断食
+    fastEl.textContent = FAST_OPTIONS[d % FAST_OPTIONS.length];
+
+    // 既存記録の表示
+    if (rec) {
+      recSection.style.display = 'block';
+      var summary = '';
+      if (rec.chakra) summary += 'チャクラ: ' + rec.chakra + '\n';
+      if (rec.condition) summary += '体調: ' + rec.condition + '/5\n';
+      if (rec.food_content) summary += '食事: ' + rec.food_content + '\n';
+      if (rec.emotion) summary += '感情: ' + rec.emotion + '\n';
+      if (rec.fasting_hours) summary += '断食: ' + rec.fasting_hours + '時間\n';
+      recSummary.textContent = summary || '記録あり';
+    } else {
+      recSection.style.display = 'none';
+    }
+
+    // 達成ボタン
+    if (done) {
+      doneBtn.textContent = '✦ 達成済み';
+      doneBtn.disabled = true;
+    } else {
+      doneBtn.textContent = '✦ 達成する';
+      doneBtn.disabled = false;
+    }
+
+    // 表示
+    document.getElementById('calModalOverlay').classList.add('lp-open');
+  }
+
+  function closeDayModal() {
+    document.getElementById('calModalOverlay').classList.remove('lp-open');
+  }
+
+  function handleMarkDone() {
+    if (!selectedDay) return;
+    var ds = dateStr(calYear, calMonth, selectedDay);
+    markDone(ds);
+    closeDayModal();
+    buildCalendar();
+
+    // トースト表示
+    if (typeof showToast === 'function') {
+      showToast('✦ ' + selectedDay + '日のケアをクリスタルに刻みました');
+    }
+  }
+
+  // ── 月ナビ ──
+  function changeMonth(dir) {
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+    buildCalendar();
+  }
+
+  // ── イベントバインド ──
+  function initCrystalCalendar() {
+    var prevBtn = document.getElementById('calPrev');
+    var nextBtn = document.getElementById('calNext');
+    var closeBtn = document.getElementById('calModalClose');
+    var doneBtn = document.getElementById('calModalDone');
+    var overlay = document.getElementById('calModalOverlay');
+
+    if (prevBtn) prevBtn.addEventListener('click', function() { changeMonth(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', function() { changeMonth(1); });
+    if (closeBtn) closeBtn.addEventListener('click', closeDayModal);
+    if (doneBtn) doneBtn.addEventListener('click', handleMarkDone);
+    if (overlay) overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeDayModal();
+    });
+
+    buildCalendar();
+  }
+
+  // ── 記録保存時にカレンダーを再描画 ──
+  // ippoの既存saveRecordLocal()が呼ばれた後にカレンダーを更新
+  var origSave = window.saveRecordLocal;
+  if (typeof origSave === 'function') {
+    window.saveRecordLocal = function() {
+      origSave.apply(this, arguments);
+      buildCalendar();
+    };
+  }
+
+  // ── 初期化 ──
+  // DOMContentLoadedまたは既にロード済みの場合
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCrystalCalendar);
+  } else {
+    // app-local.jsの他の初期化の後に実行されるようにsetTimeout
+    setTimeout(initCrystalCalendar, 100);
+  }
+
+  // 画面切り替え時にカレンダーを再描画（ホーム画面に戻ったとき）
+  var origShowScreen = window.showScreen;
+  if (typeof origShowScreen === 'function') {
+    window.showScreen = function(name) {
+      origShowScreen.apply(this, arguments);
+      if (name === 'home') {
+        setTimeout(buildCalendar, 50);
+      }
+    };
+  }
+
+})();
