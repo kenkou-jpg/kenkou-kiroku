@@ -3107,23 +3107,35 @@
   background: linear-gradient(135deg, rgba(176,127,255,0.08), rgba(176,127,255,0.03)) !important;
   border-color: rgba(176,127,255,0.20) !important;
 }
-/* ── 星空を透過させる ── */
+/* ── 星空背景を透過させる ── */
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
 #app-shell {
-  background: transparent !important;
   position: relative;
   z-index: 1;
-}
-.app-screen {
   background: transparent !important;
 }
-.app-screen.active {
-  background: transparent !important;
-}
+.app-screen,
+.app-screen.active,
 #screen-welcome {
   background: transparent !important;
 }
 body {
   background: #06080f !important;
+}
+.app-header {
+  background: rgba(6,8,15,0.85) !important;
+  backdrop-filter: blur(12px) !important;
+}
+.app-nav {
+  background: rgba(6,8,15,0.85) !important;
+  backdrop-filter: blur(12px) !important;
 }
 
 </style>
