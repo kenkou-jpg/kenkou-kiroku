@@ -4954,5 +4954,75 @@ div.condition-memo-section > *:first-child {
   }catch(e){}
 })();
 </script>
+  <script>
+(function(){
+  /* ── ホーム断食ウィジェット ── */
+  var widget = document.getElementById('fastingWidget');
+  var widgetTime = document.getElementById('widgetTime');
+  var widgetLabel = document.getElementById('widgetLabel');
+  var widgetBadge = document.getElementById('widgetBadge');
+  var widgetRing = document.getElementById('widgetRingFill');
+  if (!widget) return;
+
+  var CIRC = 2 * Math.PI * 18; // 113.1
+
+  function getGoalHours(){
+    try { var g = localStorage.getItem('kk_fastingGoal'); return g ? JSON.parse(g) : 14; }
+    catch(e){ return 14; }
+  }
+
+  function getTimerStart(){
+    try { var v = localStorage.getItem('kk_fastingTimerStart'); return v ? JSON.parse(v) : null; }
+    catch(e){ return null; }
+  }
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function update(){
+    var start = getTimerStart();
+    if (!start) {
+      widget.classList.remove('widget-active');
+      return;
+    }
+
+    widget.classList.add('widget-active');
+
+    var elapsed = Math.floor((Date.now() - start) / 1000);
+    var h = Math.floor(elapsed / 3600);
+    var m = Math.floor((elapsed % 3600) / 60);
+
+    widgetTime.textContent = h + 'h ' + pad(m) + 'm';
+
+    var goalSec = getGoalHours() * 3600;
+    var pct = Math.min(elapsed / goalSec, 1);
+    widgetRing.style.strokeDashoffset = CIRC * (1 - pct);
+
+    if (elapsed >= goalSec) {
+      widgetLabel.textContent = '目標達成！';
+      widgetBadge.textContent = '✦ 達成';
+      widgetBadge.style.color = '#5ADEDB';
+      widgetBadge.style.background = 'rgba(90,222,219,0.12)';
+    } else {
+      var remSec = goalSec - elapsed;
+      var rh = Math.floor(remSec / 3600);
+      var rm = Math.floor((remSec % 3600) / 60);
+      widgetLabel.textContent = '断食中… あと ' + rh + 'h ' + rm + 'm';
+      widgetBadge.textContent = '断食中';
+      widgetBadge.style.color = '#B49AFF';
+      widgetBadge.style.background = 'rgba(124,77,255,0.12)';
+    }
+  }
+
+  // クリックで記録画面の断食タブへ
+  widget.addEventListener('click', function(){
+    if (typeof showScreen === 'function') showScreen('record');
+    if (typeof activateTab === 'function') activateTab('fasting');
+  });
+
+  // 1秒ごとに更新
+  update();
+  setInterval(update, 1000);
+})();
+</script>
 </body>
 </html>
