@@ -4247,154 +4247,298 @@ div.condition-memo-section > *:first-child {
   </div>
 </div>
 </script>
-  <script>
+ <script>
 (function(){
-  /* ── 月の満ち欠け計算＆表示 ── */
+  /* ── 月の満ち欠け + 日別記録オーバーレイ ── */
+
   var PHASES = [
-    { name:'新月',     icon:'🌑', msg:'はじまりのとき。意図を静かに種まきしましょう。' },
-    { name:'三日月',   icon:'🌒', msg:'小さな芽が動き出す。直感を信じてみて。' },
-    { name:'上弦の月', icon:'🌓', msg:'行動のとき。からだが前に進みたがっています。' },
-    { name:'十日夜の月', icon:'🌔', msg:'満ちていく力。自分を信じて続けましょう。' },
-    { name:'満月',     icon:'🌕', msg:'満ちるとき。感謝とともに、手放す準備を。' },
-    { name:'十六夜の月', icon:'🌖', msg:'内省のとき。からだの声をじっくり聴いて。' },
-    { name:'下弦の月', icon:'🌗', msg:'手放しのとき。不要なものを静かに流しましょう。' },
-    { name:'二十六夜の月', icon:'🌘', msg:'浄化のとき。次の新月に向けて、こころを空に。' }
+    { name:'新月',     icon:'🌑', msg:'静かな始まり。内側を見つめ、デトックスに適した日。' },
+    { name:'三日月',   icon:'🌒', msg:'新しい意図を植える時。軽い食事でからだを整えて。' },
+    { name:'上弦の月', icon:'🌓', msg:'エネルギーが高まる時。行動と栄養補給のバランスを。' },
+    { name:'十三夜月', icon:'🌔', msg:'満ちていく力。からだの声に耳を傾けて。' },
+    { name:'満月',     icon:'🌕', msg:'エネルギーが最大に。感情と食欲が揺れやすい時。' },
+    { name:'十八夜月', icon:'🌖', msg:'手放しの始まり。不要なものを整理する時。' },
+    { name:'下弦の月', icon:'🌗', msg:'浄化と休息の時。断食やデトックスに向いています。' },
+    { name:'二十六夜', icon:'🌘', msg:'静かに内省する時。からだを労わり、ゆっくり休んで。' }
   ];
 
-  function getMoonAge(year, month, day){
-    var jd = julianDay(year, month, day);
-    var age = ((jd - 2451550.1) % 29.530588853);
-    if(age < 0) age += 29.530588853;
-    return age;
-  }
+  var CHAKRA_NAMES = {
+    root:'第1チャクラ（骨盤底）', sacral:'第2チャクラ（子宮）',
+    solar:'第3チャクラ（腹部）', heart:'第4チャクラ（胸）',
+    throat:'第5チャクラ（喉）', third_eye:'第6チャクラ（眉間）'
+  };
+  var EMO_NAMES = {
+    peaceful:'穏やか・平和', happy:'うれしい・満たされ',
+    tired:'疲れ・重さ', anxious:'不安・緊張', irritated:'イライラ・焦り'
+  };
+  var LIGHT_LEVELS = ['','かすかな灯','うっすらと光る','やわらかく灯る','澄んで輝く','満ちている'];
+  var MEAL_LABELS = { morning:'朝', lunch:'昼', dinner:'夕', snack:'間食' };
 
-  function julianDay(y, m, d){
-    if(m <= 2){ y--; m += 12; }
-    var A = Math.floor(y/100);
-    var B = 2 - A + Math.floor(A/4);
-    return Math.floor(365.25*(y+4716)) + Math.floor(30.6001*(m+1)) + d + B - 1524.5;
+  /* ── 月齢計算 ── */
+  function julianDay(y,m,d){
+    if(m<=2){y--;m+=12;} return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d-1524.5;
   }
-
-  function getPhaseIndex(age){
-    var i = Math.round(age / 29.530588853 * 8) % 8;
-    return i;
+  function getMoonAge(y,m,d){
+    var jd=julianDay(y,m,d); var age=((jd-2451550.1)/29.530588853)%1;
+    if(age<0) age+=1; return age*29.53;
   }
+  function getPhaseIndex(age){ return Math.round(age/29.53*8)%8; }
 
-  function drawMoon(ctx, age, size){
-    var W = size, H = size, cx = W/2, cy = H/2, r = W/2 - 10;
+  /* ── 月描画 ── */
+  function drawMoon(canvas, age){
+    var ctx=canvas.getContext('2d');
+    var W=canvas.width, H=canvas.height, cx=W/2, cy=H/2, r=60;
     ctx.clearRect(0,0,W,H);
 
-    /* 月光グロー */
-    var glowStrength = 1 - Math.abs(age - 14.765) / 14.765;
-    var glow = ctx.createRadialGradient(cx,cy,r*0.8,cx,cy,r*1.5);
-    glow.addColorStop(0,'rgba(255,250,230,'+(glowStrength*0.15)+')');
-    glow.addColorStop(1,'rgba(255,250,230,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0,0,W,H);
+    // 背景グロー
+    var glow=ctx.createRadialGradient(cx,cy,r*0.5,cx,cy,r*2);
+    glow.addColorStop(0,'rgba(220,215,240,0.08)');
+    glow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
 
-    /* 月本体（明るい面） */
-    ctx.beginPath();
-    ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.fillStyle = '#ffeedd';
-    ctx.fill();
+    // 月本体
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    var moonGrad=ctx.createRadialGradient(cx-15,cy-15,r*0.1,cx,cy,r);
+    moonGrad.addColorStop(0,'#F0EDE8'); moonGrad.addColorStop(0.7,'#D8D2C8'); moonGrad.addColorStop(1,'#C0B8AA');
+    ctx.fillStyle=moonGrad; ctx.fillRect(cx-r,cy-r,r*2,r*2);
 
-    /* クレーター */
-    var craters = [[0.3,0.35,0.08],[0.55,0.6,0.06],[0.4,0.65,0.05],[0.65,0.35,0.04],[0.5,0.45,0.07]];
-    for(var c=0;c<craters.length;c++){
-      ctx.beginPath();
-      ctx.arc(cx+(craters[c][0]-0.5)*r*2, cy+(craters[c][1]-0.5)*r*2, r*craters[c][2], 0, Math.PI*2);
-      ctx.fillStyle='rgba(200,190,170,0.3)';
-      ctx.fill();
-    }
+    // クレーター
+    var craters=[[cx-20,cy-15,8,0.06],[cx+15,cy+10,6,0.05],[cx-5,cy+25,10,0.04],[cx+25,cy-20,5,0.05]];
+    craters.forEach(function(c){ ctx.beginPath(); ctx.arc(c[0],c[1],c[2],0,Math.PI*2);
+      ctx.fillStyle='rgba(160,150,140,'+c[3]+')'; ctx.fill(); });
 
-    /* 影（月齢に応じて） */
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.clip();
-
-    var phase = (age / 29.530588853) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.arc(cx,cy,r, -Math.PI/2, Math.PI/2, false);
-    var sweepX = Math.cos(phase) * r;
-    ctx.bezierCurveTo(cx+sweepX, cy+r*0.6, cx+sweepX, cy-r*0.6, cx, cy-r);
-    ctx.fillStyle='rgba(6,8,15,0.92)';
-    ctx.fill();
-
+    // 影
+    var phase=(age/29.53)*Math.PI*2;
+    ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.5,Math.PI*1.5);
+    var shadowX = Math.cos(phase)*r;
+    ctx.bezierCurveTo(cx+shadowX,cy-r,cx+shadowX,cy+r,cx,cy+r);
+    ctx.fillStyle='rgba(6,8,15,0.88)'; ctx.fill();
     ctx.restore();
+
+    // リム
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle='rgba(220,215,240,0.12)'; ctx.lineWidth=1; ctx.stroke();
   }
 
-  function spawnSparkles(wrap, count){
-    for(var i=0;i<count;i++){
-      var s = document.createElement('div');
-      s.className='moon-sparkle';
-      var angle = Math.random()*Math.PI*2;
-      var dist = 50+Math.random()*60;
-      s.style.setProperty('--mx', Math.cos(angle)*dist+'px');
-      s.style.setProperty('--my', Math.sin(angle)*dist+'px');
-      s.style.left = (90+Math.cos(angle)*20)+'px';
-      s.style.top = (90+Math.sin(angle)*20)+'px';
-      s.style.animationDelay = (Math.random()*0.8)+'s';
-      s.style.animationDuration = (1.5+Math.random()*1.5)+'s';
-      wrap.appendChild(s);
-      (function(el){ setTimeout(function(){ el.remove(); },3500); })(s);
+  /* ── スパークル ── */
+  function spawnSparkles(container){
+    for(var i=0;i<6;i++){
+      var sp=document.createElement('div');
+      sp.style.cssText='position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(220,215,240,0.6);pointer-events:none;opacity:0;';
+      sp.style.left=(20+Math.random()*120)+'px';
+      sp.style.top=(20+Math.random()*120)+'px';
+      sp.style.animation='sparkleFloat '+(1.5+Math.random())+'s ease-out '+(Math.random()*0.5)+'s forwards';
+      container.appendChild(sp);
+      setTimeout(function(el){el.remove();}.bind(null,sp),3000);
     }
   }
 
+  /* ── localStorage からレコード取得 ── */
+  function getRecordForDate(dateStr){
+    try {
+      var all=JSON.parse(localStorage.getItem('kk_records')||'[]');
+      return all.find(function(r){return r.record_date===dateStr;})||null;
+    } catch(e){ return null; }
+  }
+
+  function escHtml(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+  function pad2(n){ return n<10?'0'+n:''+n; }
+
+  /* ── ケアプラン生成（月の相に基づく） ── */
+  function buildCarePlan(phaseIdx){
+    var plans=[
+      {food:'温かいスープ、白湯、消化に優しいもの',fasting:'16〜18h推奨（デトックス期）',mind:'静かに内観する時間を'},
+      {food:'緑野菜、発芽食品、軽めの穀物',fasting:'14〜16h推奨',mind:'新しい習慣を1つ始めてみる'},
+      {food:'たんぱく質豊富な食事、根菜類',fasting:'12〜14h（エネルギー補給期）',mind:'からだを動かすのに良い時期'},
+      {food:'鉄分・ビタミン豊富な食材',fasting:'14h前後',mind:'創造性を活かす活動を'},
+      {food:'水分多め、生野菜、フルーツ',fasting:'12h程度（食欲に注意）',mind:'感情の波を観察する'},
+      {food:'発酵食品、食物繊維、デトックス食材',fasting:'14〜16h推奨',mind:'不要なものを手放す意識を'},
+      {food:'消化に優しいもの、温かいもの',fasting:'16〜18h推奨（浄化期）',mind:'休息を優先する'},
+      {food:'白湯、おかゆ、スープ',fasting:'16h以上も可（内省期）',mind:'ゆっくり呼吸、早めに就寝'}
+    ];
+    return plans[phaseIdx] || plans[0];
+  }
+
+  /* ── 日別詳細HTML生成 ── */
+  function renderDayDetail(dateStr, phaseIdx){
+    var rec = getRecordForDate(dateStr);
+    var plan = buildCarePlan(phaseIdx);
+    var html = '';
+
+    if (!rec) {
+      html += '<div class="day-no-record"><span class="day-no-record-icon">✧</span>この日の記録はありません<br><span style="font-size:0.75rem;opacity:0.6;">記録を続けると、ここに履歴が表示されます</span></div>';
+      return html;
+    }
+
+    // 体調カード
+    if (rec.condition_scale) {
+      html += '<div class="day-card">';
+      html += '<div class="day-card-header"><span class="day-card-icon icon-chakra">☆</span>body light</div>';
+      html += '<div class="day-card-body">' + (LIGHT_LEVELS[rec.condition_scale] || ('レベル ' + rec.condition_scale)) + '</div>';
+      html += '</div>';
+    }
+
+    // チャクラカード
+    if (rec.chakra) {
+      html += '<div class="day-card">';
+      html += '<div class="day-card-header"><span class="day-card-icon icon-chakra">ch</span>チャクラ</div>';
+      html += '<div class="day-card-body">' + escHtml(CHAKRA_NAMES[rec.chakra] || rec.chakra);
+      if (rec.symptoms && rec.symptoms.length) html += '<br><span style="color:rgba(232,228,240,0.5);font-size:0.75rem;">' + rec.symptoms.map(escHtml).join('、') + '</span>';
+      html += '</div></div>';
+    }
+
+    // 食事タイムラインカード
+    if (rec.meal_timeline_raw || (rec.meals && Object.keys(rec.meals).length)) {
+      html += '<div class="day-card">';
+      html += '<div class="day-card-header"><span class="day-card-icon icon-food">🍽</span>食事記録</div>';
+      html += '<div class="day-card-body">';
+
+      // タイムライン入力があればそれを優先
+      if (rec.meal_timeline && rec.meal_timeline.length) {
+        rec.meal_timeline.forEach(function(m){
+          html += '<div class="day-meal-row">';
+          html += '<span class="day-meal-time">' + pad2(m.hour) + ':' + pad2(m.minute) + '</span>';
+          html += '<span class="day-meal-food">' + escHtml(m.food) + '</span>';
+          html += '</div>';
+        });
+      } else if (rec.meals) {
+        // 従来の食事データ
+        Object.keys(rec.meals).forEach(function(key){
+          var meal = rec.meals[key];
+          if (meal && meal.content) {
+            html += '<div class="day-meal-row">';
+            html += '<span class="day-meal-time">' + escHtml(MEAL_LABELS[key] || key) + '</span>';
+            html += '<span class="day-meal-food">' + escHtml(meal.content) + '</span>';
+            html += '</div>';
+          }
+        });
+      }
+
+      if (rec.food_score) html += '<div style="margin-top:8px;font-size:0.75rem;color:rgba(90,240,208,0.7);">食事スコア: ' + rec.food_score + '/10</div>';
+      html += '</div></div>';
+    }
+
+    // 断食カード
+    if (rec.fasting_hours || rec.fasting_start) {
+      html += '<div class="day-card">';
+      html += '<div class="day-card-header"><span class="day-card-icon icon-fasting">⏳</span>プチ断食</div>';
+      html += '<div class="day-card-body">';
+      if (rec.fasting_hours) {
+        var totalMin = (rec.fasting_hours||0)*60 + (rec.fasting_minutes||0);
+        var goalMin = (rec.fasting_goal_hours||14)*60;
+        var pct = Math.min(Math.round(totalMin/goalMin*100),100);
+        html += '<strong>' + rec.fasting_hours + 'h ' + (rec.fasting_minutes||0) + 'm</strong>';
+        html += ' <span style="color:rgba(255,255,255,0.4);">/ 目標 ' + (rec.fasting_goal_hours||14) + 'h</span>';
+        html += '<div class="day-fasting-bar"><div class="day-fasting-fill" style="width:' + pct + '%;"></div></div>';
+      }
+      if (rec.fasting_start && rec.fasting_end) {
+        html += '<span style="font-size:0.75rem;color:rgba(232,228,240,0.5);">' + escHtml(rec.fasting_start) + ' → ' + escHtml(rec.fasting_end) + '</span>';
+      }
+      if (rec.fasting_score) html += '<br><span style="font-size:0.75rem;color:rgba(245,208,32,0.7);">達成感: ' + rec.fasting_score + '/10</span>';
+      html += '</div></div>';
+    }
+
+    // 感情カード
+    if (rec.emotion || rec.wellness_score) {
+      html += '<div class="day-card">';
+      html += '<div class="day-card-header"><span class="day-card-icon icon-emotion">♡</span>感情・ウェルネス</div>';
+      html += '<div class="day-card-body">';
+      if (rec.emotion) html += '<strong>' + escHtml(EMO_NAMES[rec.emotion] || rec.emotion) + '</strong><br>';
+      if (rec.wellness_score) html += 'ウェルネス: ' + rec.wellness_score + '/10';
+      if (rec.energy_score) html += ' ｜ エネルギー: ' + rec.energy_score + '/10';
+      if (rec.gratitude) html += '<br><span style="color:rgba(232,228,240,0.5);font-size:0.75rem;">感謝: ' + escHtml(rec.gratitude) + '</span>';
+      html += '</div></div>';
+    }
+
+    // ジャーナルカード
+    if (rec.emotion_notes) {
+      html += '<div class="day-card">';
+      html += '<div class="day-card-header"><span class="day-card-icon icon-journal">✎</span>ジャーナル</div>';
+      html += '<div class="day-card-body">' + escHtml(rec.emotion_notes) + '</div>';
+      html += '</div>';
+    }
+
+    return html;
+  }
+
+  /* ── オーバーレイ表示 ── */
   function showMoon(year, month, day){
     var overlay = document.getElementById('moonOverlay');
-    var canvas = document.getElementById('moonCanvas');
-    var wrap = document.getElementById('moonCanvasWrap');
-    if(!overlay || !canvas) return;
+    if (!overlay) return;
 
     var age = getMoonAge(year, month, day);
-    var pi = getPhaseIndex(age);
-    var P = PHASES[pi];
+    var idx = getPhaseIndex(age);
+    var P = PHASES[idx];
+    var dateStr = year + '-' + pad2(month) + '-' + pad2(day);
 
-    document.getElementById('moonDateLabel').textContent = year+'年'+month+'月'+day+'日';
-    document.getElementById('moonPhaseName').textContent = P.name;
-    document.getElementById('moonPhaseSub').textContent = '月齢 '+age.toFixed(1)+' 日';
-    document.getElementById('moonAgeText').textContent = '月齢 '+age.toFixed(1)+' / 29.5 日';
-    document.getElementById('moonAgeBarFill').style.width = (age/29.530588853*100)+'%';
-    document.getElementById('moonMsgIcon').textContent = P.icon;
-    document.getElementById('moonMsgText').textContent = P.msg;
+    // 日付・月相ラベル
+    var dateLabel = overlay.querySelector('#moonDateLabel') || overlay.querySelector('.moon-date');
+    if (dateLabel) dateLabel.textContent = year + '年' + month + '月' + day + '日';
 
-    overlay.classList.add('show');
-    wrap.classList.remove('appear');
-    void wrap.offsetWidth;
-    wrap.classList.add('appear');
+    var phaseName = overlay.querySelector('#moonPhaseName') || overlay.querySelector('.moon-phase-name');
+    if (phaseName) phaseName.textContent = P.icon + ' ' + P.name;
 
-    var ctx = canvas.getContext('2d');
-    drawMoon(ctx, age, 180);
-    spawnSparkles(wrap, 12);
+    var phaseSub = overlay.querySelector('#moonPhaseSub') || overlay.querySelector('.moon-phase-sub');
+    if (phaseSub) phaseSub.textContent = P.msg;
+
+    // 月描画
+    var canvas = document.getElementById('moonCanvas');
+    if (canvas) drawMoon(canvas, age);
+
+    // 月齢バー
+    var ageBar = overlay.querySelector('#moonAgeBar');
+    if (ageBar) ageBar.style.width = ((age/29.53)*100) + '%';
+    var ageText = overlay.querySelector('#moonAgeText');
+    if (ageText) ageText.textContent = '月齢 ' + age.toFixed(1) + '日';
+
+    // スパークル
+    var canvasWrap = canvas ? canvas.parentElement : null;
+    if (canvasWrap) spawnSparkles(canvasWrap);
+
+    // 日別詳細セクション
+    var detailSection = document.getElementById('dayDetailSection') || document.getElementById('dayRecordSection');
+    if (detailSection) {
+      detailSection.innerHTML = renderDayDetail(dateStr, idx);
+    }
+
+    // オーバーレイ表示
+    overlay.style.display = 'flex';
+    overlay.classList.add('moon-show');
   }
 
-  /* カレンダーの日付クリックをフック */
+  /* ── カレンダー日付クリック ── */
   document.addEventListener('click', function(e){
     var dayEl = e.target.closest('.lp-day');
-    if(!dayEl) return;
-    var day = parseInt(dayEl.dataset.day);
-    if(!day || day <= 0) return;
-    var header = document.querySelector('.lp-cal-title');
-    if(!header) return;
-    var text = header.textContent;
-    var match = text.match(/(\d{4})年\s*(\d{1,2})月/);
-    if(!match) return;
-    showMoon(parseInt(match[1]), parseInt(match[2]), day);
+    if (!dayEl) return;
+    var dayNum = parseInt(dayEl.textContent);
+    if (!dayNum || dayNum < 1 || dayNum > 31) return;
+
+    // カレンダーヘッダーから年月を取得
+    var titleEl = document.querySelector('.lp-cal-title');
+    var year, month;
+    if (titleEl) {
+      var match = titleEl.textContent.match(/(\d{4})[^\d]+(\d{1,2})/);
+      if (match) { year = parseInt(match[1]); month = parseInt(match[2]); }
+    }
+    if (!year) { var now = new Date(); year = now.getFullYear(); month = now.getMonth()+1; }
+
+    showMoon(year, month, dayNum);
   });
 
-  /* 閉じるボタン */
-  var closeBtn = document.getElementById('moonOverlayClose');
-  if(closeBtn){
+  /* ── オーバーレイ閉じる ── */
+  var closeBtn = document.querySelector('#moonOverlay .moon-close, #moonCloseBtn');
+  if (closeBtn) {
     closeBtn.addEventListener('click', function(){
-      document.getElementById('moonOverlay').classList.remove('show');
+      var overlay = document.getElementById('moonOverlay');
+      if (overlay) { overlay.classList.remove('moon-show'); setTimeout(function(){ overlay.style.display='none'; },300); }
     });
   }
-  /* オーバーレイ外クリック */
+
+  // オーバーレイ外クリックで閉じる
   var overlay = document.getElementById('moonOverlay');
-  if(overlay){
+  if (overlay) {
     overlay.addEventListener('click', function(e){
-      if(e.target === overlay) overlay.classList.remove('show');
+      if (e.target === overlay) { overlay.classList.remove('moon-show'); setTimeout(function(){ overlay.style.display='none'; },300); }
     });
   }
 })();
