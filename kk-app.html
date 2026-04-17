@@ -4585,6 +4585,77 @@ div.condition-memo-section > *:first-child {
     var detailSection = document.getElementById('dayDetailSection') || document.getElementById('dayRecordSection');
     if (detailSection) {
       detailSection.innerHTML = renderDayDetail(dateStr);
+
+        // ドーナツグラフ描画
+    setTimeout(function(){
+      var donutCanvas = document.getElementById('dayDonutCanvas');
+      var data = window._dayDonutData;
+      if (!donutCanvas || !data) return;
+      var ctx = donutCanvas.getContext('2d');
+      var W = 200, H = 200, cx = W/2, cy = H/2;
+      var outerR = 85, innerR = 58;
+
+      ctx.clearRect(0, 0, W, H);
+
+      var fastRatio = data.fastTotal / 1440;
+      var eatRatio = data.eatTotal / 1440;
+
+      // 食事開始角度（最初の食事の時刻を基準に12時を上にする）
+      var startAngle = -Math.PI / 2; // 12時位置
+
+      if (data.meals && data.meals.length > 0) {
+        var firstMeal = data.meals[0];
+        var firstMin = firstMeal.h * 60 + firstMeal.m;
+        startAngle = (firstMin / 1440) * Math.PI * 2 - Math.PI / 2;
+      }
+
+      // 断食ゾーン（背景として全円）
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+      ctx.arc(cx, cy, innerR, Math.PI * 2, 0, true);
+      ctx.fillStyle = 'rgba(124,77,255,0.25)';
+      ctx.fill();
+
+      // 食事ゾーン
+      var eatAngle = eatRatio * Math.PI * 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, startAngle, startAngle + eatAngle);
+      ctx.arc(cx, cy, innerR, startAngle + eatAngle, startAngle, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(90,222,219,0.5)';
+      ctx.fill();
+
+      // 食事ドット
+      if (data.meals) {
+        data.meals.forEach(function(m){
+          var min = m.h * 60 + m.m;
+          var angle = (min / 1440) * Math.PI * 2 - Math.PI / 2;
+          var dotR = (outerR + innerR) / 2;
+          var dx = cx + Math.cos(angle) * dotR;
+          var dy = cy + Math.sin(angle) * dotR;
+          ctx.beginPath();
+          ctx.arc(dx, dy, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#5AF0D0';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(dx, dy, 7, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(90,240,208,0.2)';
+          ctx.fill();
+        });
+      }
+
+      // 時刻目盛り
+      [0, 6, 12, 18].forEach(function(h){
+        var angle = (h / 24) * Math.PI * 2 - Math.PI / 2;
+        var tx = cx + Math.cos(angle) * (outerR + 12);
+        var ty = cy + Math.sin(angle) * (outerR + 12);
+        ctx.fillStyle = 'rgba(232,228,240,0.3)';
+        ctx.font = '10px "Cormorant Garamond", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(h + ':00', tx, ty);
+      });
+    }, 50);
     }
 
     // オーバーレイ表示
