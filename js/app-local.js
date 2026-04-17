@@ -152,7 +152,6 @@ function goToSlide(idx) {
   var skip = $('#welcomeSkipBtn');
   if (!btn) return;
   if (idx === 0) { btn.textContent = 'はじめる'; if (skip) skip.style.display = 'none'; }
-  else if (idx < 3) { btn.textContent = '次へ →'; if (skip) { skip.style.display = 'block'; skip.textContent = 'スキップ'; } }
   else { btn.textContent = 'アプリを使い始める'; if (skip) skip.style.display = 'none'; }
 }
 
