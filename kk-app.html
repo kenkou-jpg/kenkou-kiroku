@@ -813,7 +813,27 @@
           <div class="home-stat-number gold" id="statFasting">—</div>
           <div class="home-stat-label">今週の<br>断食累計</div>
         </div>
-      </div>
+        <!-- 断食タイマーウィジェット -->
+<div class="fasting-widget" id="fastingWidget">
+  <div class="fasting-widget-ring">
+    <svg viewBox="0 0 44 44">
+      <defs>
+        <linearGradient id="widgetGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#B49AFF"/>
+          <stop offset="100%" stop-color="#5ADEDB"/>
+        </linearGradient>
+      </defs>
+      <circle class="fasting-widget-ring-bg" cx="22" cy="22" r="18"/>
+      <circle class="fasting-widget-ring-fill" id="widgetRingFill" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="113.1"/>
+    </svg>
+    <div class="fasting-widget-icon">🌙</div>
+  </div>
+  <div class="fasting-widget-info">
+    <div class="fasting-widget-time" id="widgetTime">00:00</div>
+    <div class="fasting-widget-label" id="widgetLabel">断食タイマー</div>
+  </div>
+  <div class="fasting-widget-badge" id="widgetBadge">停止中</div>
+</div>
 
       <!-- 週間カレンダー -->
       <div class="home-week-section">
@@ -2238,6 +2258,84 @@
 <!-- Service Worker登録 -->
 
 <style>
+  /* ── ホーム：断食タイマーウィジェット ── */
+.fasting-widget {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  border-radius: 16px;
+  background: rgba(124,77,255,0.08);
+  border: 1px solid rgba(124,77,255,0.15);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.fasting-widget:active {
+  transform: scale(0.98);
+}
+.fasting-widget.widget-active {
+  display: flex;
+  animation: widgetFadeIn 0.4s ease;
+}
+@keyframes widgetFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fasting-widget-ring {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.fasting-widget-ring svg {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg);
+}
+.fasting-widget-ring-bg {
+  fill: none;
+  stroke: rgba(124,77,255,0.15);
+  stroke-width: 3;
+}
+.fasting-widget-ring-fill {
+  fill: none;
+  stroke: url(#widgetGrad);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+.fasting-widget-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1rem;
+}
+.fasting-widget-info {
+  flex: 1;
+}
+.fasting-widget-time {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(232,228,240,0.95);
+  line-height: 1;
+}
+.fasting-widget-label {
+  font-size: 0.7rem;
+  color: rgba(232,228,240,0.45);
+  margin-top: 3px;
+  letter-spacing: 0.05em;
+}
+.fasting-widget-badge {
+  font-size: 0.65rem;
+  color: #B49AFF;
+  background: rgba(124,77,255,0.12);
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
   /* ── 日別オーバーレイ：ドーナツグラフ ── */
 .day-donut-wrap {
   position: relative;
