@@ -4362,7 +4362,6 @@ div.condition-memo-section > *:first-child {
   /* ── 日別詳細HTML生成 ── */
   function renderDayDetail(dateStr, phaseIdx){
     var rec = getRecordForDate(dateStr);
-    var plan = buildCarePlan(phaseIdx);
     var html = '';
 
     if (!rec) {
