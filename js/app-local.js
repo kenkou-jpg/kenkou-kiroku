@@ -1275,66 +1275,16 @@ if (document.readyState === 'loading') {
   // ── モーダル開閉 ──
   function openDayModal(d) {
     selectedDay = d;
-    var ds = dateStr(calYear, calMonth, d);
-    var done = isDone(ds);
-    var rec = getRecordForDate(ds);
-
-    var titleEl = document.getElementById('calModalTitle');
-    var dateEl = document.getElementById('calModalDate');
-    var foodsEl = document.getElementById('calModalFoods');
-    var fastEl = document.getElementById('calModalFastTime');
-    var recSection = document.getElementById('calModalRecordSection');
-    var recSummary = document.getElementById('calModalRecordSummary');
-    var doneBtn = document.getElementById('calModalDone');
-
-    if (!titleEl) return;
-
-    // タイトル
-    titleEl.textContent = done ? d + '日 ✦ 達成済み' : d + '日 のケアプラン';
-
-    // 日付
-    var w = new Date(calYear, calMonth, d).getDay();
-    dateEl.textContent = calYear + '年' + (calMonth + 1) + '月' + d + '日（' + WDAY_NAMES[w] + '） • 第2チャクラケア';
-
-    // フード提案
-    var fi = ((calMonth + d) % FOOD_SETS.length);
-    foodsEl.innerHTML = '';
-    FOOD_SETS[fi].forEach(function(f) {
-      var tag = document.createElement('div');
-      tag.className = 'lp-food-tag ' + f.t;
-      tag.textContent = f.n;
-      foodsEl.appendChild(tag);
-    });
-
-    // 断食
-    fastEl.textContent = FAST_OPTIONS[d % FAST_OPTIONS.length];
-
-    // 既存記録の表示
-    if (rec) {
-      recSection.style.display = 'block';
-      var summary = '';
-      if (rec.chakra) summary += 'チャクラ: ' + rec.chakra + '\n';
-      if (rec.condition) summary += '体調: ' + rec.condition + '/5\n';
-      if (rec.food_content) summary += '食事: ' + rec.food_content + '\n';
-      if (rec.emotion) summary += '感情: ' + rec.emotion + '\n';
-      if (rec.fasting_hours) summary += '断食: ' + rec.fasting_hours + '時間\n';
-      recSummary.textContent = summary || '記録あり';
-    } else {
-      recSection.style.display = 'none';
+    // 月オーバーレイが存在すれば、そちらを開く
+    var moonOverlay = document.getElementById('moonOverlay');
+    if (moonOverlay && typeof window.showMoonOverlay === 'function') {
+      window.showMoonOverlay(calYear, calMonth + 1, d);
+      return;
     }
-
-    // 達成ボタン
-    if (done) {
-      doneBtn.textContent = '✦ 達成済み';
-      doneBtn.disabled = true;
-    } else {
-      doneBtn.textContent = '✦ 達成する';
-      doneBtn.disabled = false;
-    }
-
-    // 表示
+    // フォールバック：既存モーダル
     document.getElementById('calModalOverlay').classList.add('lp-open');
   }
+
 
   function closeDayModal() {
     document.getElementById('calModalOverlay').classList.remove('lp-open');
