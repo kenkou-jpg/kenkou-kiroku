@@ -1297,6 +1297,35 @@
             <span>完璧に整えた</span>
           </div>
         </div>
+        
+          <!-- ── 食事タイムライン入力 ── -->
+          <div class="meal-timeline-section">
+            <p class="meal-timeline-title">today's meal timeline</p>
+            <div class="meal-input-wrap">
+              <textarea class="meal-input-area" id="mealTimelineInput" 
+                placeholder="8:00 ヨーグルトとバナナ&#10;12:30 サラダ、味噌汁、玄米&#10;19:00 鮭、野菜炒め"
+                rows="5"></textarea>
+              <p class="meal-input-hint">時刻＋スペース＋食事内容を1行ずつ入力<br>例：12:30 サラダと味噌汁</p>
+            </div>
+            <button class="meal-parse-btn" id="mealParseBtn" type="button">タイムラインを表示</button>
+
+            <!-- タイムライン表示 -->
+            <div class="meal-tl-wrap" id="mealTlWrap">
+              <div class="meal-tl-axis"></div>
+              <div id="mealTlNodes"></div>
+            </div>
+
+            <!-- 断食バー -->
+            <div class="meal-fasting-bar-section" id="mealFastingSection">
+              <p class="meal-fasting-title">fasting window</p>
+              <div class="meal-24h-bar-wrap" id="meal24hBar"></div>
+              <div class="meal-24h-ticks">
+                <span>0</span><span>3</span><span>6</span><span>9</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span>
+              </div>
+              <div class="meal-fasting-summary" id="mealFastingSummary"></div>
+              <div class="meal-fasting-badge" id="mealFastingBadge"></div>
+            </div>
+          </div>
 
         <!-- メモ -->
         <div class="form-group">
