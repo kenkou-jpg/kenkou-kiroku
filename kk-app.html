@@ -497,7 +497,7 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
 
       <!-- Record CTA -->
       <div class="record-cta">
-        <button class="record-btn-main" onclick="openRecordModal()">
+       <button class="record-btn-main" onclick="openRecordScreen()">
           <span>🌸</span><span>今日を記録する</span>
         </button>
       </div>
@@ -853,13 +853,16 @@ function openRecordScreen(){
   var wd = ['日','月','火','水','木','金','土'];
   var el = document.getElementById('rec-screen-date');
   if(el) el.textContent = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+wd[now.getDay()]+'）';
-  // reset inputs
   ['rs-morning','rs-lunch','rs-dinner','rs-snack','rs-note'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
   ['rs-first-time','rs-last-time'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
   var te = document.getElementById('rs-temp'); if(te) te.value='';
   document.querySelectorAll('#rs-symptoms .chip').forEach(function(c){ c.classList.remove('selected'); });
   document.querySelectorAll('#rs-cycle .chip').forEach(function(c){ c.classList.remove('selected'); });
-  showScreen('screen-record');
+
+  // 画面切り替え（showScreenが無くても動く）
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('screen-record').classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function toggleRsChip(el){
