@@ -2523,6 +2523,7 @@ function openDayDetail(d){
     if(m.morning) tags.push('朝: '+m.morning);
     if(m.lunch) tags.push('昼: '+m.lunch);
     if(m.dinner) tags.push('夕: '+m.dinner);
+    if(m.snack) tags.push('間食: '+m.snack);
   }
   if(tags.length){
     html += '<div class="dm-record-tags">';
@@ -2534,9 +2535,38 @@ function openDayDetail(d){
     html += '<div style="font-size:10px;color:var(--rose);letter-spacing:0.15em;margin-bottom:6px;">JOURNAL</div>';
     html += '<div style="font-size:13px;color:var(--ink);line-height:1.8;">'+rec.note.replace(/\n/g,'<br>')+'</div></div>';
   }
+
+  // ===== ドーナツグラフ =====
+  var hasDonut = rec.meals || rec.foodScore || rec.wellness || rec.temperature;
+  if(hasDonut){
+    html += '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0ebe6;">';
+    html += '<div style="font-size:11px;color:var(--ink-light);letter-spacing:0.15em;margin-bottom:12px;">記録サマリー</div>';
+
+    // 食事ドーナツ（朝・昼・夕・間食の記録状況）
+    if(rec.meals){
+      html += createMealDonut(rec.meals);
+    }
+
+    // スコア系ドーナツ（横並び）
+    var scores = [];
+    if(rec.foodScore) scores.push({label:'食事',val:rec.foodScore,max:10,color:'#e8c49a'});
+    if(rec.wellness) scores.push({label:'体調',val:rec.wellness,max:5,color:'#c9747a'});
+    if(rec.temperature) scores.push({label:'体温',val:parseFloat(rec.temperature),max:40,color:'#8aab96'});
+    if(scores.length){
+      html += '<div style="display:grid;grid-template-columns:repeat('+Math.min(scores.length,3)+',1fr);gap:12px;margin-top:16px;">';
+      for(var s=0;s<scores.length;s++){
+        html += '<div>'+createScoreDonut(scores[s].label,scores[s].val,scores[s].max,scores[s].color)+'</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
   body.innerHTML = html;
   document.getElementById('dmOverlay').classList.add('dm-open');
 }
+
+ 
 
 // ===== RECORD SCREEN =====
 function openRecordScreen(){
