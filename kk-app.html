@@ -2829,11 +2829,22 @@ function displayChakraResultInSettings(result, body) {
   body.innerHTML = html;
 }
 
-// 設定画面が表示される時に実行
-// 既存の画面切り替え処理に以下を追加
-// showScreen('settings') が呼ばれた時に updateChakraProfileDisplay() を実行する
+// ────────────────────────────────────────────────────────────
+// 設定画面でのチャクラ結果表示（switchTab 拡張）
+// ────────────────────────────────────────────────────────────
 
-// または、ページ読み込み時に実行
+// 既存の switchTab 関数を拡張
+const originalSwitchTab = switchTab;
+function switchTab(tab, btn) {
+  originalSwitchTab(tab, btn);
+  
+  // 設定画面が表示される場合
+  if (tab === 'settings') {
+    updateChakraProfileDisplay();
+  }
+}
+
+// ページ読み込み時にも実行
 document.addEventListener('DOMContentLoaded', function() {
   updateChakraProfileDisplay();
 });
