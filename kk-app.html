@@ -664,6 +664,16 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
     <div id="screen-settings" class="screen">
       <div class="spacer-top"></div>
       <div class="settings-header"><div class="settings-title">設定</div></div>
+      <div class="section-card" id="chakra-profile-card" style="display:none;">
+  <div class="section-label">YOUR CHAKRA TYPE</div>
+  <div class="section-title serif">あなたのチャクラタイプ</div>
+  <div id="chakra-profile-body"></div>
+  <div style="margin-top:14px;">
+    <button class="share-btn" onclick="location.href='chakra.html'" style="font-size:12px;padding:10px;">
+      もう一度診断する →
+    </button>
+  </div>
+</div>
       <div class="premium-card">
         <div class="pc-badge">✨ PREMIUM</div>
         <div class="pc-title">もっと深く、からだを知る</div>
@@ -846,7 +856,7 @@ function updateStats() {
   document.getElementById('insight-wellness').textContent = wellness.length ? (wellness.reduce((a,b)=>a+b,0)/wellness.length).toFixed(1) : '—';
   buildCalendar();
 }
-// ===== RECORD SCREEN =====
+// ===== RECORD SCREEN (修正版) =====
 var rsData = { meals:{}, temp:null, symptoms:[], cycle:'', note:'' };
 
 function openRecordScreen(){
@@ -855,15 +865,51 @@ function openRecordScreen(){
   var wd = ['日','月','火','水','木','金','土'];
   var el = document.getElementById('rec-screen-date');
   if(el) el.textContent = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+wd[now.getDay()]+'）';
+
+  // 入力リセット
   ['rs-morning','rs-lunch','rs-dinner','rs-snack','rs-note'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
   ['rs-first-time','rs-last-time'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
   var te = document.getElementById('rs-temp'); if(te) te.value='';
   document.querySelectorAll('#rs-symptoms .chip').forEach(function(c){ c.classList.remove('selected'); });
   document.querySelectorAll('#rs-cycle .chip').forEach(function(c){ c.classList.remove('selected'); });
 
-  // 画面切り替え（showScreenが無くても動く）
+  // 下書き復元
+  var di = document.getElementById('draft-indicator');
+  if(di) di.style.display = 'none';
+  var draft = localStorage.getItem('ippo_draft');
+  if(draft){
+    try {
+      var d = JSON.parse(draft);
+      var draftDate = new Date(d._draftDate).toDateString();
+      if(draftDate === now.toDateString()){
+        if(d.morning){ var em=document.getElementById('rs-morning'); if(em) em.value=d.morning; }
+        if(d.lunch){ var el2=document.getElementById('rs-lunch'); if(el2) el2.value=d.lunch; }
+        if(d.dinner){ var ed=document.getElementById('rs-dinner'); if(ed) ed.value=d.dinner; }
+        if(d.snack){ var es=document.getElementById('rs-snack'); if(es) es.value=d.snack; }
+        if(d.firstTime){ var ef=document.getElementById('rs-first-time'); if(ef) ef.value=d.firstTime; }
+        if(d.lastTime){ var elt=document.getElementById('rs-last-time'); if(elt) elt.value=d.lastTime; }
+        if(d.temp){ var et=document.getElementById('rs-temp'); if(et) et.value=d.temp; }
+        if(d.note){ var en=document.getElementById('rs-note'); if(en) en.value=d.note; }
+        if(d.symptoms && d.symptoms.length){
+          document.querySelectorAll('#rs-symptoms .chip').forEach(function(c){
+            if(d.symptoms.indexOf(c.textContent) !== -1) c.classList.add('selected');
+          });
+        }
+        if(d.cycle){
+          document.querySelectorAll('#rs-cycle .chip').forEach(function(c){
+            if(c.textContent === d.cycle) c.classList.add('selected');
+          });
+        }
+        if(di) di.style.display = 'block';
+        setTimeout(function(){ if(di) di.style.display='none'; }, 3000);
+      }
+    } catch(e){}
+  }
+
+  // 画面切り替え
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  document.getElementById('screen-record').classList.add('active');
+  var sr = document.getElementById('screen-record');
+  if(sr) sr.classList.add('active');
   window.scrollTo(0, 0);
 }
 
@@ -877,11 +923,9 @@ function selectRsCycle(el, val){
   rsData.cycle = val;
 }
 
-function updateRecScreen(){
-  // auto-gather (called on input)
-}
+function updateRecScreen(){}
 
-function saveRecordScreen(){
+function gatherRecordData(){
   var morning = (document.getElementById('rs-morning')||{}).value||'';
   var lunch = (document.getElementById('rs-lunch')||{}).value||'';
   var dinner = (document.getElementById('rs-dinner')||{}).value||'';
@@ -890,24 +934,170 @@ function saveRecordScreen(){
   var lastTime = (document.getElementById('rs-last-time')||{}).value||'';
   var temp = parseFloat((document.getElementById('rs-temp')||{}).value) || null;
   var note = (document.getElementById('rs-note')||{}).value||'';
-
   var symptoms = [];
   document.querySelectorAll('#rs-symptoms .chip.selected').forEach(function(c){ symptoms.push(c.textContent); });
-
   var cycle = '';
   var selCycle = document.querySelector('#rs-cycle .chip.selected');
   if(selCycle) cycle = selCycle.textContent;
+  return { morning:morning, lunch:lunch, dinner:dinner, snack:snack,
+           firstTime:firstTime, lastTime:lastTime, temp:temp, note:note,
+           symptoms:symptoms, cycle:cycle };
+}
 
-  // Find today's existing record or create new
+function draftRecordScreen(){
+  var data = gatherRecordData();
+  data._draftDate = new Date().toISOString();
+  localStorage.setItem('ippo_draft', JSON.stringify(data));
+
+  // フィードバック
+  var di = document.getElementById('draft-indicator');
+  if(di){
+    di.textContent = '一時保存しました';
+    di.style.display = 'block';
+    di.style.color = 'var(--sage)';
+    setTimeout(function(){ di.style.display='none'; }, 2500);
+  }
+}
+
+function saveRecordScreen(){
+  var data = gatherRecordData();
+
+  // 今日の既存レコードを探す or 新規作成
   var todayStr = new Date().toDateString();
   var rec = null;
-  for(var i=0; i<state.records.length; i++){
-    if(new Date(state.records[i].date).toDateString() === todayStr){
-      rec = state.records[i];
-      break;
+  if(state && state.records){
+    for(var i=0; i<state.records.length; i++){
+      if(new Date(state.records[i].date).toDateString() === todayStr){
+        rec = state.records[i];
+        break;
+      }
     }
+    if(!rec){
+      rec = { date: new Date().toISOString() };
+      state.records.push(rec);
+    }
+  } else {
+    // state が無い場合のフォールバック
+    if(typeof state === 'undefined') window.state = { records:[], name:'' };
+    if(!state.records) state.records = [];
+    rec = { date: new Date().toISOString() };
+    state.records.push(rec);
   }
 
+  // データをマージ
+  rec.meals = { morning:data.morning, lunch:data.lunch, dinner:data.dinner, snack:data.snack };
+  rec.firstMealTime = data.firstTime;
+  rec.lastMealTime = data.lastTime;
+  rec.temperature = data.temp;
+  rec.symptoms = data.symptoms;
+  rec.menstrualCycle = data.cycle;
+  if(data.note) rec.note = data.note;
+
+  // 保存
+  if(typeof saveState === 'function'){
+    saveState();
+  } else {
+    localStorage.setItem('ippo_state', JSON.stringify(state));
+  }
+  if(typeof updateStats === 'function') updateStats();
+  if(typeof updateHistory === 'function') updateHistory();
+  if(typeof buildCalendar === 'function') buildCalendar();
+
+  // 下書き削除
+  localStorage.removeItem('ippo_draft');
+
+  // 成功表示
+  var so = document.getElementById('success-overlay');
+  if(so){
+    var se = document.getElementById('success-emoji');
+    var st = document.getElementById('success-title');
+    var ss = document.getElementById('success-sub');
+    if(se) se.textContent = '🌿';
+    if(st) st.textContent = '記録を保存しました';
+    if(ss) ss.textContent = '食事・体温・症状の記録が追加されました。\nお疲れさまです！';
+    so.classList.add('active');
+  }
+}
+
+// ===== CHAKRA PROFILE =====
+function updateChakraProfile(){
+  var card = document.getElementById('chakra-profile-card');
+  var body = document.getElementById('chakra-profile-body');
+  if(!card || !body) return;
+
+  // 全レコードからチャクラ記録を集計
+  var counts = [0,0,0,0,0,0];
+  var latest = null;
+  var latestDate = null;
+  if(state && state.records){
+    state.records.forEach(function(r){
+      if(r.chakra !== undefined && r.chakra !== null){
+        counts[r.chakra]++;
+        var d = new Date(r.date);
+        if(!latestDate || d > latestDate){
+          latestDate = d;
+          latest = r.chakra;
+        }
+      }
+    });
+  }
+
+  var total = counts.reduce(function(a,b){ return a+b; }, 0);
+  if(total === 0){
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = 'block';
+
+  var CHAKRA = [
+    { name:'第1チャクラ（ムーラダーラ）', color:'#e74c3c', key:'生命力・グラウンディング', icon:'🔴' },
+    { name:'第2チャクラ（スヴァディシュターナ）', color:'#e67e22', key:'感情・生殖・創造性', icon:'🟠' },
+    { name:'第3チャクラ（マニプーラ）', color:'#f1c40f', key:'意志・消化・自信', icon:'🟡' },
+    { name:'第4チャクラ（アナーハタ）', color:'#2ecc71', key:'愛・共感・免疫', icon:'💚' },
+    { name:'第5チャクラ（ヴィシュッダ）', color:'#3498db', key:'表現・甲状腺・コミュニケーション', icon:'🔵' },
+    { name:'第6チャクラ（アージュニャー）', color:'#9b59b6', key:'直感・ホルモン・洞察', icon:'🟣' }
+  ];
+
+  // 最も多いチャクラ
+  var maxIdx = 0;
+  counts.forEach(function(c, i){ if(c > counts[maxIdx]) maxIdx = i; });
+
+  var html = '';
+
+  // メインタイプ表示
+  html += '<div style="background:linear-gradient(135deg, var(--rose-pale), var(--warm-light));border-radius:16px;padding:18px;margin-bottom:14px;text-align:center;">';
+  html += '<div style="font-size:32px;margin-bottom:8px;">' + CHAKRA[maxIdx].icon + '</div>';
+  html += '<div style="font-family:\'Shippori Mincho\',serif;font-size:16px;color:var(--ink);font-weight:600;margin-bottom:4px;">' + CHAKRA[maxIdx].name + '</div>';
+  html += '<div style="font-size:12px;color:var(--ink-mid);line-height:1.6;">' + CHAKRA[maxIdx].key + '</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--ink-light);">記録 ' + total + ' 回中 ' + counts[maxIdx] + ' 回選択</div>';
+  html += '</div>';
+
+  // 全チャクラの内訳バー
+  html += '<div style="font-size:11px;color:var(--ink-light);margin-bottom:10px;letter-spacing:0.1em;">チャクラ記録の内訳</div>';
+  CHAKRA.forEach(function(ch, i){
+    var pct = total > 0 ? Math.round(counts[i] / total * 100) : 0;
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+    html += '<span style="font-size:14px;">' + ch.icon + '</span>';
+    html += '<div style="flex:1;background:#f0ebe6;border-radius:6px;height:8px;overflow:hidden;">';
+    html += '<div style="width:' + pct + '%;height:100%;background:' + ch.color + ';border-radius:6px;transition:width 0.8s ease;"></div>';
+    html += '</div>';
+    html += '<span style="font-size:11px;color:var(--ink-mid);min-width:32px;text-align:right;">' + pct + '%</span>';
+    html += '</div>';
+  });
+
+  // 最新の記録
+  if(latest !== null && latestDate){
+    var wd = ['日','月','火','水','木','金','土'];
+    var ld = latestDate;
+    html += '<div style="margin-top:14px;padding:12px;background:var(--white);border-radius:12px;border:1px solid var(--rose-light);font-size:12px;color:var(--ink-mid);">';
+    html += '最新の記録: ' + ld.getFullYear()+'/'+(ld.getMonth()+1)+'/'+ld.getDate()+'（'+wd[ld.getDay()]+'）' + ' — ' + CHAKRA[latest].icon + ' ' + CHAKRA[latest].name;
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+}
+// ここから saveRecord 関数（元々あったコード）
   if(!rec){
     rec = { date: new Date().toISOString() };
     state.records.push(rec);
@@ -1167,6 +1357,7 @@ function saveRecord() {
   }
   saveState(); closeModal(); updateStats(); updateUnlock(); updateHistory();
   buildCalendar();
+  updateChakraProfile();
   const msgs = [`記録${state.totalDays}日目。<br>からだの声を聴いてくれてありがとう。`,`${state.streak}日連続！<br>継続はからだへの最高のギフト。`,`今日も一歩。<br>積み重ねが、あなたのパターンを見せてくれます。`];
   document.getElementById('success-message').innerHTML = msgs[Math.min(state.totalDays-1,msgs.length-1)] || msgs[0];
   document.getElementById('success-overlay').classList.add('active');
