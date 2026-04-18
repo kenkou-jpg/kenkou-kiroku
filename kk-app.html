@@ -1043,8 +1043,13 @@ function startFastTimer() {
 function switchTab(tab, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`screen-${tab}`).classList.add('active');
   if (btn) btn.classList.add('active');
+
+  if (tab === 'record') {
+    openRecordScreen();
+    return;
+  }
+  document.getElementById('screen-' + tab).classList.add('active');
 }
 
 // ===== RECORD MODAL =====
