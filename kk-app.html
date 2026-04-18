@@ -332,6 +332,34 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 ::-webkit-scrollbar { width: 0; }
 .spacer-top { height: 52px; }
+/* ===== MEAL INPUT ===== */
+.meal-input {
+  width: 100%;
+  border: 1.5px solid #e8ddd8;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.meal-input:focus { border-color: var(--rose); }
+.meal-input::placeholder { color: var(--ink-light); font-size: 13px; }
+.meal-time-input {
+  flex: 1;
+  border: 1.5px solid #e8ddd8;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.meal-time-input:focus { border-color: var(--rose); }
 </style>
 </head>
 <body>
@@ -584,7 +612,14 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-header">
-        <div class="modal-step-indicator" id="step-indicator"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="modal-step-indicator" id="step-indicator">
+  <div class="step-dot active"></div>
+  <div class="step-dot"></div>
+  <div class="step-dot"></div>
+  <div class="step-dot"></div>
+  <div class="step-dot"></div>
+  <div class="step-dot"></div>
+</div>
         <div class="modal-title" id="modal-title">今日のからだの調子は<br>どうですか？</div>
         <div class="modal-subtitle" id="modal-step-label">1 / 5</div>
       </div>
@@ -635,11 +670,12 @@ let currentRecord = {};
 let currentStep = 0;
 
 const STEPS = [
-  { title: '今日のからだの調子は\nどうですか？', label: '1 / 5', render: renderWellness },
-  { title: '骨盤まわりの\n感覚はどうですか？', label: '2 / 5', render: renderChakra },
-  { title: '今日の食事の質は\nどうでしたか？', label: '3 / 5', render: renderFood },
-  { title: '今日の断食時間は\nどのくらいでしたか？', label: '4 / 5', render: renderFasting },
-  { title: '今の気持ちに\n近いのは？', label: '5 / 5', render: renderEmotion }
+  { title: '今日のからだの調子は\nどうですか？', label: '1 / 6', render: renderWellness },
+  { title: '骨盤まわりの\n感覚はどうですか？', label: '2 / 6', render: renderChakra },
+  { title: '今日は何を\n食べましたか？', label: '3 / 6', render: renderMealInput },
+  { title: '今日の食事の質は\nどうでしたか？', label: '4 / 6', render: renderFood },
+  { title: '今日の断食時間は\nどのくらいでしたか？', label: '5 / 6', render: renderFasting },
+  { title: '今の気持ちに\n近いのは？', label: '6 / 6', render: renderEmotion }
 ];
 
 // ===== INIT =====
@@ -727,6 +763,25 @@ function updateHistory() {
   const recent = [...state.records].reverse().slice(0, 10);
   list.innerHTML = recent.map(r => {
     const d = new Date(r.date);
+      // Show meals if recorded
+  if(rec.meals){
+    const mealLabels = {morning:'🌅 朝食', lunch:'☀️ 昼食', dinner:'🌙 夕食', snack:'🍵 間食'};
+    let hasMeals = false;
+    let mealsHtml = '<div style="margin-top:12px;">';
+    Object.keys(mealLabels).forEach(k => {
+      if(rec.meals[k]){
+        hasMeals = true;
+        mealsHtml += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(200,180,170,0.15);"><span style="font-size:12px;min-width:60px;color:var(--ink-light);">'+mealLabels[k]+'</span><span style="font-size:13px;color:var(--ink);">'+rec.meals[k]+'</span></div>';
+      }
+    });
+    mealsHtml += '</div>';
+    if(hasMeals) html += mealsHtml;
+  }
+
+  // Show meal times if recorded
+  if(rec.firstMealTime && rec.lastMealTime){
+    html += '<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--ink-light);">食事時間: '+rec.firstMealTime+' 〜 '+rec.lastMealTime+'</div>';
+  }
     const tags = [];
     if (r.wellness) tags.push(`体調 ${r.wellness}/5`);
     if (r.emotion) tags.push(r.emotion);
@@ -835,7 +890,42 @@ function renderChakra() {
 }
 function selectChakra(i, el) { currentRecord.chakra = i; document.querySelectorAll('.chakra-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
 function skipChakra() { currentRecord.chakra = null; nextStep(); }
+function renderMealInput() {
+  if (!currentRecord.meals) currentRecord.meals = { morning:'', lunch:'', dinner:'', snack:'' };
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <div style="font-size:12px;color:var(--ink-light);margin-bottom:6px;">🌅 朝食</div>
+        <input type="text" class="meal-input" id="meal-morning" placeholder="例：オートミール、味噌汁" value="${currentRecord.meals.morning||''}" oninput="updateMeal('morning',this.value)">
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--ink-light);margin-bottom:6px;">☀️ 昼食</div>
+        <input type="text" class="meal-input" id="meal-lunch" placeholder="例：サラダ、鶏むね肉" value="${currentRecord.meals.lunch||''}" oninput="updateMeal('lunch',this.value)">
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--ink-light);margin-bottom:6px;">🌙 夕食</div>
+        <input type="text" class="meal-input" id="meal-dinner" placeholder="例：焼き魚、玄米、豆腐" value="${currentRecord.meals.dinner||''}" oninput="updateMeal('dinner',this.value)">
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--ink-light);margin-bottom:6px;">🍵 間食・飲み物</div>
+        <input type="text" class="meal-input" id="meal-snack" placeholder="例：ナッツ、ハーブティー" value="${currentRecord.meals.snack||''}" oninput="updateMeal('snack',this.value)">
+      </div>
+      <div style="margin-top:8px;">
+        <div style="font-size:12px;color:var(--ink-light);margin-bottom:6px;">⏰ 最初の食事と最後の食事の時刻（任意）</div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <input type="time" class="meal-time-input" id="meal-first-time" value="${currentRecord.firstMealTime||''}" onchange="currentRecord.firstMealTime=this.value">
+          <span style="color:var(--ink-light);font-size:13px;">〜</span>
+          <input type="time" class="meal-time-input" id="meal-last-time" value="${currentRecord.lastMealTime||''}" onchange="currentRecord.lastMealTime=this.value">
+        </div>
+      </div>
+    </div>
+  `;
+}
 
+function updateMeal(key, val) {
+  if (!currentRecord.meals) currentRecord.meals = {};
+  currentRecord.meals[key] = val;
+}
 function renderFood() {
   const foods = ['根菜類','発酵食品','温かいもの','砂糖控え','グルテンフリー','EPA/DHA','ビタミンD','鉄分','水2L以上'];
   if (!currentRecord.foodItems) currentRecord.foodItems = [];
