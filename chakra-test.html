@@ -1353,41 +1353,61 @@ $('prevBtn').addEventListener('click', () => {
 
 document.getElementById('saveToAppBtn').addEventListener('click', function() {
   // 診断結果を独立キーで保存（アプリから読み取れるように）
+  
+  // state から結果を取得
+  const topType = state.resultType;  // 'sacral', 'root' など
+  const scores = state.scores;        // 各チャクラのスコアオブジェクト
+  
+  // 値が存在するか確認
+  if (!topType || !scores) {
+    console.error('❌ エラー: 診断結果が見つかりません');
+    alert('診断を最後まで完了してください');
+    return;
+  }
+  
   var result = {
-    type: topChakra,           // 例: 'sacral', 'root' など
-    scores: totalScores,       // 各チャクラのスコアオブジェクト
+    type: topType,
+    scores: scores,
     date: new Date().toISOString()
   };
-  localStorage.setItem('ippo_chakra_result', JSON.stringify(result));
-
-  // アプリのstateにも追記（もしstateが存在すれば）
+  
   try {
-    var st = JSON.parse(localStorage.getItem('ippo_state'));
-    if (st && st.records) {
-      // 最新の記録にチャクラ情報を付与、なければ新規作成
-      var today = new Date().toDateString();
-      var todayRec = st.records.find(function(r) {
-        return new Date(r.date).toDateString() === today;
-      });
-      if (todayRec) {
-        todayRec.chakra = topChakra;
-      } else {
-        st.records.push({ date: new Date().toISOString(), chakra: topChakra });
+    localStorage.setItem('ippo_chakra_result', JSON.stringify(result));
+    console.log('✅ 診断結果を保存しました:', result);
+
+    // アプリのstateにも追記（もしstateが存在すれば）
+    try {
+      var st = JSON.parse(localStorage.getItem('ippo_state'));
+      if (st && st.records) {
+        // 最新の記録にチャクラ情報を付与、なければ新規作成
+        var today = new Date().toDateString();
+        var todayRec = st.records.find(function(r) {
+          return new Date(r.date).toDateString() === today;
+        });
+        if (todayRec) {
+          todayRec.chakra = topType;
+        } else {
+          st.records.push({ date: new Date().toISOString(), chakra: topType });
+        }
+        localStorage.setItem('ippo_state', JSON.stringify(st));
       }
-      localStorage.setItem('ippo_state', JSON.stringify(st));
-    }
-  } catch(e) {}
+    } catch(e) {}
 
-  // ボタンを「保存済み」に変更
-  this.textContent = '✓ 保存しました';
-  this.style.background = 'var(--teal)';
-  this.disabled = true;
+    // ボタンを「保存済み」に変更
+    this.textContent = '✓ 保存しました';
+    this.style.background = 'var(--teal)';
+    this.disabled = true;
 
-  // 保存バッジ表示
-  var badge = document.createElement('div');
-  badge.className = 'saved-badge';
-  badge.innerHTML = '<span class="saved-dot"></span> アプリに保存済み';
-  this.parentElement.insertBefore(badge, this);
+    // 保存バッジ表示
+    var badge = document.createElement('div');
+    badge.className = 'saved-badge';
+    badge.innerHTML = '<span class="saved-dot"></span> アプリに保存済み';
+    this.parentElement.insertBefore(badge, this);
+    
+  } catch(e) {
+    console.error('❌ 保存に失敗:', e);
+    alert('保存に失敗しました。もう一度お試しください。');
+  }
 });
 
 
