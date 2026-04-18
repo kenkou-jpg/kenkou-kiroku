@@ -2518,20 +2518,69 @@ function openDayDetail(d){
   if(rec.temperature) tags.push(rec.temperature+'℃');
   if(rec.symptoms && rec.symptoms.length) tags.push(rec.symptoms.join('・'));
   if(rec.menstrualCycle && rec.menstrualCycle !== 'なし') tags.push('生理: '+rec.menstrualCycle);
-  if(rec.meals){
-    var m = rec.meals;
-    if(m.morning) tags.push('朝: '+m.morning);
-    if(m.lunch) tags.push('昼: '+m.lunch);
-    if(m.dinner) tags.push('夕: '+m.dinner);
-    if(m.snack) tags.push('間食: '+m.snack);
-  }
   if(tags.length){
     html += '<div class="dm-record-tags">';
     tags.forEach(function(t){ html += '<span class="dm-tag">'+t+'</span>'; });
     html += '</div>';
   }
+
+  // ===== 食事内容テキスト =====
+  if(rec.meals){
+    var m = rec.meals;
+    var mealRows = [];
+    if(m.morning) mealRows.push({icon:'🌅', label:'朝食', text:m.morning, time:m.morningTime||''});
+    if(m.lunch)   mealRows.push({icon:'☀️', label:'昼食', text:m.lunch,   time:m.lunchTime||''});
+    if(m.dinner)  mealRows.push({icon:'🌙', label:'夕食', text:m.dinner,  time:m.dinnerTime||''});
+    if(m.snack)   mealRows.push({icon:'🍪', label:'間食', text:m.snack,   time:m.snackTime||''});
+    if(mealRows.length){
+      html += '<div style="margin-top:14px;background:var(--white);border-radius:14px;padding:14px;box-shadow:0 1px 6px var(--shadow);">';
+      html += '<div style="font-size:10px;color:var(--ink-light);letter-spacing:0.15em;margin-bottom:10px;">MEALS</div>';
+      for(var mi=0;mi<mealRows.length;mi++){
+        var mr = mealRows[mi];
+        html += '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:'+(mi<mealRows.length-1?'10px':'0')+';padding-bottom:'+(mi<mealRows.length-1?'10px':'0')+';border-bottom:'+(mi<mealRows.length-1?'1px solid #f0ebe6':'none')+';">';
+        html += '<span style="font-size:18px;flex-shrink:0;margin-top:2px;">'+mr.icon+'</span>';
+        html += '<div style="flex:1;">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+        html += '<span style="font-size:12px;font-weight:500;color:var(--ink);">'+mr.label+'</span>';
+        if(mr.time) html += '<span style="font-size:10px;color:var(--ink-light);">'+mr.time+'</span>';
+        html += '</div>';
+        html += '<div style="font-size:13px;color:var(--ink-mid);line-height:1.7;margin-top:3px;">'+mr.text+'</div>';
+        html += '</div></div>';
+      }
+      html += '</div>';
+    }
+  }
+
+  // ===== 断食セクション =====
+  if(rec.fasting){
+    html += '<div style="margin-top:14px;background:linear-gradient(135deg,#2c2420,#3d302a);border-radius:14px;padding:16px;color:white;">';
+    html += '<div style="font-size:10px;letter-spacing:0.15em;color:rgba(255,255,255,0.5);margin-bottom:8px;">FASTING</div>';
+    html += '<div style="display:flex;align-items:center;gap:12px;">';
+    // 断食ミニドーナツ
+    var fGoal = rec.fastingGoal || 16;
+    var fHours = parseFloat(rec.fasting) || 0;
+    var fPct = Math.min(fHours / fGoal, 1);
+    var fR = 28, fC = 2 * Math.PI * fR;
+    var fOffset = fC - (fC * fPct);
+    html += '<div style="position:relative;width:64px;height:64px;flex-shrink:0;">';
+    html += '<svg viewBox="0 0 64 64" style="width:100%;height:100%;transform:rotate(-90deg);">';
+    html += '<circle cx="32" cy="32" r="'+fR+'" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="5"/>';
+    html += '<circle cx="32" cy="32" r="'+fR+'" fill="none" stroke="'+(fPct>=1?'#8aab96':'#e8c49a')+'" stroke-width="5" stroke-dasharray="'+fC+'" stroke-dashoffset="'+fOffset+'" stroke-linecap="round"/>';
+    html += '</svg>';
+    html += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">';
+    html += '<div style="font-family:Shippori Mincho,serif;font-size:16px;font-weight:700;color:white;">'+fHours+'</div>';
+    html += '<div style="font-size:7px;color:rgba(255,255,255,0.6);letter-spacing:0.1em;">時間</div>';
+    html += '</div></div>';
+    // テキスト
+    html += '<div style="flex:1;">';
+    html += '<div style="font-family:Shippori Mincho,serif;font-size:15px;margin-bottom:4px;">'+fHours+'時間の断食</div>';
+    html += '<div style="font-size:11px;color:rgba(255,255,255,0.6);">目標 '+fGoal+'時間'+(fPct>=1?' ✓ 達成':'')+'</div>';
+    html += '</div></div></div>';
+  }
+
+  // ===== ジャーナル =====
   if(rec.note){
-    html += '<div style="margin-top:12px;padding:14px;background:var(--rose-pale);border-radius:14px;border-left:3px solid var(--rose);">';
+    html += '<div style="margin-top:14px;padding:14px;background:var(--rose-pale);border-radius:14px;border-left:3px solid var(--rose);">';
     html += '<div style="font-size:10px;color:var(--rose);letter-spacing:0.15em;margin-bottom:6px;">JOURNAL</div>';
     html += '<div style="font-size:13px;color:var(--ink);line-height:1.8;">'+rec.note.replace(/\n/g,'<br>')+'</div></div>';
   }
@@ -2541,13 +2590,9 @@ function openDayDetail(d){
   if(hasDonut){
     html += '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0ebe6;">';
     html += '<div style="font-size:11px;color:var(--ink-light);letter-spacing:0.15em;margin-bottom:12px;">記録サマリー</div>';
-
-    // 食事ドーナツ（朝・昼・夕・間食の記録状況）
     if(rec.meals){
       html += createMealDonut(rec.meals);
     }
-
-    // スコア系ドーナツ（横並び）
     var scores = [];
     if(rec.foodScore) scores.push({label:'食事',val:rec.foodScore,max:10,color:'#e8c49a'});
     if(rec.wellness) scores.push({label:'体調',val:rec.wellness,max:5,color:'#c9747a'});
@@ -2565,6 +2610,7 @@ function openDayDetail(d){
   body.innerHTML = html;
   document.getElementById('dmOverlay').classList.add('dm-open');
 }
+
 
  
 
