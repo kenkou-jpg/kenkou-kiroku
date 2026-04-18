@@ -4264,7 +4264,78 @@ div.condition-memo-section > *:first-child {
 .condition-memo-section .light-orb-canvas {
   background: transparent !important;
 }
-
+/* ── 日付モーダル（食事ドーナツグラフ） ── */
+.dm-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center;
+}
+.dm-overlay.dm-open { display:flex; }
+.dm-box {
+  width:88%; max-width:360px; max-height:82vh;
+  background:#FBF7F2; border-radius:24px; padding:28px 22px;
+  overflow-y:auto; position:relative;
+  box-shadow:0 12px 40px rgba(0,0,0,0.15);
+}
+.dm-box::-webkit-scrollbar { width:3px; }
+.dm-box::-webkit-scrollbar-thumb { background:rgba(108,74,103,0.15); border-radius:2px; }
+.dm-x {
+  position:absolute; top:14px; right:14px;
+  width:32px; height:32px; border-radius:50%;
+  border:1.5px solid rgba(108,74,103,0.12);
+  background:rgba(108,74,103,0.04);
+  color:#6C4A67; font-size:0.9rem;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.dm-x:active { background:rgba(108,74,103,0.12); }
+.dm-date {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.05rem; text-align:center; margin-bottom:18px;
+  color:#3D2E3A; letter-spacing:0.03em;
+}
+.dm-empty {
+  text-align:center; padding:28px 0;
+  font-size:0.85rem; color:#A090A0; line-height:1.9;
+}
+.dm-donut-wrap {
+  position:relative; width:160px; height:160px; margin:4px auto 6px;
+}
+.dm-donut-svg { width:160px; height:160px; transform:rotate(-90deg); }
+.dm-donut-center {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:none;
+}
+.dm-donut-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem; font-weight:700; color:#3D2E3A; line-height:1;
+}
+.dm-donut-label { font-size:0.55rem; color:#A090A0; margin-top:3px; letter-spacing:0.1em; }
+.dm-legend { display:flex; justify-content:center; gap:14px; margin:8px 0 16px; }
+.dm-legend span { display:flex; align-items:center; gap:5px; font-size:0.7rem; color:#6C4A67; }
+.dm-legend-dot { width:8px; height:8px; border-radius:3px; display:inline-block; }
+.dm-meal-item {
+  display:flex; align-items:baseline; gap:10px;
+  padding:7px 0; border-bottom:1px solid rgba(108,74,103,0.06);
+}
+.dm-meal-time {
+  font-family:'Cormorant Garamond',serif;
+  font-size:0.85rem; color:#27B7B3; min-width:44px; font-weight:600;
+}
+.dm-meal-food { font-size:0.8125rem; color:#3D2E3A; }
+.dm-summary {
+  display:flex; justify-content:center; gap:18px; margin:16px 0 4px;
+}
+.dm-summary-item { text-align:center; }
+.dm-summary-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem; font-weight:700; line-height:1;
+}
+.dm-summary-lbl { font-size:0.6rem; color:#A090A0; margin-top:3px; }
+.dm-record-text {
+  padding:10px 0; font-size:0.8125rem; line-height:2; color:#6C4A67;
+}
 </style>
     <script src="js/app-local.js"></script>
   <!-- ① 星空 -->
@@ -5246,6 +5317,167 @@ div.condition-memo-section > *:first-child {
       if (name === 'insight') setTimeout(showSampleCharts, 200);
     };
   }
+})();
+</script>
+  <!-- 日付詳細モーダル -->
+<div class="dm-overlay" id="dmOverlay">
+  <div class="dm-box">
+    <button class="dm-x" id="dmClose">✕</button>
+    <div class="dm-date" id="dmDate"></div>
+    <div id="dmBody"></div>
+  </div>
+</div>
+  <script>
+(function(){
+  var WDAY=['日','月','火','水','木','金','土'];
+  var CHAKRA_NAMES={root:'第1チャクラ',sacral:'第2チャクラ',solar:'第3チャクラ',heart:'第4チャクラ',throat:'第5チャクラ',third_eye:'第6チャクラ'};
+  var EMO_NAMES={peaceful:'穏やか',happy:'うれしい',tired:'疲れ',anxious:'不安',irritated:'イライラ'};
+  var MEAL_TIMES={morning:8,lunch:12,dinner:19,snack:15};
+
+  function pad2(n){return n<10?'0'+n:''+n;}
+  function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+  function getRecForDate(ds){
+    try{var a=JSON.parse(localStorage.getItem('kk_records')||'[]');
+    return a.find(function(r){return r.record_date===ds;})||null;}catch(e){return null;}
+  }
+
+  /* SVGドーナツ描画 */
+  function buildSvgDonut(svgEl, segments){
+    svgEl.innerHTML='';
+    var cx=80,cy=80,r=58,sw=16,circ=2*Math.PI*r,offset=0;
+    segments.forEach(function(seg){
+      if(seg.pct<=0)return;
+      var len=circ*seg.pct/100, gap=circ*0.006;
+      var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',r);
+      c.setAttribute('fill','none');c.setAttribute('stroke',seg.color);
+      c.setAttribute('stroke-width',sw);c.setAttribute('stroke-linecap','round');
+      c.setAttribute('stroke-dasharray',Math.max(0,len-gap)+' '+(circ-(len-gap)));
+      c.setAttribute('stroke-dashoffset',-offset);
+      c.style.transition='stroke-dasharray 0.8s ease';
+      svgEl.appendChild(c);
+      offset+=len;
+    });
+  }
+
+  /* openDayModal をグローバルに定義（既存を上書き） */
+  window.openDayModal=function(d){
+    var calYear,calMonth;
+    var lbl=document.getElementById('calMonthLabel');
+    if(lbl){var m=lbl.textContent.match(/(\d{4})年\s*(\d{1,2})月/);
+      if(m){calYear=parseInt(m[1]);calMonth=parseInt(m[2])-1;}}
+    if(calYear===undefined){var now=new Date();calYear=now.getFullYear();calMonth=now.getMonth();}
+
+    var ds=calYear+'-'+pad2(calMonth+1)+'-'+pad2(d);
+    var w=new Date(calYear,calMonth,d).getDay();
+    var rec=getRecForDate(ds);
+
+    document.getElementById('dmDate').textContent=
+      calYear+'年'+(calMonth+1)+'月'+d+'日（'+WDAY[w]+'）';
+
+    var body=document.getElementById('dmBody');
+
+    if(!rec){
+      body.innerHTML='<div class="dm-empty">この日の記録はありません<br><span style="font-size:0.75rem;opacity:0.6;">記録画面から食事や断食を記録すると<br>ここにグラフが表示されます</span></div>';
+      document.getElementById('dmOverlay').classList.add('dm-open');
+      return;
+    }
+
+    /* 食事データ取得 */
+    var meals=[];
+    if(rec.meal_timeline&&rec.meal_timeline.length){
+      rec.meal_timeline.forEach(function(m){
+        meals.push({hour:m.hour||m.h||0,minute:m.minute||m.m||0,food:m.food||m.name||''});
+      });
+    }else if(rec.meals){
+      Object.keys(rec.meals).forEach(function(k){
+        var meal=rec.meals[k];
+        if(meal&&meal.content)meals.push({hour:MEAL_TIMES[k]||12,minute:0,food:meal.content});
+      });
+    }
+
+    /* 断食計算 */
+    var fastH=rec.fasting_hours||0,fastM=rec.fasting_minutes||0;
+    var fastTotal=fastH*60+fastM,eatTotal=1440-fastTotal;
+    if(meals.length>=2&&fastTotal===0){
+      var sorted=meals.slice().sort(function(a,b){return(a.hour*60+a.minute)-(b.hour*60+b.minute);});
+      eatTotal=(sorted[sorted.length-1].hour*60+sorted[sorted.length-1].minute)-(sorted[0].hour*60+sorted[0].minute);
+      if(eatTotal<=0)eatTotal=60;
+      fastTotal=1440-eatTotal;fastH=Math.floor(fastTotal/60);fastM=fastTotal%60;
+    }
+
+    var html='';
+
+    if(meals.length>0){
+      /* ドーナツ */
+      var fastPct=Math.round(fastTotal/1440*100);
+      var eatPct=100-fastPct;
+      html+='<div class="dm-donut-wrap">';
+      html+='<svg class="dm-donut-svg" id="dmSvg" viewBox="0 0 160 160"></svg>';
+      html+='<div class="dm-donut-center">';
+      html+='<div class="dm-donut-num">'+fastH+'h'+pad2(fastM)+'m</div>';
+      html+='<div class="dm-donut-label">FASTING</div>';
+      html+='</div></div>';
+
+      /* 凡例 */
+      html+='<div class="dm-legend">';
+      html+='<span><span class="dm-legend-dot" style="background:#3D2E3A;"></span>断食 '+fastPct+'%</span>';
+      html+='<span><span class="dm-legend-dot" style="background:#E63FA8;"></span>食事 '+eatPct+'%</span>';
+      html+='</div>';
+
+      /* 食事リスト */
+      meals.sort(function(a,b){return(a.hour*60+a.minute)-(b.hour*60+b.minute);});
+      meals.forEach(function(m){
+        html+='<div class="dm-meal-item">';
+        html+='<span class="dm-meal-time">'+pad2(m.hour)+':'+pad2(m.minute)+'</span>';
+        html+='<span class="dm-meal-food">'+esc(m.food)+'</span>';
+        html+='</div>';
+      });
+
+      /* サマリー */
+      html+='<div class="dm-summary">';
+      html+='<div class="dm-summary-item"><div class="dm-summary-num" style="color:#3D2E3A;">'+fastH+'h '+fastM+'m</div><div class="dm-summary-lbl">断食時間</div></div>';
+      html+='<div class="dm-summary-item"><div class="dm-summary-num" style="color:#E63FA8;">'+Math.floor(eatTotal/60)+'h '+(eatTotal%60)+'m</div><div class="dm-summary-lbl">食事ウィンドウ</div></div>';
+      html+='<div class="dm-summary-item"><div class="dm-summary-num" style="color:#27B7B3;">'+meals.length+'</div><div class="dm-summary-lbl">食事回数</div></div>';
+      html+='</div>';
+    }else{
+      /* 食事タイムラインなし → テキスト表示 */
+      var lines=[];
+      if(rec.chakra)lines.push('チャクラ: '+(CHAKRA_NAMES[rec.chakra]||rec.chakra));
+      if(rec.condition_scale)lines.push('体調: '+rec.condition_scale+'/5');
+      if(rec.food_content)lines.push('食事: '+rec.food_content);
+      if(rec.emotion)lines.push('感情: '+(EMO_NAMES[rec.emotion]||rec.emotion));
+      if(rec.fasting_hours)lines.push('断食: '+rec.fasting_hours+'h '+(rec.fasting_minutes||0)+'m');
+      if(rec.wellness_score)lines.push('ウェルネス: '+rec.wellness_score+'/10');
+      html+='<div class="dm-record-text">'+(lines.length?lines.join('<br>'):'記録あり')+'</div>';
+    }
+
+    body.innerHTML=html;
+    document.getElementById('dmOverlay').classList.add('dm-open');
+
+    /* SVGドーナツ描画 */
+    if(meals.length>0){
+      setTimeout(function(){
+        var svg=document.getElementById('dmSvg');
+        if(!svg)return;
+        var fastPct=Math.round(fastTotal/1440*100);
+        var eatPct=100-fastPct;
+        buildSvgDonut(svg,[
+          {color:'#3D2E3A',pct:fastPct},
+          {color:'#E63FA8',pct:eatPct}
+        ]);
+      },30);
+    }
+  };
+
+  /* 閉じる */
+  document.getElementById('dmClose').addEventListener('click',function(){
+    document.getElementById('dmOverlay').classList.remove('dm-open');
+  });
+  document.getElementById('dmOverlay').addEventListener('click',function(e){
+    if(e.target===this)this.classList.remove('dm-open');
+  });
 })();
 </script>
 </body>
