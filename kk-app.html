@@ -1386,7 +1386,7 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
       <!-- Sample Graph with demo overlay -->
       <div class="sample-graph-section">
         <div class="sg-header">
-          <div class="sg-title">ウェルネス推移</div>
+          <div class="sg-title">からだのリズム</div>
           <div class="sg-tabs">
             <button class="sg-tab active" onclick="setGraphTab('7d', this)">7日</button>
             <button class="sg-tab" onclick="setGraphTab('30d', this)">30日</button>
@@ -2399,7 +2399,7 @@ function setGraphTab(tab, el) {
   const required = needDays[tab] || 7;
   const overlay = document.getElementById('graph-overlay');
   const titleEl = document.querySelector('.sg-title');
-  if (titleEl) titleEl.textContent = `ウェルネス推移（${labelMap[tab]}）`;
+  if (titleEl) titleEl.textContent = `からだのリズム（${labelMap[tab]}）`;
   if (overlay) {
     if (state.totalDays >= required) {
       overlay.style.display = 'none';
