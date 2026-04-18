@@ -1433,6 +1433,95 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
   </div>
   <div class="section-card">
     <div class="section-label">MEAL TIMELINE</div>
+
+    <!-- ===== からだのための選択 ===== -->
+<div class="section-card">
+  <div class="section-label">BODY-CONSCIOUS CHOICES</div>
+  <div class="section-title serif">からだのための選択</div>
+  <div style="font-size:12px;color:var(--ink-light);line-height:1.7;margin-bottom:16px;">今日、からだのために選んだものはありますか？</div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;" id="rs-body-choices">
+
+    <div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px;">🔥 温めるもの</div>
+      <div class="chips" data-category="warming">
+        <span class="chip" data-val="生姜">生姜</span>
+        <span class="chip" data-val="シナモン">シナモン</span>
+        <span class="chip" data-val="根菜">根菜</span>
+        <span class="chip" data-val="味噌汁">味噌汁</span>
+        <span class="chip" data-val="白湯">白湯</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px;">🌱 腸を整えるもの</div>
+      <div class="chips" data-category="gut">
+        <span class="chip" data-val="発酵食品">発酵食品</span>
+        <span class="chip" data-val="食物繊維">食物繊維</span>
+        <span class="chip" data-val="ぬか漬け">ぬか漬け</span>
+        <span class="chip" data-val="キムチ">キムチ</span>
+        <span class="chip" data-val="ヨーグルト">ヨーグルト</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px;">🩸 血を補うもの</div>
+      <div class="chips" data-category="blood">
+        <span class="chip" data-val="ほうれん草">ほうれん草</span>
+        <span class="chip" data-val="小松菜">小松菜</span>
+        <span class="chip" data-val="ひじき">ひじき</span>
+        <span class="chip" data-val="プルーン">プルーン</span>
+        <span class="chip" data-val="黒ごま">黒ごま</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px;">🧘 ホルモンを助けるもの</div>
+      <div class="chips" data-category="hormone">
+        <span class="chip" data-val="大豆">大豆</span>
+        <span class="chip" data-val="亜麻仁">亜麻仁</span>
+        <span class="chip" data-val="ナッツ">ナッツ</span>
+        <span class="chip" data-val="豆乳">豆乳</span>
+        <span class="chip" data-val="アボカド">アボカド</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px;">🔄 巡らせるもの</div>
+      <div class="chips" data-category="circulation">
+        <span class="chip" data-val="くるみ">くるみ</span>
+        <span class="chip" data-val="えごま油">えごま油</span>
+        <span class="chip" data-val="海藻">海藻</span>
+        <span class="chip" data-val="玉ねぎ">玉ねぎ</span>
+        <span class="chip" data-val="青魚">青魚</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-bottom:8px;">🚫 控えたもの</div>
+      <div class="chips" data-category="avoided">
+        <span class="chip" data-val="カフェイン">カフェイン</span>
+        <span class="chip" data-val="砂糖">砂糖</span>
+        <span class="chip" data-val="冷たいもの">冷たいもの</span>
+        <span class="chip" data-val="アルコール">アルコール</span>
+        <span class="chip" data-val="加工食品">加工食品</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+    
+    var rs = document.getElementById('screen-record');
+var html = rs.innerHTML;
+var i = html.indexOf('MEAL TIMELINE');
+// MEAL TIMELINEセクションの終わりを探す
+console.log('MEAL周辺:', html.substring(i, i+200));
+// 記録画面の全セクションラベルを確認
+var labels = rs.querySelectorAll('.section-label');
+labels.forEach(function(l, idx){
+  console.log('セクション'+idx+':', l.textContent, '/', l.nextElementSibling ? l.nextElementSibling.textContent : '');
+});
+
     <div class="section-title serif">食事の記録</div>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div>
@@ -3020,6 +3109,17 @@ function saveRecordScreen(){
   rec.temperature = data.temp;
   rec.symptoms = data.symptoms;
   rec.menstrualCycle = data.cycle;
+    // からだのための選択を保存
+  var bodyChoices = {};
+  document.querySelectorAll('#rs-body-choices .chips').forEach(function(group){
+    var cat = group.getAttribute('data-category');
+    var selected = [];
+    group.querySelectorAll('.chip.selected').forEach(function(c){
+      selected.push(c.getAttribute('data-val'));
+    });
+    if(selected.length) bodyChoices[cat] = selected;
+  });
+  rec.bodyChoices = bodyChoices;
   if(data.note) rec.note = data.note;
   saveState();
   updateStats();
