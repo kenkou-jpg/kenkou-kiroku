@@ -4379,6 +4379,190 @@ div.condition-memo-section > *:first-child {
     requestAnimationFrame(draw);
   }
   resize();
+  // ===== CALENDAR + DAY DETAIL =====
+var calYear, calMonth;
+(function(){
+  var now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+})();
+
+function buildCalendar() {
+  var label = document.getElementById('calLabel');
+  var grid = document.getElementById('calGrid');
+  if (!label || !grid) return;
+  label.textContent = calYear + '年 ' + (calMonth + 1) + '月';
+  grid.innerHTML = '';
+
+  var firstDow = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var todayD = new Date();
+
+  // 空白セル
+  for (var e = 0; e < firstDow; e++) {
+    var empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
+  }
+
+  // 日セル
+  for (var d = 1; d <= daysInMonth; d++) {
+    var el = document.createElement('div');
+    el.className = 'cal-day';
+
+    var isToday = (d === todayD.getDate() && calMonth === todayD.getMonth() && calYear === todayD.getFullYear());
+    if (isToday) el.classList.add('today');
+
+    // その日に記録があるか
+    var ds = new Date(calYear, calMonth, d).toDateString();
+    var hasRec = state.records.some(function(r){ return new Date(r.date).toDateString() === ds; });
+    if (hasRec) el.classList.add('has-record');
+
+    el.textContent = d;
+    el.addEventListener('click', (function(day){ return function(){ openDayDetail(day); }; })(d));
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  buildCalendar();
+}
+
+// 月ナビボタン
+document.addEventListener('DOMContentLoaded', function(){
+  var prev = document.getElementById('calPrev');
+  var next = document.getElementById('calNext');
+  if (prev) prev.addEventListener('click', function(){ changeMonth(-1); });
+  if (next) next.addEventListener('click', function(){ changeMonth(1); });
+});
+
+// ── ドーナツSVG描画 ──
+function buildSvgDonut(svgEl, segments) {
+  svgEl.innerHTML = '';
+  var cx = 80, cy = 80, r = 58, sw = 16;
+  var circ = 2 * Math.PI * r;
+  var offset = 0;
+  segments.forEach(function(seg) {
+    if (seg.pct <= 0) return;
+    var len = circ * seg.pct / 100;
+    var gap = circ * 0.006;
+    var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r);
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', seg.color);
+    c.setAttribute('stroke-width', sw); c.setAttribute('stroke-linecap', 'round');
+    c.setAttribute('stroke-dasharray', Math.max(0, len - gap) + ' ' + (circ - (len - gap)));
+    c.setAttribute('stroke-dashoffset', -offset);
+    c.style.transition = 'stroke-dasharray 0.8s ease';
+    svgEl.appendChild(c);
+    offset += len;
+  });
+}
+
+// ── 日付タップ → モーダル表示 ──
+function openDayDetail(d) {
+  var WDAY = ['日','月','火','水','木','金','土'];
+  var dateObj = new Date(calYear, calMonth, d);
+  var ds = dateObj.toDateString();
+  var w = dateObj.getDay();
+
+  // その日の記録を取得
+  var recs = state.records.filter(function(r){ return new Date(r.date).toDateString() === ds; });
+
+  document.getElementById('dmDate').textContent =
+    calYear + '年' + (calMonth + 1) + '月' + d + '日（' + WDAY[w] + '）';
+
+  var body = document.getElementById('dmBody');
+
+  if (recs.length === 0) {
+    body.innerHTML = '<div class="dm-empty">この日の記録はありません<br><span style="font-size:0.75rem;opacity:0.6;">「今日を記録する」から記録すると<br>ここにグラフが表示されます</span></div>';
+    document.getElementById('dmOverlay').classList.add('dm-open');
+    return;
+  }
+
+  // 最新の記録を使用
+  var rec = recs[recs.length - 1];
+  var html = '';
+
+  // 断食データがある場合 → ドーナツグラフ
+  var fastH = rec.fasting || 0;
+  var eatH = 24 - fastH;
+
+  if (fastH > 0) {
+    var fastPct = Math.round(fastH / 24 * 100);
+    var eatPct = 100 - fastPct;
+
+    html += '<div class="dm-donut-wrap">';
+    html += '<svg class="dm-donut-svg" id="dmSvg" viewBox="0 0 160 160"></svg>';
+    html += '<div class="dm-donut-center">';
+    html += '<div class="dm-donut-num">' + fastH + 'h</div>';
+    html += '<div class="dm-donut-label">FASTING</div>';
+    html += '</div></div>';
+
+    html += '<div class="dm-legend">';
+    html += '<span><span class="dm-legend-dot" style="background:var(--ink);"></span>断食 ' + fastPct + '%</span>';
+    html += '<span><span class="dm-legend-dot" style="background:var(--rose);"></span>食事 ' + eatPct + '%</span>';
+    html += '</div>';
+
+    html += '<div class="dm-summary">';
+    html += '<div class="dm-summary-item"><div class="dm-summary-num" style="color:var(--ink);">' + fastH + 'h</div><div class="dm-summary-lbl">断食時間</div></div>';
+    html += '<div class="dm-summary-item"><div class="dm-summary-num" style="color:var(--rose);">' + eatH + 'h</div><div class="dm-summary-lbl">食事ウィンドウ</div></div>';
+    html += '</div>';
+  }
+
+  // 記録タグ表示
+  var tags = [];
+  if (rec.wellness) tags.push('体調 ' + rec.wellness + '/5');
+  if (rec.chakra !== undefined && rec.chakra !== null) {
+    var chakraNames = ['第1チャクラ','第2チャクラ','第3チャクラ','第4チャクラ','第5チャクラ','第6チャクラ'];
+    tags.push(chakraNames[rec.chakra] || 'チャクラ');
+  }
+  if (rec.foodScore) tags.push('食事 ' + rec.foodScore + '/10');
+  if (rec.fasting) tags.push('断食 ' + rec.fasting + 'h');
+  if (rec.emotion) tags.push(rec.emotion);
+  if (rec.foodItems && rec.foodItems.length) tags.push(rec.foodItems.join('・'));
+
+  if (tags.length > 0) {
+    html += '<div class="dm-record-tags">';
+    tags.forEach(function(t){ html += '<span class="dm-tag">' + t + '</span>'; });
+    html += '</div>';
+  }
+
+  // ジャーナルメモ
+  if (rec.note) {
+    html += '<div style="margin-top:12px;padding:14px;background:var(--rose-pale);border-radius:14px;border-left:3px solid var(--rose);">';
+    html += '<div style="font-size:10px;color:var(--rose);letter-spacing:0.15em;margin-bottom:6px;">JOURNAL</div>';
+    html += '<div style="font-size:13px;color:var(--ink);line-height:1.8;">' + rec.note.replace(/\n/g, '<br>') + '</div>';
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+  document.getElementById('dmOverlay').classList.add('dm-open');
+
+  // ドーナツ描画
+  if (fastH > 0) {
+    setTimeout(function(){
+      var svg = document.getElementById('dmSvg');
+      if (!svg) return;
+      var fastPct = Math.round(fastH / 24 * 100);
+      var eatPct = 100 - fastPct;
+      buildSvgDonut(svg, [
+        { color: '#2c2420', pct: fastPct },
+        { color: '#c9747a', pct: eatPct }
+      ]);
+    }, 30);
+  }
+}
+
+// モーダル閉じる
+document.getElementById('dmClose').addEventListener('click', function(){
+  document.getElementById('dmOverlay').classList.remove('dm-open');
+});
+document.getElementById('dmOverlay').addEventListener('click', function(e){
+  if (e.target === this) this.classList.remove('dm-open');
+});
   init();
   draw();
   window.addEventListener('resize', function(){ resize(); init(); });
