@@ -1651,6 +1651,7 @@ function updateStats() {
     foods.length ? (foods.reduce((a,b) => a+b, 0) / foods.length).toFixed(1) : '—';
   document.getElementById('insight-wellness').textContent =
     wellness.length ? (wellness.reduce((a,b) => a+b, 0) / wellness.length).toFixed(1) : '—';
+  buildCalendar();  // ← 追加
 }
 
 function updateUnlock() {
