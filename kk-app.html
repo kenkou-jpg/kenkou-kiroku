@@ -2589,7 +2589,12 @@ function saveSymptomSettings(){
   closeSymptomSettings();
   updateRecordSymptoms();
 }
-
+function updateDiseaseSettingDisplay(){
+  var display = document.getElementById('disease-setting-display');
+  if(!display) return;
+  var saved = state.myDisease || '';
+  display.textContent = saved || '設定する';
+}
 function updateSymptomSettingDisplay(){
   var display = document.getElementById('symptom-setting-display');
   if(!display) return;
@@ -3067,6 +3072,8 @@ document.addEventListener('DOMContentLoaded', function(){
   if(dmClose) dmClose.addEventListener('click', function(){ document.getElementById('dmOverlay').classList.remove('dm-open'); });
   var dmOverlay = document.getElementById('dmOverlay');
   if(dmOverlay) dmOverlay.addEventListener('click', function(e){ if(e.target===e.currentTarget) e.currentTarget.classList.remove('dm-open'); });
+  updateSymptomSettingDisplay();
+  updateDiseaseSettingDisplay();
 });
 
 function openDayDetail(d){
