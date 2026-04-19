@@ -2813,14 +2813,17 @@ function saveEditRecord(){
     state.records.push(rec);
   }
 
-  // 食事
-  var meals = {};
-  var mk = ['morning','lunch','dinner','snack'];
-  for(var i=0;i<mk.length;i++){
-    var v = document.getElementById('edit-meal-'+mk[i]).value.trim();
-    if(v) meals[mk[i]] = v;
-  }
-  rec.meals = meals;
+    // 食事（フリーメモ）
+  var editFreeEl = document.getElementById('edit-meal-free');
+  var editFreeText = editFreeEl ? editFreeEl.value.trim() : '';
+  var editParsed = parseMealMemo(editFreeText);
+  rec.mealFree = editFreeText;
+  rec.meals = { free: editFreeText };
+  rec.firstMealTime = editParsed ? editParsed.firstTime : '';
+  rec.lastMealTime = editParsed ? editParsed.lastTime : '';
+  rec.mealCount = editParsed ? editParsed.mealCount : 0;
+  rec.fasting = editParsed ? editParsed.fastingHours : 0;
+
 
   // 体温
   var tempVal = document.getElementById('edit-temp').value.trim();
