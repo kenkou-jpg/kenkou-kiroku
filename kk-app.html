@@ -1151,6 +1151,29 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
 </style>
 </head>
 <body>
+  
+  <!-- ログイン画面 -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg, #fdf8f0 0%, #f5ede3 100%);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Noto Sans JP',sans-serif;">
+  <div style="width:100%;max-width:360px;">
+    <div style="font-family:'Shippori Mincho',serif;font-size:32px;color:#2d6a4f;margin-bottom:8px;text-align:center;font-weight:bold;">ippo</div>
+    <div style="font-size:12px;color:#666;text-align:center;margin-bottom:40px;">生理周期・卵巣ケア記録アプリ</div>
+    
+    <div style="margin-bottom:20px;">
+      <input id="login-email" type="email" placeholder="メールアドレス" style="width:100%;padding:14px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:'Noto Sans JP',sans-serif;">
+      <input id="login-password" type="password" placeholder="パスワード" style="width:100%;padding:14px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;">
+    </div>
+    
+    <button onclick="loginUser()" style="width:100%;padding:14px;background:#8aab96;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;margin-bottom:12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;">ログイン</button>
+    <button onclick="signupUser()" style="width:100%;padding:14px;background:#d4a574;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;font-size:14px;font-family:'Noto Sans JP',sans-serif;">新規登録</button>
+    
+    <div style="margin-top:20px;font-size:12px;color:#999;text-align:center;line-height:1.6;">
+      <p>このアプリはパソコンとモバイルで  
+データを自動同期します</p>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <div id="app">
 
   <!-- ===== WELCOME ===== -->
@@ -1891,15 +1914,43 @@ const STEPS = [
   }
 ];
 
-  function saveState() {
+function saveState() {
   // バグ16: プライベートブラウジング・容量超過でのクラッシュを防ぐ
   try {
     localStorage.setItem('ippo_state', JSON.stringify(state));
   } catch(e) {
     console.warn('ippo: localStorage save failed', e);
   }
+  
+  // Supabase に保存
+  if (isLoggedIn && currentUserId) {
+    saveStateToSupabase();
+  }
+  
   // クラウド同期
   if(typeof cloudBackupAll === 'function') cloudBackupAll();
+}
+
+async function saveStateToSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('user_data')
+      .upsert({
+        user_id: currentUserId,
+        state: state,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
+    
+    if (error) {
+      console.error('❌ Supabase 保存エラー:', error);
+    } else {
+      console.log('✅ Supabase に保存しました');
+    }
+  } catch (e) {
+    console.error('❌ エラー:', e);
+  }
 }
 
 // ===== INIT =====
@@ -3452,6 +3503,176 @@ function switchTab(tab, btn) {
 document.addEventListener('DOMContentLoaded', function() {
   updateChakraProfileDisplay();
 });
+
+  // ────────────────────────────────────────────────────────────
+// Supabase 初期化
+// ────────────────────────────────────────────────────────────
+
+const SUPABASE_URL = 'https://ekaoojdqhkpeudujfsdh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrYW9vamRxaGtwZXVkdWpmc2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MTg3MTUsImV4cCI6MjA5MjA5NDcxNX0.QPoyDxCrnhNInpfGJ5qOVQqn6OQ7clAoOmGgvqQTGX0';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY );
+
+let currentUserId = null;
+let isLoggedIn = false;
+
+// ユーザー認証状態を監視
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    currentUserId = session.user.id;
+    isLoggedIn = true;
+    console.log('✅ ログイン:', currentUserId);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadStateFromSupabase();
+  } else {
+    currentUserId = null;
+    isLoggedIn = false;
+    console.log('ログアウト');
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+// ページ読み込み時に認証状態を確認
+window.addEventListener('load', async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    currentUserId = session.user.id;
+    isLoggedIn = true;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadStateFromSupabase();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+  
+// ────────────────────────────────────────────────────────────
+// ユーザー認証関数
+// ────────────────────────────────────────────────────────────
+
+async function loginUser() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  
+  if (!email || !password) {
+    alert('メールアドレスとパスワードを入力してください');
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+    
+    if (error) {
+      alert('❌ ログインに失敗しました:\n' + error.message);
+    } else {
+      console.log('✅ ログイン成功');
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+    }
+  } catch (e) {
+    console.error('❌ エラー:', e);
+    alert('ログイン中にエラーが発生しました');
+  }
+}
+
+async function signupUser() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  
+  if (!email || !password) {
+    alert('メールアドレスとパスワードを入力してください');
+    return;
+  }
+  
+  if (password.length < 6) {
+    alert('パスワードは6文字以上で設定してください');
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password
+    });
+    
+    if (error) {
+      alert('❌ 登録に失敗しました:\n' + error.message);
+    } else {
+      alert('✅ 登録成功！\nメールアドレスを確認してからログインしてください');
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+    }
+  } catch (e) {
+    console.error('❌ エラー:', e);
+    alert('登録中にエラーが発生しました');
+  }
+}
+
+async function logoutUser() {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('❌ ログアウトエラー:', error);
+      alert('ログアウトに失敗しました');
+    } else {
+      console.log('✅ ログアウト成功');
+    }
+  } catch (e) {
+    console.error('❌ エラー:', e);
+  }
+}
+
+  // ────────────────────────────────────────────────────────────
+// Supabase からデータを読み込む
+// ────────────────────────────────────────────────────────────
+
+async function loadStateFromSupabase() {
+  if (!isLoggedIn || !currentUserId) {
+    loadStateFromLocalStorage();
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('user_data')
+      .select('state')
+      .eq('user_id', currentUserId)
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase 読み込みエラー:', error);
+      loadStateFromLocalStorage();
+    } else if (data && data.state) {
+      state = data.state;
+      console.log('✅ Supabase からデータを読み込みました');
+      updateUI();
+    } else {
+      loadStateFromLocalStorage();
+    }
+  } catch (e) {
+    console.error('❌ エラー:', e);
+    loadStateFromLocalStorage();
+  }
+}
+
+function loadStateFromLocalStorage() {
+  const saved = localStorage.getItem('ippo_state');
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+      console.log('✅ ローカルストレージからデータを読み込みました');
+      updateUI();
+    } catch (e) {
+      console.error('❌ パースエラー:', e);
+    }
+  }
+}
 
 </script>
 </body>
