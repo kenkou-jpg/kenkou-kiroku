@@ -1478,40 +1478,27 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
     <div class="home-date" id="rec-screen-date"></div>
   </div>
   <div class="section-card">
-    <div class="section-label">MEAL TIMELINE</div>
-
-
+   <div class="section-label">MEAL TIMELINE</div>
     <div class="section-title serif">食事の記録</div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div>
-        <div style="font-size:12px;color:var(--ink-mid);margin-bottom:6px;">🌅 朝食</div>
-        <input class="meal-input" id="rs-morning" placeholder="例）オートミール、味噌汁">
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--ink-mid);margin-bottom:6px;">☀️ 昼食</div>
-        <input class="meal-input" id="rs-lunch" placeholder="例）玄米、焼き魚、サラダ">
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--ink-mid);margin-bottom:6px;">🌙 夕食</div>
-        <input class="meal-input" id="rs-dinner" placeholder="例）鍋、雑穀米">
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--ink-mid);margin-bottom:6px;">🍵 間食</div>
-        <input class="meal-input" id="rs-snack" placeholder="例）ナッツ、ハーブティー">
-      </div>
-      <div style="display:flex;gap:10px;margin-top:4px;">
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--ink-light);margin-bottom:4px;">最初の食事</div>
-          <input type="time" class="meal-time-input" id="rs-first-time">
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--ink-light);margin-bottom:4px;">最後の食事</div>
-          <input type="time" class="meal-time-input" id="rs-last-time">
-        </div>
+    <div style="font-size:12px;color:var(--ink-light);line-height:1.7;margin-bottom:12px;">
+      時間と食べたものを自由に記入してください<br>
+      <span style="font-size:11px;color:var(--ink-light);">例）0930 緑茶、アーモンド / 1300 味噌汁</span>
+    </div>
+    <textarea id="rs-meal-free" placeholder="0930 緑茶、アーモンドコーヒー&#10;1300 味噌汁&#10;1430 レタス、さつまいも&#10;1600 納豆ご飯&#10;1700 アーモンドコーヒー" style="width:100%;min-height:160px;border:1.5px solid #e8ddd8;border-radius:12px;padding:14px;font-family:Noto Sans JP,sans-serif;font-size:13px;color:var(--ink);background:var(--white);resize:vertical;outline:none;line-height:1.9;" onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor='#e8ddd8'"></textarea>
+    <div id="meal-auto-parse" style="margin-top:12px;display:none;padding:14px;background:var(--warm-light);border-radius:12px;">
+      <div style="font-size:11px;color:var(--ink-light);letter-spacing:0.1em;margin-bottom:8px;">AUTO PARSE</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;color:var(--ink);">🍽 <span id="parse-meal-count">0</span>食</div>
+        <div style="font-size:13px;color:var(--ink);">⏰ <span id="parse-first-time">--:--</span>〜<span id="parse-last-time">--:--</span></div>
+        <div style="font-size:13px;color:var(--ink);">🌙 断食 <span id="parse-fasting">0</span>h</div>
       </div>
     </div>
+    <div style="margin-top:10px;text-align:right;">
+      <button onclick="saveMealDraft()" style="font-size:12px;color:var(--ink-light);background:none;border:1px solid #e8ddd8;border-radius:20px;padding:6px 16px;cursor:pointer;">一時保存</button>
+      <span id="draft-saved-msg" style="font-size:11px;color:var(--sage);margin-left:8px;display:none;">✓ 保存しました</span>
+    </div>
   </div>
-  
+
     <!-- ===== からだのための選択（参考欄） ===== -->
   <div class="section-card">
     <div style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="var b=this.nextElementSibling;var a=this.querySelector('.bc-arrow');if(b.style.display==='none'){b.style.display='block';a.textContent='▾';}else{b.style.display='none';a.textContent='▸';}">
@@ -3228,19 +3215,25 @@ function openRecordScreen(){
     try {
       var d = JSON.parse(draft);
       if(new Date(d._draftDate).toDateString() === now.toDateString()){
-        if(d.morning){ var em=document.getElementById('rs-morning'); if(em) em.value=d.morning; }
-        if(d.lunch){ var el2=document.getElementById('rs-lunch'); if(el2) el2.value=d.lunch; }
-        if(d.dinner){ var ed=document.getElementById('rs-dinner'); if(ed) ed.value=d.dinner; }
-        if(d.snack){ var es=document.getElementById('rs-snack'); if(es) es.value=d.snack; }
-        if(d.firstTime){ var ef=document.getElementById('rs-first-time'); if(ef) ef.value=d.firstTime; }
-        if(d.lastTime){ var elt=document.getElementById('rs-last-time'); if(elt) elt.value=d.lastTime; }
-        if(d.temp){ var et=document.getElementById('rs-temp'); if(et) et.value=d.temp; }
+              // フリーメモ下書き復元
+        var mealDraft = localStorage.getItem('ippo_meal_draft');
+        if(mealDraft){
+          try {
+            var md = JSON.parse(mealDraft);
+            if(new Date(md._draftDate).toDateString() === now.toDateString()){
+              var ta = document.getElementById('rs-meal-free');
+              if(ta && md.mealFree){ ta.value = md.mealFree; updateMealParse(); }
+            }
+          } catch(e){}
+        }
+      if(d.temp){ var et=document.getElementById('rs-temp'); if(et) et.value=d.temp; }
         if(d.note){ var en=document.getElementById('rs-note'); if(en) en.value=d.note; }
         if(d.symptoms && d.symptoms.length){
           document.querySelectorAll('#rs-symptoms .chip').forEach(function(c){
             if(d.symptoms.indexOf(c.textContent) !== -1) c.classList.add('selected');
           });
         }
+        
         if(d.cycle){
           document.querySelectorAll('#rs-cycle .chip').forEach(function(c){
             if(c.textContent === d.cycle) c.classList.add('selected');
@@ -3260,6 +3253,74 @@ function toggleRsChip(el){ el.classList.toggle('selected'); }
 function selectRsCycle(el, val){
   document.querySelectorAll('#rs-cycle .chip').forEach(function(c){ c.classList.remove('selected'); });
   el.classList.add('selected');
+}
+// ===== フリーメモ自動解析 =====
+function parseMealMemo(text){
+  var lines = text.split('\n');
+  var times = [];
+  var mealCount = 0;
+  lines.forEach(function(line){
+    var m = line.match(/(\d{1,2}):?(\d{2})/);
+    if(m){
+      var h = parseInt(m[1]);
+      var min = parseInt(m[2]);
+      if(h >= 0 && h <= 23 && min >= 0 && min <= 59){
+        times.push(h * 60 + min);
+        mealCount++;
+      }
+    }
+  });
+  if(times.length === 0) return null;
+  times.sort(function(a,b){ return a-b; });
+  var firstMin = times[0];
+  var lastMin = times[times.length - 1];
+  var eatWindow = lastMin - firstMin;
+  var fastHours = Math.round((1440 - eatWindow) / 60 * 10) / 10;
+  if(fastHours < 0) fastHours = 0;
+  var toTime = function(m){ return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2); };
+  return {
+    mealCount: mealCount,
+    firstTime: toTime(firstMin),
+    lastTime: toTime(lastMin),
+    fastingHours: fastHours
+  };
+}
+
+function updateMealParse(){
+  var ta = document.getElementById('rs-meal-free');
+  var box = document.getElementById('meal-auto-parse');
+  if(!ta || !box) return;
+  var result = parseMealMemo(ta.value);
+  if(result && result.mealCount > 0){
+    box.style.display = 'block';
+    document.getElementById('parse-meal-count').textContent = result.mealCount;
+    document.getElementById('parse-first-time').textContent = result.firstTime;
+    document.getElementById('parse-last-time').textContent = result.lastTime;
+    document.getElementById('parse-fasting').textContent = result.fastingHours;
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+// テキストエリア入力時にリアルタイム解析
+document.addEventListener('input', function(e){
+  if(e.target.id === 'rs-meal-free') updateMealParse();
+});
+
+// 一時保存
+function saveMealDraft(){
+  var ta = document.getElementById('rs-meal-free');
+  if(!ta) return;
+  var draft = {
+    mealFree: ta.value,
+    _draftDate: new Date().toISOString()
+  };
+  localStorage.setItem('ippo_meal_draft', JSON.stringify(draft));
+  var msg = document.getElementById('draft-saved-msg');
+  if(msg){
+    msg.style.display = 'inline';
+    setTimeout(function(){ msg.style.display = 'none'; }, 2000);
+  }
 }
 
 function gatherRecordData(){
@@ -3298,9 +3359,17 @@ function saveRecordScreen(){
     rec = { date: new Date().toISOString() };
     state.records.push(rec);
   }
-  rec.meals = { morning:data.morning, lunch:data.lunch, dinner:data.dinner, snack:data.snack };
-  rec.firstMealTime = data.firstTime;
-  rec.lastMealTime = data.lastTime;
+   // フリーメモから食事データを取得
+  var mealFreeEl = document.getElementById('rs-meal-free');
+  var mealFreeText = mealFreeEl ? mealFreeEl.value.trim() : '';
+  var parsed = parseMealMemo(mealFreeText);
+  rec.mealFree = mealFreeText;
+  rec.meals = { free: mealFreeText };
+  rec.firstMealTime = parsed ? parsed.firstTime : '';
+  rec.lastMealTime = parsed ? parsed.lastTime : '';
+  rec.mealCount = parsed ? parsed.mealCount : 0;
+  rec.fasting = parsed ? parsed.fastingHours : 0;
+  localStorage.removeItem('ippo_meal_draft');
   rec.temperature = data.temp;
   rec.symptoms = data.symptoms;
   rec.menstrualCycle = data.cycle;
