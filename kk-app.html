@@ -1419,6 +1419,26 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
 
     </div> <!-- screen-insights 終了 -->
 
+     <!-- ===== BOTTOM NAV ===== -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <span>ホーム</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('insights', this)">
+        <span class="nav-icon">📊</span>
+        <span>インサイト</span>
+      </button>
+      <button class="nav-item" onclick="openRecordScreen()">
+        <span class="nav-icon" style="font-size: 28px; margin-top: -6px;">⊕</span>
+        <span>記録</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('settings', this)">
+        <span class="nav-icon">⚙️</span>
+        <span>設定</span>
+      </button>
+    </nav>
+
   <!-- ===== RECORD SCREEN ===== -->
 <div id="screen-record" class="screen">
   <div class="spacer-top"></div>
@@ -1727,26 +1747,6 @@ labels.forEach(function(l, idx){
       </div>
     </div>
    </div>
-
-    <!-- ===== BOTTOM NAV ===== -->
-    <nav class="bottom-nav">
-      <button class="nav-item active" onclick="switchTab('home', this)">
-        <span class="nav-icon">🏠</span>
-        <span>ホーム</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('insights', this)">
-        <span class="nav-icon">📊</span>
-        <span>インサイト</span>
-      </button>
-     <button class="nav-item" onclick="openRecordScreen()">
-        <span class="nav-icon" style="font-size: 28px; margin-top: -6px;">⊕</span>
-        <span>記録</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('settings', this)">
-        <span class="nav-icon">⚙️</span>
-        <span>設定</span>
-      </button>
-    </nav>
 
   <!-- ===== RECORD MODAL ===== -->
   <div class="modal-overlay" id="record-modal" onclick="closeModal()">
