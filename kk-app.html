@@ -2974,12 +2974,24 @@ function createMealDonut(meals, fasting, fastingGoal){
   html += '</svg>';
   // 中央テキスト
   html += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;">';
-   if(fasting){
-    var fH2 = parseFloat(fasting) || 0;
-    var fGoalH = fastingGoal || 16;
-    html += '<div style="font-family:Shippori Mincho,serif;font-size:22px;font-weight:700;color:'+fastColor+';">'+fH2+'<span style="font-size:12px;font-weight:400;">h</span></div>';
+    // 断食時間を計算（fasting値がない場合はfirstMealTime/lastMealTimeから算出）
+  var fastHours = 0;
+  if(fasting){
+    fastHours = parseFloat(fasting) || 0;
+  } else if(meals && meals.firstTime && meals.lastTime){
+    var lp = meals.lastTime.split(':');
+    var fp = meals.firstTime.split(':');
+    var lastMin = parseInt(lp[0]) * 60 + parseInt(lp[1] || 0);
+    var firstMin = parseInt(fp[0]) * 60 + parseInt(fp[1] || 0);
+    var eatWindow = lastMin > firstMin ? lastMin - firstMin : (lastMin + 1440) - firstMin;
+    fastHours = Math.round((1440 - eatWindow) / 60 * 10) / 10;
+    if(fastHours < 0 || fastHours > 24) fastHours = 0;
+  }
+  var fGoalH = fastingGoal || 16;
+  if(fastHours > 0){
+    html += '<div style="font-family:Shippori Mincho,serif;font-size:22px;font-weight:700;color:'+fastColor+';">'+fastHours+'<span style="font-size:12px;font-weight:400;">h</span></div>';
     html += '<div style="font-size:8px;color:var(--ink-light);letter-spacing:0.1em;margin-top:2px;">断食時間</div>';
-    html += '<div style="font-size:9px;color:'+(fH2>=fGoalH?'#8aab96':'var(--ink-light)')+';margin-top:3px;">'+(fH2>=fGoalH?'✓ 目標達成':'目標 '+fGoalH+'h')+'</div>';
+    html += '<div style="font-size:9px;color:'+(fastHours>=fGoalH?'#8aab96':'var(--ink-light)')+';margin-top:3px;">'+(fastHours>=fGoalH?'✓ 目標達成':'目標 '+fGoalH+'h')+'</div>';
   } else {
     html += '<div style="font-family:Shippori Mincho,serif;font-size:20px;font-weight:700;color:var(--ink);">'+filledMeals.length+'<span style="font-size:13px;font-weight:400;color:var(--ink-light);">/4</span></div>';
     html += '<div style="font-size:8px;color:var(--ink-light);letter-spacing:0.12em;margin-top:2px;">meals</div>';
@@ -3160,7 +3172,11 @@ function openDayDetail(d){
   if(rec.meals){
     html += '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0ebe6;">';
     html += '<div style="font-size:11px;color:var(--ink-light);letter-spacing:0.15em;margin-bottom:12px;">記録サマリー</div>';
-    html += createMealDonut(rec.meals, rec.fasting, rec.fastingGoal);
+    var mealsWithTime = rec.meals || {};
+    if(rec.firstMealTime) mealsWithTime.firstTime = rec.firstMealTime;
+    if(rec.lastMealTime) mealsWithTime.lastTime = rec.lastMealTime;
+    html += createMealDonut(mealsWithTime, rec.fasting, rec.fastingGoal);
+
     html += '</div>';
   }
 
