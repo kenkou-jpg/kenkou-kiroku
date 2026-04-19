@@ -1449,17 +1449,6 @@ h1, h2, h3, .serif { font-family: 'Shippori Mincho', serif; }
   <div class="section-card">
     <div class="section-label">MEAL TIMELINE</div>
 
-    
-    var rs = document.getElementById('screen-record');
-var html = rs.innerHTML;
-var i = html.indexOf('MEAL TIMELINE');
-// MEAL TIMELINEセクションの終わりを探す
-console.log('MEAL周辺:', html.substring(i, i+200));
-// 記録画面の全セクションラベルを確認
-var labels = rs.querySelectorAll('.section-label');
-labels.forEach(function(l, idx){
-  console.log('セクション'+idx+':', l.textContent, '/', l.nextElementSibling ? l.nextElementSibling.textContent : '');
-});
 
     <div class="section-title serif">食事の記録</div>
     <div style="display:flex;flex-direction:column;gap:14px;">
