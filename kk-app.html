@@ -2974,11 +2974,15 @@ function createMealDonut(meals, fasting, fastingGoal){
   html += '</svg>';
   // 中央テキスト
   html += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;">';
-  html += '<div style="font-family:Shippori Mincho,serif;font-size:20px;font-weight:700;color:var(--ink);">'+filledMeals.length+'<span style="font-size:13px;font-weight:400;color:var(--ink-light);">/4</span></div>';
-  html += '<div style="font-size:8px;color:var(--ink-light);letter-spacing:0.12em;margin-top:2px;">meals</div>';
-  if(fasting){
+   if(fasting){
     var fH2 = parseFloat(fasting) || 0;
-    html += '<div style="font-size:9px;color:'+fastColor+';margin-top:4px;font-weight:500;">🌙 '+fH2+'h断食</div>';
+    var fGoalH = fastingGoal || 16;
+    html += '<div style="font-family:Shippori Mincho,serif;font-size:22px;font-weight:700;color:'+fastColor+';">'+fH2+'<span style="font-size:12px;font-weight:400;">h</span></div>';
+    html += '<div style="font-size:8px;color:var(--ink-light);letter-spacing:0.1em;margin-top:2px;">断食時間</div>';
+    html += '<div style="font-size:9px;color:'+(fH2>=fGoalH?'#8aab96':'var(--ink-light)')+';margin-top:3px;">'+(fH2>=fGoalH?'✓ 目標達成':'目標 '+fGoalH+'h')+'</div>';
+  } else {
+    html += '<div style="font-family:Shippori Mincho,serif;font-size:20px;font-weight:700;color:var(--ink);">'+filledMeals.length+'<span style="font-size:13px;font-weight:400;color:var(--ink-light);">/4</span></div>';
+    html += '<div style="font-size:8px;color:var(--ink-light);letter-spacing:0.12em;margin-top:2px;">meals</div>';
   }
   html += '</div></div>';
 
